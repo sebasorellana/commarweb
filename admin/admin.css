@@ -1048,11 +1048,23 @@ img {
 }
 
 .admin-settings-container {
-    max-width: 960px;
+    width: 100%;
 }
 
 .admin-settings-form {
+    grid-template-columns: minmax(0, 1fr);
     padding-bottom: 6.5rem;
+}
+
+@media (min-width: 1180px) {
+    .admin-settings-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+    }
+
+    .admin-settings-form .admin-settings-section:last-of-type {
+        grid-column: 1 / -1;
+    }
 }
 
 .admin-settings-section {
@@ -1100,7 +1112,7 @@ img {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    max-width: 960px;
+    width: 100%;
 }
 
 .admin-settings-savebar-inner span {

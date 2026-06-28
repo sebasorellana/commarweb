@@ -1,0 +1,36 @@
+name: Deploy production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure SSH
+        env:
+          CPANEL_SSH_PRIVATE_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY }}
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_PORT: ${{ secrets.CPANEL_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$CPANEL_SSH_PRIVATE_KEY" > ~/.ssh/cpanel_deploy_key
+          chmod 600 ~/.ssh/cpanel_deploy_key
+          ssh-keyscan -p "${CPANEL_PORT:-22}" "$CPANEL_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy on cPanel
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_PORT: ${{ secrets.CPANEL_PORT }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_REPO_PATH: ${{ secrets.CPANEL_REPO_PATH }}
+          CPANEL_PUBLIC_PATH: ${{ secrets.CPANEL_PUBLIC_PATH }}
+        run: |
+          ssh -i ~/.ssh/cpanel_deploy_key -p "${CPANEL_PORT:-22}" "$CPANEL_USER@$CPANEL_HOST" "
+            set -e
+            cd '$CPANEL_REPO_PATH'
+            git pull origin main
+            tar --exclude='.git' --exclude='admin/config.php' --exclude='includes/db-config.php' --exclude='.DS_Store' -cf - . | tar -xf - -C '$CPANEL_PUBLIC_PATH'
+          "

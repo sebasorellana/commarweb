@@ -21,6 +21,9 @@ if (!function_exists('commar_default_settings')) {
             'instagram_url' => '',
             'linkedin_url' => '',
             'whatsapp_number' => '5491100000000',
+            'maintenance_enabled' => '0',
+            'maintenance_title' => 'Sitio en mantenimiento',
+            'maintenance_message' => 'Estamos realizando tareas de actualización. Volveremos a estar disponibles en breve.',
         ];
     }
 }

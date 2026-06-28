@@ -69,3 +69,154 @@ if (!function_exists('commar_contact_address_lines')) {
         return array_values(array_filter(array_map('trim', $lines), static fn(string $line): bool => $line !== ''));
     }
 }
+
+if (!function_exists('commar_maintenance_enabled')) {
+    function commar_maintenance_enabled(): bool
+    {
+        return (string) commar_setting('maintenance_enabled') === '1';
+    }
+}
+
+if (!function_exists('commar_whatsapp_number_label')) {
+    function commar_whatsapp_number_label(): string
+    {
+        $phone = preg_replace('/\D+/', '', (string) commar_setting('whatsapp_number')) ?: '5491100000000';
+
+        return '+' . $phone;
+    }
+}
+
+if (!function_exists('commar_render_maintenance_page')) {
+    function commar_render_maintenance_page(): void
+    {
+        $title = trim((string) commar_setting('maintenance_title')) ?: 'Sitio en mantenimiento';
+        $message = trim((string) commar_setting('maintenance_message')) ?: 'Estamos realizando tareas de actualización. Volveremos a estar disponibles en breve.';
+        $email = commar_contact_email();
+        $whatsappLabel = commar_whatsapp_number_label();
+        $whatsappUrl = commar_whatsapp_url('Hola COMMAR GROUP, quisiera recibir mas informacion.');
+
+        http_response_code(503);
+        header('Retry-After: 3600');
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title><?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?> | COMMAR GROUP</title>
+    <link rel="icon" type="image/png" href="img/logo-commar-500.png">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 2rem;
+            background: #0b0d0f;
+            color: #f8fafc;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .maintenance-page {
+            width: min(100%, 760px);
+            display: grid;
+            gap: 2.5rem;
+        }
+        .maintenance-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+        .maintenance-brand img {
+            width: 42px;
+            height: 48px;
+            object-fit: contain;
+        }
+        .maintenance-content {
+            display: grid;
+            gap: 1.25rem;
+        }
+        .maintenance-kicker {
+            margin: 0;
+            color: #9ca3af;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+        h1 {
+            margin: 0;
+            max-width: 11ch;
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            line-height: 0.92;
+            letter-spacing: 0;
+        }
+        .maintenance-message {
+            margin: 0;
+            max-width: 620px;
+            color: #d1d5db;
+            font-size: clamp(1rem, 2.2vw, 1.25rem);
+            line-height: 1.65;
+        }
+        .maintenance-contact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding-top: 0.5rem;
+        }
+        .maintenance-contact a {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            padding: 0.7rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 6px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .maintenance-footer {
+            color: #6b7280;
+            font-size: 0.76rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <main class="maintenance-page">
+        <div class="maintenance-brand">
+            <img src="img/logo-commar-500.png" alt="" width="500" height="578">
+            <span>COMMAR GROUP</span>
+        </div>
+        <section class="maintenance-content" aria-labelledby="maintenance-title">
+            <p class="maintenance-kicker">Sitio fuera de línea</p>
+            <h1 id="maintenance-title"><?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></h1>
+            <p class="maintenance-message"><?php echo nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')); ?></p>
+            <div class="maintenance-contact" aria-label="Canales de contacto">
+                <a href="mailto:<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?></a>
+                <a href="<?php echo htmlspecialchars($whatsappUrl, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($whatsappLabel, ENT_QUOTES, 'UTF-8'); ?></a>
+            </div>
+        </section>
+        <p class="maintenance-footer">Volveremos pronto</p>
+    </main>
+</body>
+</html>
+        <?php
+        exit;
+    }
+}
+
+if (PHP_SAPI !== 'cli' && commar_maintenance_enabled()) {
+    commar_render_maintenance_page();
+}

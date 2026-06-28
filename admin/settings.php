@@ -15,6 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $settings['instagram_url'] = trim((string) ($_POST['instagram_url'] ?? ''));
     $settings['linkedin_url'] = trim((string) ($_POST['linkedin_url'] ?? ''));
     $settings['whatsapp_number'] = preg_replace('/\D+/', '', (string) ($_POST['whatsapp_number'] ?? '')) ?? '';
+    $settings['maintenance_enabled'] = isset($_POST['maintenance_enabled']) ? '1' : '0';
+    $settings['maintenance_title'] = trim((string) ($_POST['maintenance_title'] ?? ''));
+    $settings['maintenance_message'] = trim((string) ($_POST['maintenance_message'] ?? ''));
 
     if ($settings['contact_email'] !== '' && !filter_var($settings['contact_email'], FILTER_VALIDATE_EMAIL)) {
         $errors[] = 'El email de contacto no es válido.';
@@ -30,6 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if ($settings['maintenance_enabled'] === '1' && $settings['maintenance_title'] === '') {
+        $errors[] = 'El título de mantenimiento es obligatorio si el sitio está fuera de línea.';
+    }
+
+    if ($settings['maintenance_enabled'] === '1' && $settings['maintenance_message'] === '') {
+        $errors[] = 'El mensaje de mantenimiento es obligatorio si el sitio está fuera de línea.';
+    }
+
     if ($errors === []) {
         commar_save_settings([
             'contact_email' => $settings['contact_email'],
@@ -38,6 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'instagram_url' => $settings['instagram_url'],
             'linkedin_url' => $settings['linkedin_url'],
             'whatsapp_number' => $settings['whatsapp_number'],
+            'maintenance_enabled' => $settings['maintenance_enabled'],
+            'maintenance_title' => $settings['maintenance_title'],
+            'maintenance_message' => $settings['maintenance_message'],
         ]);
 
         header('Location: settings.php?updated=1');
@@ -117,6 +131,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input type="tel" name="whatsapp_number" value="<?php echo commar_admin_h((string) $settings['whatsapp_number']); ?>" placeholder="5491100000000">
                                 <span class="admin-help">Usá código de país y área, sin espacios ni símbolos. Ejemplo: 5491100000000.</span>
                             </label>
+                        </section>
+
+                        <section class="admin-settings-section">
+                            <div class="admin-section-head">
+                                <span class="admin-kicker">Disponibilidad</span>
+                                <h3>Sitio fuera de línea</h3>
+                            </div>
+                            <label class="admin-toggle-row">
+                                <input type="checkbox" name="maintenance_enabled" value="1" <?php echo ((string) ($settings['maintenance_enabled'] ?? '0')) === '1' ? 'checked' : ''; ?>>
+                                <span>
+                                    Activar página de mantenimiento
+                                    <small>Los visitantes verán una pantalla temporal. El backend seguirá disponible.</small>
+                                </span>
+                            </label>
+                            <div class="admin-grid">
+                                <label>
+                                    Título
+                                    <input type="text" name="maintenance_title" value="<?php echo commar_admin_h((string) ($settings['maintenance_title'] ?? 'Sitio en mantenimiento')); ?>" maxlength="140">
+                                </label>
+                                <label>
+                                    Mensaje
+                                    <textarea name="maintenance_message" rows="4"><?php echo commar_admin_h((string) ($settings['maintenance_message'] ?? 'Estamos realizando tareas de actualización. Volveremos a estar disponibles en breve.')); ?></textarea>
+                                </label>
+                            </div>
+                            <span class="admin-help">La página también mostrará el email público y el número de WhatsApp configurados arriba.</span>
                         </section>
 
                         <button type="submit" class="admin-button-primary">Guardar configuración</button>

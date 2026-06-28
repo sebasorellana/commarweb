@@ -88,6 +88,17 @@ if (!function_exists('commar_is_admin_request')) {
     }
 }
 
+if (!function_exists('commar_admin_session_active')) {
+    function commar_admin_session_active(): bool
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE && isset($_COOKIE[session_name()])) {
+            session_start();
+        }
+
+        return ($_SESSION['commar_admin'] ?? false) === true;
+    }
+}
+
 if (!function_exists('commar_whatsapp_number_label')) {
     function commar_whatsapp_number_label(): string
     {
@@ -252,6 +263,6 @@ if (!function_exists('commar_render_maintenance_page')) {
     }
 }
 
-if (PHP_SAPI !== 'cli' && !commar_is_admin_request() && commar_maintenance_enabled()) {
+if (PHP_SAPI !== 'cli' && !commar_is_admin_request() && !commar_admin_session_active() && commar_maintenance_enabled()) {
     commar_render_maintenance_page();
 }

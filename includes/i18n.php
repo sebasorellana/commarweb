@@ -186,7 +186,7 @@ if (!function_exists('commar_localized_path')) {
         $parts = explode('#', $href, 2);
         $pathAndQuery = $parts[0];
         $fragment = isset($parts[1]) ? '#' . $parts[1] : '';
-        $separator = str_contains($pathAndQuery, '?') ? '&' : '?';
+        $separator = strpos($pathAndQuery, '?') !== false ? '&' : '?';
 
         return $pathAndQuery . $separator . 'lang=' . rawurlencode($lang) . $fragment;
     }

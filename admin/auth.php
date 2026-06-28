@@ -19,7 +19,7 @@ function commar_admin_require_login(): void
 {
     if (!commar_admin_is_logged_in()) {
         $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/admin/index.php')), '/');
-        $adminDir = str_ends_with($scriptDir, '/admin') ? $scriptDir : '/admin';
+        $adminDir = substr($scriptDir, -6) === '/admin' ? $scriptDir : '/admin';
 
         header('Location: ' . $adminDir . '/login.php');
         exit;

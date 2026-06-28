@@ -1,0 +1,88 @@
+<?php require_once __DIR__ . '/includes/site.php'; ?>
+<!DOCTYPE html>
+<html lang="<?php echo htmlspecialchars(commar_lang_attr(), ENT_QUOTES, 'UTF-8'); ?>">
+<head>
+    <?php
+    require_once __DIR__ . '/includes/site.php';
+    require_once __DIR__ . '/includes/articles.php';
+
+    $articles = commar_articles();
+    $seo = [
+        'title' => 'Blog',
+        'description' => 'Artículos de COMMAR GROUP sobre arquitectura, construcción, documentación técnica, gestión de obra y estrategias ambientales.',
+        'path' => 'blog.php',
+        'image' => 'img/logo-commar-500.png',
+        'image_alt' => 'COMMAR GROUP',
+        'og_type' => 'website',
+        'json_ld' => [
+            [
+                '@context' => 'https://schema.org',
+                '@type' => 'Blog',
+                'name' => 'Blog COMMAR GROUP',
+                'description' => 'Artículos sobre arquitectura, construcción, documentación técnica y estrategias ambientales.',
+                'url' => commar_absolute_url(commar_url('blog.php')),
+                'inLanguage' => commar_lang_attr(),
+            ],
+        ],
+    ];
+    include __DIR__ . '/includes/seo.php';
+    ?>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
+    <link rel="stylesheet" href="style.css?v=20260508-1">
+</head>
+<body>
+    <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
+    <?php
+    $headerVariant = 'default';
+    $menuItems = [
+        ['label' => 'Inicio', 'href' => 'index.php'],
+        ['label' => 'El estudio', 'href' => 'el-estudio.php'],
+        ['label' => 'Servicios', 'href' => 'servicios.php'],
+        ['label' => 'Obra Viva', 'href' => 'obra-viva.php'],
+        ['label' => 'Obras', 'href' => 'obras.php'],
+        ['label' => 'Blog', 'href' => 'blog.php'],
+        ['label' => 'Contacto', 'href' => 'contacto.php'],
+    ];
+    include __DIR__ . '/includes/header.php';
+    ?>
+
+    <main>
+        <section class="blog-page" aria-labelledby="blog-title">
+            <div class="site-shell-wide">
+                <header class="blog-header">
+                    <span class="blog-kicker">Blog</span>
+                    <h1 id="blog-title" class="blog-title">Artículos de COMMAR GROUP</h1>
+                    <p class="blog-intro">Ideas y criterios prácticos sobre arquitectura, construcción, gestión de obra, documentación técnica y medio ambiente.</p>
+                </header>
+
+                <div class="blog-list">
+                    <?php foreach ($articles as $article): ?>
+                        <article class="blog-card">
+                            <a href="<?php echo htmlspecialchars(commar_url($article['url']), ENT_QUOTES, 'UTF-8'); ?>" class="blog-card-media<?php echo $article['image'] === '' ? ' is-placeholder' : ''; ?>" aria-label="<?php echo htmlspecialchars($article['title'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <img src="<?php echo htmlspecialchars($article['display_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $article['display_image_width']; ?>" height="<?php echo (int) $article['display_image_height']; ?>" loading="lazy" decoding="async" class="blog-card-image">
+                            </a>
+                            <div class="blog-card-copy">
+                                <span class="blog-card-meta"><?php echo htmlspecialchars($article['category'], ENT_QUOTES, 'UTF-8'); ?> // <?php echo htmlspecialchars($article['year'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                <h2 class="blog-card-title"><a href="<?php echo htmlspecialchars(commar_url($article['url']), ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($article['title'], ENT_QUOTES, 'UTF-8'); ?></a></h2>
+                                <?php if (!empty($article['tags'])): ?>
+                                    <div class="article-tag-list">
+                                        <?php foreach ($article['tags'] as $tag): ?>
+                                            <span><?php echo htmlspecialchars((string) $tag, ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                                <p class="blog-card-description"><?php echo htmlspecialchars($article['description'], ENT_QUOTES, 'UTF-8'); ?></p>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <?php include __DIR__ . '/includes/footer.php'; ?>
+    <script src="script.js?v=20260508-1" defer></script>
+</body>
+</html>

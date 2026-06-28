@@ -117,11 +117,35 @@ if (!function_exists('commar_render_maintenance_page')) {
             display: grid;
             place-items: center;
             padding: 2rem;
-            background: #0b0d0f;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 12% 18%, rgba(36, 120, 190, 0.95), transparent 36rem),
+                radial-gradient(circle at 82% 22%, rgba(164, 211, 55, 0.82), transparent 30rem),
+                radial-gradient(circle at 62% 86%, rgba(18, 77, 151, 0.86), transparent 32rem),
+                linear-gradient(135deg, #07121f 0%, #101820 48%, #17210d 100%);
             color: #f8fafc;
             font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+        }
+        body::before {
+            background:
+                radial-gradient(ellipse at 28% 72%, rgba(255, 255, 255, 0.12), transparent 28rem),
+                radial-gradient(ellipse at 74% 64%, rgba(164, 211, 55, 0.18), transparent 24rem);
+            filter: blur(34px);
+            transform: scale(1.08);
+        }
+        body::after {
+            background: rgba(0, 0, 0, 0.58);
+        }
         .maintenance-page {
+            position: relative;
+            z-index: 1;
             width: min(100%, 760px);
             display: grid;
             gap: 2.5rem;

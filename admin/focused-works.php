@@ -9,6 +9,8 @@ $updated = ($_GET['updated'] ?? '') === '1';
 $created = ($_GET['created'] ?? '') === '1';
 $deleted = ($_GET['deleted'] ?? '') === '1';
 $reordered = ($_GET['reordered'] ?? '') === '1';
+$visibleLang = isset($worksByLang['es']) ? 'es' : (array_key_first($worksByLang) ?? 'es');
+$visibleWorks = $worksByLang[$visibleLang] ?? [];
 
 ?>
 <!DOCTYPE html>
@@ -49,14 +51,13 @@ $reordered = ($_GET['reordered'] ?? '') === '1';
                         <p class="admin-alert admin-alert-success">Orden actualizado.</p>
                     <?php endif; ?>
 
-                    <?php if (empty($worksByLang)): ?>
+                    <?php if (empty($visibleWorks)): ?>
                         <p class="admin-empty">No hay obras en foco cargadas.</p>
                     <?php else: ?>
                         <div class="admin-focused-works-langs">
-                        <?php foreach ($worksByLang as $lang => $works): ?>
                             <div class="admin-focused-works-lang-group">
                                 <form action="reorder-focused-works.php" method="post">
-                                    <input type="hidden" name="lang" value="<?php echo commar_admin_h($lang); ?>">
+                                    <input type="hidden" name="lang" value="<?php echo commar_admin_h($visibleLang); ?>">
                                     <div class="admin-table-wrap">
                                         <table class="admin-post-table">
                                             <thead>
@@ -67,7 +68,7 @@ $reordered = ($_GET['reordered'] ?? '') === '1';
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php foreach ($works as $work): ?>
+                                                <?php foreach ($visibleWorks as $work): ?>
                                                     <tr>
                                                         <td>
                                                             <div class="admin-post-title">
@@ -96,7 +97,6 @@ $reordered = ($_GET['reordered'] ?? '') === '1';
                                     </div>
                                 </form>
                             </div>
-                        <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
                 </section>

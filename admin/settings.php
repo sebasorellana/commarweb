@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     <?php endif; ?>
 
-                    <form method="post" class="admin-form">
+                    <form method="post" class="admin-form admin-settings-form">
                         <section class="admin-settings-section">
                             <div class="admin-section-head">
                                 <span class="admin-kicker">Datos de contacto</span>
@@ -158,7 +158,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <span class="admin-help">La página también mostrará el email público y el número de WhatsApp configurados arriba.</span>
                         </section>
 
-                        <button type="submit" class="admin-button-primary">Guardar configuración</button>
+                        <div class="admin-settings-savebar">
+                            <div class="admin-settings-savebar-inner">
+                                <span>Configuración general</span>
+                                <button type="submit" class="admin-button-primary">Guardar configuración</button>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </main>

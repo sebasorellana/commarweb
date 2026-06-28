@@ -1005,8 +1005,54 @@ img {
 }
 
 /* Settings Page */
+.admin-subnav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    max-width: 100%;
+    padding: 0.35rem;
+    margin: 0 0 1.25rem;
+    overflow-x: auto;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: var(--admin-shadow);
+    backdrop-filter: blur(12px);
+}
+
+.admin-subnav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 0.55rem 0.9rem;
+    border-radius: 0.35rem;
+    color: var(--admin-text-secondary);
+    font-size: 0.88rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.admin-subnav a:hover {
+    background: var(--admin-bg);
+    color: var(--admin-text-primary);
+}
+
+.admin-subnav a.is-active {
+    background: var(--admin-primary-color);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(11, 59, 143, 0.18);
+}
+
 .admin-settings-container {
     max-width: 960px;
+}
+
+.admin-settings-form {
+    padding-bottom: 6.5rem;
 }
 
 .admin-settings-section {
@@ -1034,6 +1080,37 @@ img {
     .admin-settings-email-grid {
         grid-template-columns: 1fr 1fr;
     }
+}
+
+.admin-settings-savebar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: var(--admin-sidebar-width);
+    z-index: 80;
+    padding: 0.85rem 1.5rem;
+    border-top: 1px solid var(--admin-border-color);
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 -14px 30px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(14px);
+}
+
+.admin-settings-savebar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 960px;
+}
+
+.admin-settings-savebar-inner span {
+    color: var(--admin-text-secondary);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.admin-settings-savebar .admin-button-primary {
+    min-width: 210px;
 }
 
 /* Rich Editor */
@@ -1202,6 +1279,24 @@ img {
     }
     .admin-content {
         padding: 1rem;
+    }
+    .admin-subnav {
+        display: flex;
+        width: 100%;
+    }
+    .admin-settings-savebar {
+        left: 0;
+        padding: 0.75rem 1rem;
+    }
+    .admin-settings-savebar-inner {
+        max-width: none;
+    }
+    .admin-settings-savebar-inner span {
+        display: none;
+    }
+    .admin-settings-savebar .admin-button-primary {
+        width: 100%;
+        min-width: 0;
     }
     .admin-topbar {
         flex-direction: column;

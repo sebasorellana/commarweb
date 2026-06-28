@@ -29,13 +29,16 @@ if (!is_array($heroImages) || count($heroImages) === 0) {
         <div class="admin-main">
             <?php commar_admin_header('Página Home'); ?>
 
-            <main class="admin-content admin-dashboard-grid">
-                <section class="admin-panel">
-                    <h2>Hero de la home</h2>
-                    <?php if ($updated): ?>
-                        <p class="admin-alert admin-alert-success">Hero actualizado.</p>
-                    <?php endif; ?>
-                    <form action="save-home.php" method="post" enctype="multipart/form-data" class="admin-form">
+            <main class="admin-content">
+                <?php commar_admin_home_nav('hero'); ?>
+
+                <div class="admin-dashboard-grid">
+                    <section class="admin-panel">
+                        <h2>Hero de la home</h2>
+                        <?php if ($updated): ?>
+                            <p class="admin-alert admin-alert-success">Hero actualizado.</p>
+                        <?php endif; ?>
+                        <form action="save-home.php" method="post" enctype="multipart/form-data" class="admin-form">
                         <label>
                             Modo del texto principal
                             <select name="home_hero_text_mode">
@@ -79,21 +82,22 @@ if (!is_array($heroImages) || count($heroImages) === 0) {
                             <span class="admin-help">Tiempo entre imágenes en milisegundos. Ejemplo: 5000 = 5 segundos.</span>
                         </label>
 
-                        <button type="submit">Actualizar hero</button>
-                    </form>
-                </section>
+                            <button type="submit">Actualizar hero</button>
+                        </form>
+                    </section>
 
-                <aside class="admin-panel">
-                    <h2>Imágenes actuales</h2>
-                    <div class="admin-hero-preview-list">
-                        <?php foreach (array_slice($heroImages, 0, 3) as $image): ?>
-                            <figure class="admin-hero-preview">
-                                <img src="../<?php echo commar_admin_h((string) ($image['path'] ?? '')); ?>" alt="Imagen actual del hero home">
-                                <figcaption><?php echo commar_admin_h((string) ($image['path'] ?? '')); ?></figcaption>
-                            </figure>
-                        <?php endforeach; ?>
-                    </div>
-                </aside>
+                    <aside class="admin-panel">
+                        <h2>Imágenes actuales</h2>
+                        <div class="admin-hero-preview-list">
+                            <?php foreach (array_slice($heroImages, 0, 3) as $image): ?>
+                                <figure class="admin-hero-preview">
+                                    <img src="../<?php echo commar_admin_h((string) ($image['path'] ?? '')); ?>" alt="Imagen actual del hero home">
+                                    <figcaption><?php echo commar_admin_h((string) ($image['path'] ?? '')); ?></figcaption>
+                                </figure>
+                            <?php endforeach; ?>
+                        </div>
+                    </aside>
+                </div>
             </main>
 
             <?php commar_admin_footer(); ?>

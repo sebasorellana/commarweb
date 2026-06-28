@@ -27,10 +27,12 @@ $pageTitle = $isEditing ? 'Editar obra en foco' : 'Nueva obra en foco';
 </head>
 <body class="admin-page">
     <div class="admin-shell">
-        <?php commar_admin_nav('focused-works'); ?>
+        <?php commar_admin_nav('home'); ?>
         <div class="admin-main">
-            <?php commar_admin_header($pageTitle); ?>
+            <?php commar_admin_header('Página Home'); ?>
             <main class="admin-content">
+                <?php commar_admin_home_nav('focused-works'); ?>
+
                 <section class="admin-panel admin-wide-panel">
                     <div class="admin-page-actions" style="margin-bottom: 2rem;">
                         <div>

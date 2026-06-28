@@ -164,10 +164,12 @@ img {
 }
 
 .admin-login-card input {
+    appearance: none;
+    -webkit-appearance: none;
     width: 100%;
     min-height: 52px;
     border: 1px solid #cfd6df;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 0.8rem 0.95rem;
     background: #f8fafc;
     color: #111827;
@@ -612,11 +614,16 @@ img {
 .admin-form input[type="file"],
 .admin-form select,
 .admin-form textarea,
+.admin-user-form input[type="text"],
+.admin-user-form input[type="email"],
+.admin-user-form input[type="password"],
 .admin-article-form input[type="text"],
 .admin-article-form input[type="url"],
 .admin-article-form input[type="file"],
 .admin-article-form select,
 .admin-article-form textarea {
+    appearance: none;
+    -webkit-appearance: none;
     display: block;
     width: 100%;
     min-height: 42px;
@@ -625,9 +632,22 @@ img {
     font-family: inherit;
     font-size: 0.95rem;
     border: 1px solid var(--admin-border-color);
-    border-radius: 0.3rem;
+    border-radius: 8px;
     background-color: #fff;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-form select,
+.admin-article-form select {
+    padding-right: 2.4rem;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #6c757d 50%),
+        linear-gradient(135deg, #6c757d 50%, transparent 50%);
+    background-position:
+        calc(100% - 1.1rem) 50%,
+        calc(100% - 0.78rem) 50%;
+    background-size: 0.36rem 0.36rem, 0.36rem 0.36rem;
+    background-repeat: no-repeat;
 }
 
 .admin-form input[type="file"],
@@ -635,9 +655,38 @@ img {
     padding: 0.5rem;
 }
 
+.admin-form input[type="file"]::file-selector-button,
+.admin-article-form input[type="file"]::file-selector-button {
+    margin-right: 0.75rem;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 7px;
+    background: var(--admin-bg);
+    color: var(--admin-text-primary);
+    padding: 0.45rem 0.75rem;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-form input[type="file"]::-webkit-file-upload-button,
+.admin-article-form input[type="file"]::-webkit-file-upload-button {
+    margin-right: 0.75rem;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 7px;
+    background: var(--admin-bg);
+    color: var(--admin-text-primary);
+    padding: 0.45rem 0.75rem;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 .admin-form input:focus,
 .admin-form select:focus,
 .admin-form textarea:focus,
+.admin-user-form input:focus,
 .admin-article-form input:focus,
 .admin-article-form select:focus,
 .admin-article-form textarea:focus {
@@ -1000,6 +1049,14 @@ img {
     gap: 1rem;
 }
 
+.admin-user-form label {
+    display: grid;
+    gap: 0.4rem;
+    color: var(--admin-text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
 .admin-user-form button[type="submit"] {
     width: 100%;
 }
@@ -1183,17 +1240,7 @@ img {
 /* Focused Works */
 .admin-focused-works-langs {
     display: grid;
-    gap: 3rem;
-}
-
-.admin-focused-works-lang-group h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding-bottom: 0.75rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid var(--admin-border-color);
+    gap: 1rem;
 }
 
 /* Footer */

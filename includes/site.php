@@ -77,6 +77,17 @@ if (!function_exists('commar_maintenance_enabled')) {
     }
 }
 
+if (!function_exists('commar_is_admin_request')) {
+    function commar_is_admin_request(): bool
+    {
+        $scriptName = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+        $requestUri = str_replace('\\', '/', (string) ($_SERVER['REQUEST_URI'] ?? ''));
+
+        return strpos($scriptName, '/admin/') !== false
+            || strpos($requestUri, '/admin/') !== false;
+    }
+}
+
 if (!function_exists('commar_whatsapp_number_label')) {
     function commar_whatsapp_number_label(): string
     {
@@ -241,6 +252,6 @@ if (!function_exists('commar_render_maintenance_page')) {
     }
 }
 
-if (PHP_SAPI !== 'cli' && commar_maintenance_enabled()) {
+if (PHP_SAPI !== 'cli' && !commar_is_admin_request() && commar_maintenance_enabled()) {
     commar_render_maintenance_page();
 }

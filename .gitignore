@@ -1,3 +1,4 @@
 .DS_Store
 Archive.zip
 admin/config.php
+includes/db-config.php

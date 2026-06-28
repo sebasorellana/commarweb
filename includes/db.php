@@ -1,9 +1,20 @@
 <?php
-const COMMAR_DB_HOST = '127.0.0.1';
-const COMMAR_DB_NAME = 'commar';
-const COMMAR_DB_USER = 'root';
-const COMMAR_DB_PASSWORD = '';
-const COMMAR_DB_CHARSET = 'utf8mb4';
+$commarDbConfig = [];
+$commarDbConfigPath = __DIR__ . '/db-config.php';
+
+if (is_file($commarDbConfigPath)) {
+    $commarDbConfig = require $commarDbConfigPath;
+}
+
+if (!is_array($commarDbConfig)) {
+    $commarDbConfig = [];
+}
+
+defined('COMMAR_DB_HOST') || define('COMMAR_DB_HOST', (string) ($commarDbConfig['host'] ?? '127.0.0.1'));
+defined('COMMAR_DB_NAME') || define('COMMAR_DB_NAME', (string) ($commarDbConfig['name'] ?? 'commar'));
+defined('COMMAR_DB_USER') || define('COMMAR_DB_USER', (string) ($commarDbConfig['user'] ?? 'root'));
+defined('COMMAR_DB_PASSWORD') || define('COMMAR_DB_PASSWORD', (string) ($commarDbConfig['password'] ?? ''));
+defined('COMMAR_DB_CHARSET') || define('COMMAR_DB_CHARSET', (string) ($commarDbConfig['charset'] ?? 'utf8mb4'));
 
 if (!function_exists('commar_db')) {
     function commar_db(): PDO

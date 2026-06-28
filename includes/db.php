@@ -201,7 +201,7 @@ if (!function_exists('commar_db_ensure_schema')) {
         ] as $sql) {
             try {
                 $pdo->exec($sql);
-            } catch (PDOException) {
+            } catch (PDOException $exception) {
                 // Older local schemas may already be compatible enough to continue.
             }
         }

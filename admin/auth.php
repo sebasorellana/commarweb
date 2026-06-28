@@ -213,7 +213,7 @@ function commar_admin_reset_password(string $token, string $password): bool
 
         $pdo->commit();
         return true;
-    } catch (Throwable) {
+    } catch (Throwable $exception) {
         $pdo->rollBack();
         return false;
     }

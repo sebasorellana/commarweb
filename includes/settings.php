@@ -40,7 +40,7 @@ if (!function_exists('commar_settings')) {
 }
 
 if (!function_exists('commar_setting')) {
-    function commar_setting(string $key): mixed
+    function commar_setting(string $key)
     {
         $settings = commar_settings();
 

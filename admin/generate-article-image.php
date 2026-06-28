@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-function commar_admin_ai_image_response(int $status, string $error): never
+function commar_admin_ai_image_response(int $status, string $error): void
 {
     http_response_code($status);
     echo json_encode(['ok' => false, 'error' => $error], JSON_UNESCAPED_UNICODE);

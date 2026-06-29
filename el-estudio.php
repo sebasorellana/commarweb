@@ -101,69 +101,6 @@
             </div>
         </section>
 
-        <section class="about-section about-history" aria-labelledby="about-history-title">
-            <div class="site-shell-wide about-history-grid">
-                <div class="about-founder-card" data-history-images-reveal>
-                    <img src="img/reunion.jpg" alt="Reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="lazy" decoding="async" class="about-founder-image">
-                    <img src="img/reunion2.jpg" alt="Segunda reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="lazy" decoding="async" class="about-founder-image">
-                </div>
-
-                <div class="about-history-content">
-                    <span class="about-kicker">Trayectoria</span>
-                    <h2 id="about-history-title" class="about-heading">De la gestión municipal a un grupo integral.</h2>
-                    <div class="about-copy">
-                        <p>Año 2002, mientras comenzaba mi carrera profesional, incursionando con tramitaciones municipales ante el gobierno de la Ciudad Autónoma de Buenos Aires. Me especialicé en el acompañamiento personal de mis clientes con la gestión y optimización de sus proyectos de propiedad horizontal.</p>
-                        <p>Afianzándose mi situación profesional, en 2003 comenzaba mi carrera docente en la UBA en la materia Estructuras, hasta el 2007, año en el que fui incorporando profesionales a mi estudio para dar respuesta a las crecientes demandas. Abrimos juego para resolver todo tipo de obras: demoliciones, construcciones y ejecución llave en mano de edificios de mediana envergadura.</p>
-                        <p>Ya por el 2009 mi carrera docente se orientó a la tecnicatura en Instalaciones. Hoy ejerzo el cargo de Profesor Adjunto en Instalaciones II, cátedra Ing. Roscardi. Esto me impulsó a trabajar en el desarrollo de proyectos de instalaciones sanitarias, eléctricas, térmicas y sistemas de prevención contra incendio, propias y para terceros.</p>
-                        <p>En el año 2010 creo COMMAR GROUP, con el fin de unificar la incorporación de Commissioning Argentina S.A., dedicada al medio ambiente, brindando servicios de monitoreo de calidad de aire, análisis de afluentes gaseosos, líquidos y ruidos.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="about-section about-services" aria-labelledby="about-services-title">
-            <div class="site-shell-wide">
-                <div class="about-section-header">
-                    <span class="about-kicker">Divisiones</span>
-                    <h2 id="about-services-title" class="about-heading">Servicios integrados</h2>
-                </div>
-
-                <div class="about-services-grid">
-                    <article class="about-service-panel">
-                        <span>01</span>
-                        <h3>Servicios de Arquitectura</h3>
-                        <p>ARQCONSULT es la división de Commar que cuenta con un staff de profesionales en grado de brindar soluciones integradoras para el desarrollo de proyectos habitacionales, comerciales e industriales.</p>
-                        <p>Acompañamos desde el estudio de factibilidad y presupuesto hasta la dirección de obra, documentación y habilitaciones correspondientes.</p>
-                    </article>
-                    <article class="about-service-panel">
-                        <span>02</span>
-                        <h3>Servicios de Construcción</h3>
-                        <p>Contamos con más de 60 personas en todos los rubros de obra, realizando demoliciones, obra nueva, remodelaciones y ampliaciones.</p>
-                        <p>Tenemos amplia experiencia en garages comerciales, oficinas y depósitos industriales, con sistemas racionalizados livianos y hormigón armado.</p>
-                    </article>
-                    <article class="about-service-panel">
-                        <span>03</span>
-                        <h3>Servicios de Medio Ambiente</h3>
-                        <p>Brindamos servicios de monitoreo y desarrollamos proyectos llave en mano para sistemas de muestreo y análisis continuo de efluentes gaseosos, líquidos, fluidos de proceso y mitigación de olores.</p>
-                        <p>También trabajamos en el desarrollo de cabinas y redes de monitoreo de calidad del aire.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <section class="about-section about-environment" aria-labelledby="about-environment-title">
-            <div class="site-shell-wide about-environment-stack">
-                <div>
-                    <span class="about-kicker">Medio ambiente</span>
-                    <h2 id="about-environment-title" class="about-heading">Experiencia técnica en control ambiental.</h2>
-                </div>
-                <div class="about-copy">
-                    <p>Fuimos filial del Grupo SOFINTER de Italia, la consultora ambiental de mayor experiencia local en el control de emisiones y calidad del aire, hasta el año 2010, cuando se independizó formando parte de Commar Group.</p>
-                    <p>Ese recorrido consolidó una forma de trabajo basada en precisión técnica, tecnología aplicada y equipos interdisciplinarios preparados para resolver desafíos ambientales complejos.</p>
-                </div>
-            </div>
-        </section>
-
         <section class="about-section about-team" aria-labelledby="about-team-title">
             <div class="site-shell-wide">
                 <div class="about-section-header">
@@ -212,6 +149,70 @@
                 </div>
             </div>
         </section>
+
+        <section class="about-section about-history" aria-labelledby="about-history-title">
+            <div class="site-shell-wide about-history-grid">
+                <div class="about-founder-card" data-history-images-reveal>
+                    <img src="img/reunion.jpg" alt="Reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="lazy" decoding="async" class="about-founder-image">
+                    <img src="img/reunion2.jpg" alt="Segunda reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="lazy" decoding="async" class="about-founder-image">
+                </div>
+
+                <div class="about-history-content">
+                    <span class="about-kicker">Trayectoria</span>
+                    <h2 id="about-history-title" class="about-heading">De la gestión municipal a un grupo integral.</h2>
+                    <div class="about-copy">
+                        <p>La historia de COMMAR GROUP nace en 2002, cuando Romina Lo Conte comenzó a abrirse camino en un territorio donde cada expediente, cada permiso y cada decisión técnica exigían precisión, criterio y una mirada capaz de anticiparse a los obstáculos. Desde la gestión municipal ante el Gobierno de la Ciudad de Buenos Aires, entendió que detrás de cada trámite había un proyecto esperando avanzar.</p>
+                        <p>Con esa convicción, transformó la experiencia administrativa en una forma de acompañamiento estratégico. Lo que empezó como una respuesta cercana para clientes de propiedad horizontal fue creciendo hasta convertirse en una estructura profesional capaz de ordenar procesos, destrabar complejidades y darle dirección concreta a obras cada vez más ambiciosas.</p>
+                        <p>Su recorrido académico y docente en la Universidad de Buenos Aires fortaleció esa visión. La enseñanza de estructuras primero, y luego el desarrollo en instalaciones, consolidaron una manera de trabajar donde la técnica no es un dato aislado, sino una herramienta para construir con responsabilidad, coordinación y futuro.</p>
+                        <p>En 2010, Romina Lo Conte dio forma a COMMAR GROUP: un grupo integral nacido para reunir arquitectura, construcción, gestión técnica y medio ambiente bajo una misma lógica de trabajo. Una evolución natural para una trayectoria marcada por la decisión de convertir problemas complejos en soluciones posibles.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section about-services" aria-labelledby="about-services-title">
+            <div class="site-shell-wide">
+                <div class="about-section-header">
+                    <span class="about-kicker">Divisiones</span>
+                    <h2 id="about-services-title" class="about-heading">Servicios integrados</h2>
+                </div>
+
+                <div class="about-services-grid">
+                    <article class="about-service-panel">
+                        <span>01</span>
+                        <h3>Servicios de Arquitectura</h3>
+                        <p>ARQCONSULT es la división de Commar que cuenta con un staff de profesionales en grado de brindar soluciones integradoras para el desarrollo de proyectos habitacionales, comerciales e industriales.</p>
+                        <p>Acompañamos desde el estudio de factibilidad y presupuesto hasta la dirección de obra, documentación y habilitaciones correspondientes.</p>
+                    </article>
+                    <article class="about-service-panel">
+                        <span>02</span>
+                        <h3>Servicios de Construcción</h3>
+                        <p>Contamos con más de 60 personas en todos los rubros de obra, realizando demoliciones, obra nueva, remodelaciones y ampliaciones.</p>
+                        <p>Tenemos amplia experiencia en garages comerciales, oficinas y depósitos industriales, con sistemas racionalizados livianos y hormigón armado.</p>
+                    </article>
+                    <article class="about-service-panel">
+                        <span>03</span>
+                        <h3>Servicios de Medio Ambiente</h3>
+                        <p>Brindamos servicios de monitoreo y desarrollamos proyectos llave en mano para sistemas de muestreo y análisis continuo de efluentes gaseosos, líquidos, fluidos de proceso y mitigación de olores.</p>
+                        <p>También trabajamos en el desarrollo de cabinas y redes de monitoreo de calidad del aire.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section about-environment" aria-labelledby="about-environment-title">
+            <div class="site-shell-wide about-environment-stack">
+                <div>
+                    <span class="about-kicker">Medio ambiente</span>
+                    <h2 id="about-environment-title" class="about-heading">Experiencia técnica en control ambiental.</h2>
+                </div>
+                <div class="about-copy">
+                    <p>Fuimos filial del Grupo SOFINTER de Italia, la consultora ambiental de mayor experiencia local en el control de emisiones y calidad del aire, hasta el año 2010, cuando se independizó formando parte de Commar Group.</p>
+                    <p>Ese recorrido consolidó una forma de trabajo basada en precisión técnica, tecnología aplicada y equipos interdisciplinarios preparados para resolver desafíos ambientales complejos.</p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <?php include __DIR__ . '/includes/footer.php'; ?>

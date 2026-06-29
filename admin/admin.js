@@ -164,7 +164,9 @@ document.querySelectorAll('[data-article-form]').forEach((form) => {
         }
 
         galleryPreview.innerHTML = '';
-        Array.from(galleryInput.files || []).forEach((file) => {
+        const existingCount = galleryList ? galleryList.querySelectorAll('.admin-gallery-item').length : 0;
+        const availableSlots = Math.max(0, 10 - existingCount);
+        Array.from(galleryInput.files || []).slice(0, availableSlots).forEach((file) => {
             const item = document.createElement('div');
             const image = document.createElement('img');
             const label = document.createElement('span');
@@ -179,6 +181,13 @@ document.querySelectorAll('[data-article-form]').forEach((form) => {
             item.append(image, label);
             galleryPreview.append(item);
         });
+
+        if ((galleryInput.files?.length || 0) > availableSlots) {
+            const item = document.createElement('div');
+            item.className = 'admin-gallery-limit';
+            item.textContent = 'Máximo 10 imágenes por obra.';
+            galleryPreview.append(item);
+        }
     });
 
     if (!galleryList) {

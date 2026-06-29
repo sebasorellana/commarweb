@@ -13,6 +13,18 @@ if ($isEditing && !$work) {
 
 $description = $work ? json_decode((string) $work['description_json'], true) : [];
 $metrics = $work ? json_decode((string) $work['metrics_json'], true) : [];
+$gallery = $work ? json_decode((string) ($work['gallery_json'] ?? '[]'), true) : [];
+$gallery = is_array($gallery) ? array_values(array_filter($gallery, static function ($item): bool {
+    return is_array($item) && trim((string) ($item['path'] ?? '')) !== '';
+})) : [];
+if ($work && empty($gallery) && !empty($work['image'])) {
+    $gallery[] = [
+        'path' => (string) $work['image'],
+        'width' => (int) ($work['image_width'] ?? 0),
+        'height' => (int) ($work['image_height'] ?? 0),
+        'alt' => (string) ($work['hero_alt'] ?? ''),
+    ];
+}
 $descriptionValue = is_array($description) ? implode("\n\n", array_map('strval', $description)) : '';
 $metricsValue = '';
 if (is_array($metrics)) {
@@ -29,7 +41,7 @@ $pageTitle = $isEditing ? 'Editar obra' : 'Nueva obra';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo commar_admin_h($pageTitle); ?> | MOnkey CMS</title>
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="admin.css?v=20260628-works-gallery">
 </head>
 <body class="admin-page">
     <div class="admin-shell">
@@ -50,7 +62,7 @@ $pageTitle = $isEditing ? 'Editar obra' : 'Nueva obra';
                         <p class="admin-alert admin-alert-error">La obra solicitada no existe.</p>
                     <?php else: ?>
                         <div class="admin-form-container">
-                            <form action="save-work.php" method="post" enctype="multipart/form-data" class="admin-form">
+                            <form action="save-work.php" method="post" enctype="multipart/form-data" class="admin-form" data-article-form>
                                 <?php if ($isEditing): ?>
                                     <input type="hidden" name="id" value="<?php echo (int) $work['id']; ?>">
                                 <?php endif; ?>
@@ -97,14 +109,26 @@ $pageTitle = $isEditing ? 'Editar obra' : 'Nueva obra';
                                         Texto alternativo de imagen
                                         <input type="text" name="hero_alt" value="<?php echo commar_admin_h($work['hero_alt'] ?? ''); ?>">
                                     </label>
-                                    <label>
-                                        Imagen
-                                        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" <?php echo !$isEditing ? 'required' : ''; ?>>
-                                        <?php if ($isEditing && !empty($work['image'])): ?>
-                                            <span class="admin-help">Imagen actual: <?php echo commar_admin_h($work['image']); ?>. Dejar vacío para no cambiar.</span>
-                                            <img src="../<?php echo commar_admin_h($work['image']); ?>" alt="" style="max-width: 220px; margin-top: 0.5rem; border-radius: 0.3rem;">
-                                        <?php endif; ?>
-                                    </label>
+                                    <section class="admin-sidebar-card admin-work-gallery-card">
+                                        <label>
+                                            Galería de imágenes
+                                            <input type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple <?php echo !$isEditing ? 'required' : ''; ?> data-gallery-input>
+                                        </label>
+                                        <span class="admin-help">Subí de 1 a 10 imágenes. La primera imagen del orden será la principal. Arrastrá para ordenar las existentes.</span>
+                                        <div class="admin-gallery-list" data-gallery-list>
+                                            <?php foreach ($gallery as $galleryItem): ?>
+                                                <?php $galleryPath = (string) ($galleryItem['path'] ?? ''); ?>
+                                                <?php if ($galleryPath !== ''): ?>
+                                                    <div class="admin-gallery-item" draggable="true">
+                                                        <img src="../<?php echo commar_admin_h($galleryPath); ?>" alt="" width="72" height="72">
+                                                        <span>Arrastrar</span>
+                                                        <input type="hidden" name="gallery_existing[]" value="<?php echo commar_admin_h($galleryPath); ?>">
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <div class="admin-gallery-list admin-gallery-list-new" data-gallery-preview></div>
+                                    </section>
                                 </div>
                                 <button type="submit" class="admin-button-primary">Guardar obra</button>
                             </form>
@@ -115,5 +139,6 @@ $pageTitle = $isEditing ? 'Editar obra' : 'Nueva obra';
             <?php commar_admin_footer(); ?>
         </div>
     </div>
+    <script src="admin.js?v=20260628-works-gallery" defer></script>
 </body>
 </html>

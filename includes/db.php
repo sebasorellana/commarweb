@@ -85,6 +85,7 @@ if (!function_exists('commar_db_ensure_schema')) {
                 `content_html` LONGTEXT NULL,
                 `content_json` LONGTEXT NOT NULL,
                 `gallery_json` LONGTEXT NULL,
+                `youtube_url` VARCHAR(255) NOT NULL DEFAULT '',
                 `tags_json` LONGTEXT NULL,
                 `status` ENUM('draft', 'published', 'deleted') NOT NULL DEFAULT 'published',
                 `published_at` DATETIME NULL,
@@ -117,6 +118,22 @@ if (!function_exists('commar_db_ensure_schema')) {
                 `setting_value` LONGTEXT NOT NULL,
                 `updated_at` DATETIME NOT NULL,
                 PRIMARY KEY (`setting_key`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
+
+        $pdo->exec(
+            "CREATE TABLE IF NOT EXISTS `commar_newsletter_submissions` (
+                `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `email` VARCHAR(255) NOT NULL,
+                `source` VARCHAR(80) NOT NULL DEFAULT 'website',
+                `page_url` VARCHAR(500) NOT NULL DEFAULT '',
+                `ip_address` VARCHAR(45) NOT NULL DEFAULT '',
+                `user_agent` VARCHAR(255) NOT NULL DEFAULT '',
+                `submitted_at` DATETIME NOT NULL,
+                `updated_at` DATETIME NOT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uniq_commar_newsletter_email` (`email`),
+                KEY `idx_commar_newsletter_submitted` (`submitted_at`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
         );
 
@@ -178,6 +195,7 @@ if (!function_exists('commar_db_ensure_schema')) {
                 `image` VARCHAR(255) NOT NULL DEFAULT '',
                 `image_width` INT UNSIGNED NOT NULL DEFAULT 0,
                 `image_height` INT UNSIGNED NOT NULL DEFAULT 0,
+                `gallery_json` LONGTEXT NULL,
                 `hero_alt` VARCHAR(255) NOT NULL DEFAULT '',
                 `intro` TEXT NOT NULL,
                 `description_json` LONGTEXT NOT NULL,
@@ -194,16 +212,36 @@ if (!function_exists('commar_db_ensure_schema')) {
 
         foreach ([
             "ALTER TABLE `commar_articles` ADD COLUMN IF NOT EXISTS `tags_json` LONGTEXT NULL AFTER `gallery_json`",
+            "ALTER TABLE `commar_articles` ADD COLUMN IF NOT EXISTS `youtube_url` VARCHAR(255) NOT NULL DEFAULT '' AFTER `gallery_json`",
             "ALTER TABLE `commar_articles` MODIFY COLUMN `description` LONGTEXT NOT NULL",
             "ALTER TABLE `commar_articles` MODIFY COLUMN `image` VARCHAR(255) NOT NULL DEFAULT ''",
             "ALTER TABLE `commar_articles` MODIFY COLUMN `image_width` INT UNSIGNED NOT NULL DEFAULT 0",
             "ALTER TABLE `commar_articles` MODIFY COLUMN `image_height` INT UNSIGNED NOT NULL DEFAULT 0",
+            "ALTER TABLE `commar_works` ADD COLUMN IF NOT EXISTS `gallery_json` LONGTEXT NULL AFTER `image_height`",
         ] as $sql) {
             try {
                 $pdo->exec($sql);
             } catch (PDOException $exception) {
                 // Older local schemas may already be compatible enough to continue.
             }
+        }
+
+        try {
+            $columnCheck = $pdo->query("SHOW COLUMNS FROM `commar_articles` LIKE 'youtube_url'");
+            if ($columnCheck && !$columnCheck->fetch()) {
+                $pdo->exec("ALTER TABLE `commar_articles` ADD COLUMN `youtube_url` VARCHAR(255) NOT NULL DEFAULT '' AFTER `gallery_json`");
+            }
+        } catch (PDOException $exception) {
+            // Save screens will surface DB issues if the schema is not writable.
+        }
+
+        try {
+            $columnCheck = $pdo->query("SHOW COLUMNS FROM `commar_works` LIKE 'gallery_json'");
+            if ($columnCheck && !$columnCheck->fetch()) {
+                $pdo->exec("ALTER TABLE `commar_works` ADD COLUMN `gallery_json` LONGTEXT NULL AFTER `image_height`");
+            }
+        } catch (PDOException $exception) {
+            // The site can continue; save screens will surface DB issues if the schema is not writable.
         }
     }
 }

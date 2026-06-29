@@ -67,6 +67,92 @@ function commar_admin_parse_work_metrics(string $value): array
     return $metrics;
 }
 
+function commar_admin_work_gallery_from_row(?array $work): array
+{
+    if (!$work) {
+        return [];
+    }
+
+    $gallery = json_decode((string) ($work['gallery_json'] ?? '[]'), true);
+    $gallery = is_array($gallery) ? array_values(array_filter($gallery, static function ($item): bool {
+        return is_array($item) && trim((string) ($item['path'] ?? '')) !== '';
+    })) : [];
+
+    if (empty($gallery) && trim((string) ($work['image'] ?? '')) !== '') {
+        $gallery[] = [
+            'path' => (string) $work['image'],
+            'width' => (int) ($work['image_width'] ?? 0),
+            'height' => (int) ($work['image_height'] ?? 0),
+            'alt' => (string) ($work['hero_alt'] ?? ''),
+        ];
+    }
+
+    return $gallery;
+}
+
+function commar_admin_save_work_gallery_images(string $slug, string $heroAlt, int $availableSlots): array
+{
+    $gallery = [];
+    $files = $_FILES['gallery_images'] ?? null;
+    if (!$files || !isset($files['tmp_name']) || $availableSlots <= 0) {
+        return $gallery;
+    }
+
+    $uploadDir = dirname(__DIR__) . '/img/obras';
+    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true)) {
+        http_response_code(500);
+        exit('No se pudo crear la carpeta de imágenes.');
+    }
+
+    $extensions = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
+    $tmpNames = is_array($files['tmp_name']) ? $files['tmp_name'] : [];
+
+    foreach ($tmpNames as $index => $tmpName) {
+        if (count($gallery) >= $availableSlots) {
+            break;
+        }
+
+        $error = (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE);
+        if ($error === UPLOAD_ERR_NO_FILE) {
+            continue;
+        }
+
+        if ($error !== UPLOAD_ERR_OK) {
+            http_response_code(422);
+            exit('No se pudo subir una de las imágenes.');
+        }
+
+        $imageInfo = getimagesize((string) $tmpName);
+        if ($imageInfo === false) {
+            http_response_code(422);
+            exit('Una de las imágenes no es válida.');
+        }
+
+        $extension = $extensions[$imageInfo[2]] ?? null;
+        if ($extension === null) {
+            http_response_code(422);
+            exit('Formato no soportado. Usá JPG, PNG o WEBP.');
+        }
+
+        $relativePath = 'img/obras/' . $slug . '-gallery-' . date('YmdHis') . '-' . ($index + 1) . '.' . $extension;
+        $targetPath = dirname(__DIR__) . '/' . $relativePath;
+
+        if (!move_uploaded_file((string) $tmpName, $targetPath)) {
+            http_response_code(500);
+            exit('No se pudo guardar una de las imágenes.');
+        }
+
+        $gallery[] = [
+            'path' => $relativePath,
+            'width' => (int) $imageInfo[0],
+            'height' => (int) $imageInfo[1],
+            'alt' => $heroAlt,
+        ];
+    }
+
+    return $gallery;
+}
+
 $id = (int) ($_POST['id'] ?? 0);
 $isEditing = $id > 0;
 $title = trim((string) ($_POST['title'] ?? ''));
@@ -86,48 +172,52 @@ if ($title === '' || $category === '' || $summary === '' || $intro === '' || emp
 }
 
 $db = commar_db();
-$slug = commar_admin_unique_work_slug($db, commar_admin_work_slug($slugInput !== '' ? $slugInput : $title), $id);
-$imagePath = '';
-$imageWidth = 0;
-$imageHeight = 0;
-
-if (!empty($_FILES['image']['tmp_name']) && ($_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
-    $tmpName = (string) $_FILES['image']['tmp_name'];
-    $imageInfo = getimagesize($tmpName);
-
-    if ($imageInfo === false) {
-        http_response_code(422);
-        exit('La imagen no es válida.');
+$currentWork = null;
+if ($isEditing) {
+    $currentStatement = $db->prepare("SELECT * FROM commar_works WHERE id = :id AND status <> 'deleted' LIMIT 1");
+    $currentStatement->execute(['id' => $id]);
+    $currentWork = $currentStatement->fetch();
+    if (!$currentWork) {
+        http_response_code(404);
+        exit('La obra solicitada no existe.');
     }
-
-    $extensions = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
-    $extension = $extensions[$imageInfo[2]] ?? null;
-    if ($extension === null) {
-        http_response_code(422);
-        exit('Formato no soportado. Usá JPG, PNG o WEBP.');
-    }
-
-    $uploadDir = dirname(__DIR__) . '/img/obras';
-    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true)) {
-        http_response_code(500);
-        exit('No se pudo crear la carpeta de imágenes.');
-    }
-
-    $imagePath = 'img/obras/' . $slug . '-' . date('YmdHis') . '.' . $extension;
-    $targetPath = dirname(__DIR__) . '/' . $imagePath;
-
-    if (!move_uploaded_file($tmpName, $targetPath)) {
-        http_response_code(500);
-        exit('No se pudo guardar la imagen.');
-    }
-
-    $imageWidth = (int) $imageInfo[0];
-    $imageHeight = (int) $imageInfo[1];
 }
 
+$slug = commar_admin_unique_work_slug($db, commar_admin_work_slug($slugInput !== '' ? $slugInput : $title), $id);
+$currentGallery = commar_admin_work_gallery_from_row(is_array($currentWork) ? $currentWork : null);
+$existingGallery = [];
+$postedExisting = $_POST['gallery_existing'] ?? [];
+$postedExisting = is_array($postedExisting) ? array_slice($postedExisting, 0, 10) : [];
+
+foreach ($postedExisting as $galleryPath) {
+    $galleryPath = (string) $galleryPath;
+    foreach ($currentGallery as $galleryItem) {
+        if (($galleryItem['path'] ?? '') === $galleryPath) {
+            $galleryItem['alt'] = $heroAlt;
+            $existingGallery[] = $galleryItem;
+            break;
+        }
+    }
+}
+
+$newGallery = commar_admin_save_work_gallery_images($slug, $heroAlt, 10 - count($existingGallery));
+$gallery = array_slice(array_merge($existingGallery, $newGallery), 0, 10);
+
+if (empty($gallery)) {
+    http_response_code(422);
+    exit('La obra debe tener al menos una imagen.');
+}
+
+$primaryImage = $gallery[0];
 $now = date('Y-m-d H:i:s');
 $descriptionJson = json_encode($description, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 $metricsJson = json_encode($metrics, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+$galleryJson = json_encode($gallery, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+if ($descriptionJson === false || $metricsJson === false || $galleryJson === false) {
+    http_response_code(500);
+    exit('No se pudo preparar la información de la obra.');
+}
 
 if ($isEditing) {
     $params = [
@@ -138,37 +228,27 @@ if ($isEditing) {
         'location' => $location,
         'year' => $year,
         'summary' => $summary,
+        'image' => (string) ($primaryImage['path'] ?? ''),
+        'image_width' => (int) ($primaryImage['width'] ?? 0),
+        'image_height' => (int) ($primaryImage['height'] ?? 0),
+        'gallery_json' => $galleryJson,
         'hero_alt' => $heroAlt,
         'intro' => $intro,
         'description_json' => $descriptionJson,
         'metrics_json' => $metricsJson,
         'updated_at' => $now,
     ];
-    $sql = 'UPDATE commar_works SET slug = :slug, title = :title, category = :category, location = :location, year = :year, summary = :summary, hero_alt = :hero_alt, intro = :intro, description_json = :description_json, metrics_json = :metrics_json, updated_at = :updated_at';
-
-    if ($imagePath !== '') {
-        $sql .= ', image = :image, image_width = :image_width, image_height = :image_height';
-        $params['image'] = $imagePath;
-        $params['image_width'] = $imageWidth;
-        $params['image_height'] = $imageHeight;
-    }
-
-    $sql .= ' WHERE id = :id';
+    $sql = 'UPDATE commar_works SET slug = :slug, title = :title, category = :category, location = :location, year = :year, summary = :summary, image = :image, image_width = :image_width, image_height = :image_height, gallery_json = :gallery_json, hero_alt = :hero_alt, intro = :intro, description_json = :description_json, metrics_json = :metrics_json, updated_at = :updated_at WHERE id = :id';
     $db->prepare($sql)->execute($params);
     header('Location: works.php?updated=1');
     exit;
 }
 
-if ($imagePath === '') {
-    http_response_code(422);
-    exit('La imagen es obligatoria para una nueva obra.');
-}
-
 $statement = $db->prepare(
     'INSERT INTO commar_works
-     (slug, title, category, location, year, summary, image, image_width, image_height, hero_alt, intro, description_json, metrics_json, status, created_at, updated_at)
+     (slug, title, category, location, year, summary, image, image_width, image_height, gallery_json, hero_alt, intro, description_json, metrics_json, status, created_at, updated_at)
      VALUES
-     (:slug, :title, :category, :location, :year, :summary, :image, :image_width, :image_height, :hero_alt, :intro, :description_json, :metrics_json, :status, :created_at, :updated_at)'
+     (:slug, :title, :category, :location, :year, :summary, :image, :image_width, :image_height, :gallery_json, :hero_alt, :intro, :description_json, :metrics_json, :status, :created_at, :updated_at)'
 );
 $statement->execute([
     'slug' => $slug,
@@ -177,9 +257,10 @@ $statement->execute([
     'location' => $location,
     'year' => $year,
     'summary' => $summary,
-    'image' => $imagePath,
-    'image_width' => $imageWidth,
-    'image_height' => $imageHeight,
+    'image' => (string) ($primaryImage['path'] ?? ''),
+    'image_width' => (int) ($primaryImage['width'] ?? 0),
+    'image_height' => (int) ($primaryImage['height'] ?? 0),
+    'gallery_json' => $galleryJson,
     'hero_alt' => $heroAlt,
     'intro' => $intro,
     'description_json' => $descriptionJson,

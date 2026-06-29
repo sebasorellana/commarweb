@@ -57,11 +57,11 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
-    <link rel="stylesheet" href="style.css?v=20260508-1">
+    <link rel="stylesheet" href="style.css?v=20260628-blog-header">
 </head>
 <body>
     <?php
-    $headerVariant = 'default';
+    $headerVariant = 'home';
     $menuItems = [
         ['label' => 'Inicio', 'href' => 'index.php'],
         ['label' => 'El estudio', 'href' => 'el-estudio.php'],
@@ -147,6 +147,6 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
     </main>
 
     <?php include __DIR__ . '/includes/footer.php'; ?>
-    <script src="script.js?v=20260508-1" defer></script>
+    <script src="script.js?v=20260628-blog-header" defer></script>
 </body>
 </html>

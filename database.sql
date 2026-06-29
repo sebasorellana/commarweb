@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `commar_articles` (
     `content_html` LONGTEXT NULL,
     `content_json` LONGTEXT NOT NULL,
     `gallery_json` LONGTEXT NULL,
+    `youtube_url` VARCHAR(255) NOT NULL DEFAULT '',
     `tags_json` LONGTEXT NULL,
     `status` ENUM('draft', 'published', 'deleted') NOT NULL DEFAULT 'published',
     `published_at` DATETIME NULL,
@@ -26,6 +27,9 @@ CREATE TABLE IF NOT EXISTS `commar_articles` (
 
 ALTER TABLE `commar_articles`
     ADD COLUMN IF NOT EXISTS `tags_json` LONGTEXT NULL AFTER `gallery_json`;
+
+ALTER TABLE `commar_articles`
+    ADD COLUMN IF NOT EXISTS `youtube_url` VARCHAR(255) NOT NULL DEFAULT '' AFTER `gallery_json`;
 
 ALTER TABLE `commar_articles`
     MODIFY COLUMN `description` LONGTEXT NOT NULL;
@@ -48,6 +52,20 @@ CREATE TABLE IF NOT EXISTS `commar_media` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uniq_commar_media_path` (`path`),
     KEY `idx_commar_media_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `commar_newsletter_submissions` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(255) NOT NULL,
+    `source` VARCHAR(80) NOT NULL DEFAULT 'website',
+    `page_url` VARCHAR(500) NOT NULL DEFAULT '',
+    `ip_address` VARCHAR(45) NOT NULL DEFAULT '',
+    `user_agent` VARCHAR(255) NOT NULL DEFAULT '',
+    `submitted_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_commar_newsletter_email` (`email`),
+    KEY `idx_commar_newsletter_submitted` (`submitted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `commar_settings` (`setting_key`, `setting_value`, `updated_at`) VALUES

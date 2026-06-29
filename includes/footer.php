@@ -3,7 +3,13 @@ $footerEmail = commar_contact_email();
 $footerAddressLines = commar_contact_address_lines();
 $instagramUrl = trim((string) commar_setting('instagram_url'));
 $linkedinUrl = trim((string) commar_setting('linkedin_url'));
+$footerScript = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+$shouldRenderNewsletter = !in_array($footerScript, ['index.php'], true);
 ?>
+    <?php if ($shouldRenderNewsletter): ?>
+        <?php $newsletterTitleId = 'newsletter-title-footer'; ?>
+        <?php include __DIR__ . '/newsletter.php'; ?>
+    <?php endif; ?>
     <footer class="site-footer">
         <div class="site-shell-wide footer-shell">
             <div class="footer-top">

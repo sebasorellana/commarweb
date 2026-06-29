@@ -259,23 +259,7 @@ $contactEmail = commar_contact_email();
     </section>
 
     <!-- NEWSLETTER -->
-    <section id="newsletter" class="home-newsletter-section" aria-labelledby="newsletter-title">
-        <div class="site-shell-wide">
-            <div class="home-newsletter" data-newsletter-reveal>
-                <div class="home-newsletter-copy">
-                    <span class="home-newsletter-kicker">Newsletter</span>
-                    <h2 id="newsletter-title" class="home-newsletter-title">Recibí nuevas obras, ideas y próximos movimientos de COMMAR GROUP.</h2>
-                </div>
-                <div class="home-newsletter-form home-newsletter-optin">
-                    <!-- Optin - Inicio -->
-                    <div id="optin-dpdV9vOk" data-type="inline"></div>
-                    <link rel="stylesheet" type="text/css" href="https://optin.myperfit.com/res/css/commargroup/dpdV9vOk.css"/>
-                    <script type="text/javascript" src="https://optin.myperfit.com/res/js/commargroup/dpdV9vOk.js" charset="UTF-8"></script>
-                    <!-- Optin - Fin -->
-                </div>
-            </div>
-        </div>
-    </section>
+    <?php include __DIR__ . '/includes/newsletter.php'; ?>
 
     <!-- EXPERIENCIA MATERIAL -->
     <section id="experiencia-material" class="shader-carousel-section" aria-labelledby="experiencia-material-title">

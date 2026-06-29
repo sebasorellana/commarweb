@@ -7,7 +7,6 @@ $encodedArticleTitle = rawurlencode($articleTitle);
 $encodedWhatsappText = rawurlencode($articleTitle . ' - ' . $articleUrl);
 ?>
 <footer class="article-footer">
-    <a href="<?php echo htmlspecialchars(commar_url('blog.php'), ENT_QUOTES, 'UTF-8'); ?>" class="article-back-link"><?php echo htmlspecialchars(commar_t('article.back'), ENT_QUOTES, 'UTF-8'); ?></a>
     <div class="article-signature">COMMAR GROUP</div>
     <div class="article-share" aria-label="<?php echo htmlspecialchars(commar_t('article.share'), ENT_QUOTES, 'UTF-8'); ?>">
         <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo htmlspecialchars($encodedArticleUrl, ENT_QUOTES, 'UTF-8'); ?>" class="article-share-link" target="_blank" rel="noopener noreferrer" aria-label="Compartir en Facebook">
@@ -23,4 +22,5 @@ $encodedWhatsappText = rawurlencode($articleTitle . ' - ' . $articleUrl);
             <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M19.1 17.2c-.3-.1-1.6-.8-1.8-.9-.2-.1-.4-.1-.6.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.6-.8-2.7-1.4-3.8-3.1-.3-.5.3-.5.8-1.5.1-.2.1-.3 0-.5s-.6-1.5-.8-2c-.2-.5-.4-.4-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2 0 1.3.9 2.5 1.1 2.7.1.2 1.9 2.8 4.5 4 .6.3 1.1.4 1.5.6.6.2 1.2.2 1.7.1.5-.1 1.6-.6 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.5-.3Z"/><path d="M16 4.5a11.4 11.4 0 0 0-9.8 17.2L4.8 27l5.5-1.4A11.4 11.4 0 1 0 16 4.5Zm0 20.9c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.3.9.9-3.2-.2-.3A9.5 9.5 0 1 1 16 25.4Z"/></svg>
         </a>
     </div>
+    <a href="<?php echo htmlspecialchars(commar_url('blog.php'), ENT_QUOTES, 'UTF-8'); ?>" class="article-back-link"><?php echo htmlspecialchars(commar_t('article.back'), ENT_QUOTES, 'UTF-8'); ?></a>
 </footer>

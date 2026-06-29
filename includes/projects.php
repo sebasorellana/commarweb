@@ -1,10 +1,101 @@
 <?php
 require_once __DIR__ . '/site.php';
 
+if (!function_exists('commar_slugify')) {
+    function commar_slugify(string $value): string
+    {
+        $value = trim($value);
+        $normalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+        $value = $normalized !== false ? $normalized : $value;
+        $value = strtolower($value);
+        $value = preg_replace('/[^a-z0-9]+/', '-', $value) ?? '';
+        $value = trim($value, '-');
+
+        return $value !== '' ? $value : 'obra';
+    }
+}
+
+if (!function_exists('commar_project_gallery_item')) {
+    function commar_project_gallery_item(string $path, int $width, int $height, string $alt = ''): array
+    {
+        return [
+            'path' => $path,
+            'width' => $width,
+            'height' => $height,
+            'alt' => $alt,
+        ];
+    }
+}
+
 if (!function_exists('commar_static_projects')) {
     function commar_static_projects(): array
     {
-        return [
+        $alphabetWorks = [
+            ['Avenida Alvear', 'Residencial', 'Buenos Aires', '2024', 'img/proyecto-01.jpg', 1400, 933],
+            ['Ágora Alsina', 'Institucional', 'Buenos Aires', '2025', 'img/proyecto-02.jpg', 1000, 1400],
+            ['Altos Amenábar', 'Residencial', 'Belgrano', '2023', 'img/proyecto-03.jpg', 1400, 1400],
+            ['Atelier Arevalo', 'Comercial', 'Palermo', '2022', 'img/proyecto-04.jpg', 1400, 933],
+            ['Auditorio Anchorena', 'Cultural', 'Recoleta', '2026', 'img/proyecto-05.jpg', 1400, 933],
+            ['Base Belgrano', 'Corporativo', 'Buenos Aires', '2023', 'img/proyecto-02.jpg', 1000, 1400],
+            ['Centro Cobalto', 'Cultural', 'Córdoba', '2025', 'img/proyecto-03.jpg', 1400, 1400],
+            ['Distrito Dorrego', 'Uso Mixto', 'Rosario', '2022', 'img/proyecto-04.jpg', 1400, 933],
+            ['Estación Esmeralda', 'Institucional', 'Mendoza', '2026', 'img/proyecto-05.jpg', 1400, 933],
+            ['Forum Figueroa', 'Corporativo', 'La Plata', '2024', 'img/proyecto-06.jpg', 1097, 1400],
+            ['Galería Gurruchaga', 'Comercial', 'Buenos Aires', '2021', 'img/proyecto-01.jpg', 1400, 933],
+            ['Hábitat Humboldt', 'Residencial', 'Mar del Plata', '2025', 'img/proyecto-02.jpg', 1000, 1400],
+            ['Instituto Iberá', 'Institucional', 'Corrientes', '2023', 'img/proyecto-03.jpg', 1400, 1400],
+            ['Jardín Juncal', 'Residencial', 'San Isidro', '2022', 'img/proyecto-04.jpg', 1400, 933],
+            ['Kiosco Kavanagh', 'Comercial', 'Buenos Aires', '2024', 'img/proyecto-05.jpg', 1400, 933],
+            ['Laboratorio Luro', 'Industrial', 'Bahía Blanca', '2026', 'img/proyecto-06.jpg', 1097, 1400],
+            ['Mercado Malabia', 'Comercial', 'Buenos Aires', '2021', 'img/proyecto-01.jpg', 1400, 933],
+            ['Nave Nogoyá', 'Industrial', 'Entre Ríos', '2025', 'img/proyecto-02.jpg', 1000, 1400],
+            ['Observatorio Olivos', 'Institucional', 'Vicente López', '2023', 'img/proyecto-03.jpg', 1400, 1400],
+            ['Pasaje Palermo', 'Uso Mixto', 'Buenos Aires', '2024', 'img/proyecto-04.jpg', 1400, 933],
+            ['Quinta Quirno', 'Residencial', 'San Fernando', '2022', 'img/proyecto-05.jpg', 1400, 933],
+            ['Residencia Rivera', 'Residencial', 'Neuquén', '2026', 'img/proyecto-06.jpg', 1097, 1400],
+            ['Sede Serrano', 'Corporativo', 'Buenos Aires', '2025', 'img/proyecto-01.jpg', 1400, 933],
+            ['Taller Thames', 'Industrial', 'Buenos Aires', '2023', 'img/proyecto-02.jpg', 1000, 1400],
+            ['Unidad Uspallata', 'Institucional', 'Mendoza', '2024', 'img/proyecto-03.jpg', 1400, 1400],
+            ['Vivienda Vera', 'Residencial', 'Tigre', '2021', 'img/proyecto-04.jpg', 1400, 933],
+            ['Warehouse Wilde', 'Industrial', 'Avellaneda', '2026', 'img/proyecto-05.jpg', 1400, 933],
+            ['Xiloteca Xumek', 'Cultural', 'San Luis', '2025', 'img/proyecto-06.jpg', 1097, 1400],
+            ['Yard Yrigoyen', 'Uso Mixto', 'Lanús', '2022', 'img/proyecto-01.jpg', 1400, 933],
+            ['Zócalo Zapiola', 'Comercial', 'Buenos Aires', '2024', 'img/proyecto-02.jpg', 1000, 1400],
+        ];
+
+        $projects = [];
+        foreach ($alphabetWorks as $index => $work) {
+            [$title, $category, $location, $year, $image, $imageWidth, $imageHeight] = $work;
+            $projects[] = [
+                'id' => str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
+                'slug' => commar_slugify($title),
+                'title' => $title,
+                'category' => $category,
+                'location' => $location,
+                'year' => $year,
+                'summary' => 'Obra de referencia para el directorio alfabético, con enfoque en coordinación técnica, materialidad y resolución integral.',
+                'img' => $image,
+                'img_width' => $imageWidth,
+                'img_height' => $imageHeight,
+                'hero_alt' => $title . ', obra de COMMAR GROUP',
+                'gallery' => [
+                    commar_project_gallery_item($image, $imageWidth, $imageHeight, $title . ', obra de COMMAR GROUP'),
+                ],
+                'intro' => $title . ' integra arquitectura, gestión técnica y ejecución ordenada para resolver un programa de ' . strtolower($category) . ' con una respuesta clara y contemporánea.',
+                'description' => [
+                    'La obra organiza programa, estructura y materialidad con una estrategia de ejecución pensada para reducir interferencias durante el proceso constructivo.',
+                    'El desarrollo prioriza documentación clara, coordinación entre equipos y una lectura espacial consistente desde el acceso hasta las áreas principales.',
+                ],
+                'metrics' => [
+                    'Programa' => $category,
+                    'Superficie' => number_format(720 + ($index * 185), 0, ',', '.') . ' m²',
+                    'Estado' => $index % 3 === 0 ? 'En desarrollo' : 'Construido',
+                    'Equipo' => 'Arquitectura, documentación y dirección de obra',
+                ],
+            ];
+        }
+
+        return array_merge($projects, [
             [
                 'id' => '01',
                 'slug' => 'casa-atlas',
@@ -17,6 +108,11 @@ if (!function_exists('commar_static_projects')) {
                 'img_width' => 1400,
                 'img_height' => 933,
                 'hero_alt' => 'Vista exterior de Casa Atlas, obra residencial de COMMAR GROUP',
+                'gallery' => [
+                    commar_project_gallery_item('img/proyecto-01.jpg', 1400, 933, 'Vista exterior de Casa Atlas, obra residencial de COMMAR GROUP'),
+                    commar_project_gallery_item('img/proyecto-02.jpg', 1000, 1400, 'Interior de Casa Atlas'),
+                    commar_project_gallery_item('img/proyecto-03.jpg', 1400, 1400, 'Detalle material de Casa Atlas'),
+                ],
                 'intro' => 'Casa Atlas explora una arquitectura doméstica de planos rotundos, patios contenidos y una materialidad mineral que filtra la luz como si fuera una segunda piel.',
                 'description' => [
                     'La vivienda se organiza como una secuencia de vacíos intermedios, terrazas contenidas y recintos que alternan exposición y refugio. La estructura no se oculta: ordena la experiencia espacial y define la identidad de la obra.',
@@ -41,6 +137,9 @@ if (!function_exists('commar_static_projects')) {
                 'img_width' => 1000,
                 'img_height' => 1400,
                 'hero_alt' => 'Pabellón Delta, edificio institucional de COMMAR GROUP',
+                'gallery' => [
+                    commar_project_gallery_item('img/proyecto-02.jpg', 1000, 1400, 'Pabellón Delta, edificio institucional de COMMAR GROUP'),
+                ],
                 'intro' => 'Pabellón Delta funciona como una infraestructura cívica abierta, donde la estructura de hormigón y la envolvente vidriada construyen una relación directa con el espacio público.',
                 'description' => [
                     'El edificio se concibe como un sistema de plataformas, núcleos y visuales cruzadas que permite orientar el flujo de usuarios sin sacrificar claridad espacial. Cada gesto formal responde a necesidades de circulación y permanencia.',
@@ -65,6 +164,9 @@ if (!function_exists('commar_static_projects')) {
                 'img_width' => 1400,
                 'img_height' => 1400,
                 'hero_alt' => 'Torre Prisma, obra de uso mixto de COMMAR GROUP',
+                'gallery' => [
+                    commar_project_gallery_item('img/proyecto-03.jpg', 1400, 1400, 'Torre Prisma, obra de uso mixto de COMMAR GROUP'),
+                ],
                 'intro' => 'Torre Prisma desarrolla una envolvente aguda y precisa, donde la estructura y la piel exterior construyen una presencia vertical deliberadamente intensa.',
                 'description' => [
                     'La torre combina usos comerciales, áreas de trabajo y espacios de estancia en una sección vertical de alta densidad. La lectura del edificio cambia con la distancia, pasando de un volumen abstracto a un ensamblaje visible de planos y aristas.',
@@ -89,6 +191,9 @@ if (!function_exists('commar_static_projects')) {
                 'img_width' => 1400,
                 'img_height' => 933,
                 'hero_alt' => 'Refugio Litoral, proyecto de hospitalidad de COMMAR GROUP',
+                'gallery' => [
+                    commar_project_gallery_item('img/proyecto-04.jpg', 1400, 933, 'Refugio Litoral, proyecto de hospitalidad de COMMAR GROUP'),
+                ],
                 'intro' => 'Refugio Litoral propone una arquitectura de hospitalidad silenciosa, apoyada en horizontales largas, patios de descanso y una relación directa con el agua y el paisaje cercano.',
                 'description' => [
                     'El proyecto organiza sus programas como episodios sucesivos entre jardines, estanques y planos cubiertos. La experiencia está construida desde la pausa, la sombra y la continuidad material entre interior y exterior.',
@@ -113,6 +218,9 @@ if (!function_exists('commar_static_projects')) {
                 'img_width' => 1400,
                 'img_height' => 933,
                 'hero_alt' => 'Patio Umbral, proyecto cultural de COMMAR GROUP',
+                'gallery' => [
+                    commar_project_gallery_item('img/proyecto-05.jpg', 1400, 933, 'Patio Umbral, proyecto cultural de COMMAR GROUP'),
+                ],
                 'intro' => 'Patio Umbral convierte el recorrido en la materia principal del proyecto, articulando muros, sombras profundas y vacíos intermedios de distinta escala.',
                 'description' => [
                     'La pieza cultural se construye como una secuencia de compresiones y aperturas. Cada transición reordena la percepción del visitante y produce pausas deliberadas antes de los espacios de mayor intensidad programática.',
@@ -137,6 +245,9 @@ if (!function_exists('commar_static_projects')) {
                 'img_width' => 1097,
                 'img_height' => 1400,
                 'hero_alt' => 'Núcleo Basalto, edificio corporativo de COMMAR GROUP',
+                'gallery' => [
+                    commar_project_gallery_item('img/proyecto-06.jpg', 1097, 1400, 'Núcleo Basalto, edificio corporativo de COMMAR GROUP'),
+                ],
                 'intro' => 'Núcleo Basalto desarrolla una presencia corporativa densa y contenida, basada en piedra volcánica, vidrio oscuro y una expresión estructural deliberadamente monolítica.',
                 'description' => [
                     'El edificio se organiza en torno a un núcleo central que concentra servicios, estructura y circulación, liberando perímetros de trabajo abiertos y altamente adaptables. La imagen exterior traduce esa lógica interna sin concesiones.',
@@ -149,7 +260,7 @@ if (!function_exists('commar_static_projects')) {
                     'Equipo' => 'Arquitectura, workplace y documentación ejecutiva',
                 ],
             ],
-        ];
+        ]);
     }
 }
 
@@ -158,6 +269,18 @@ if (!function_exists('commar_normalize_work_row')) {
     {
         $description = json_decode((string) ($row['description_json'] ?? '[]'), true);
         $metrics = json_decode((string) ($row['metrics_json'] ?? '[]'), true);
+        $gallery = json_decode((string) ($row['gallery_json'] ?? '[]'), true);
+        $image = (string) ($row['image'] ?? '');
+        $imageWidth = (int) ($row['image_width'] ?? 0);
+        $imageHeight = (int) ($row['image_height'] ?? 0);
+        $heroAlt = (string) ($row['hero_alt'] ?? '');
+        $gallery = is_array($gallery) ? array_values(array_filter($gallery, static function ($item): bool {
+            return is_array($item) && trim((string) ($item['path'] ?? '')) !== '';
+        })) : [];
+
+        if (empty($gallery) && $image !== '') {
+            $gallery[] = commar_project_gallery_item($image, $imageWidth, $imageHeight, $heroAlt);
+        }
 
         return [
             'id' => str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
@@ -168,10 +291,11 @@ if (!function_exists('commar_normalize_work_row')) {
             'location' => (string) ($row['location'] ?? ''),
             'year' => (string) ($row['year'] ?? ''),
             'summary' => (string) ($row['summary'] ?? ''),
-            'img' => (string) ($row['image'] ?? ''),
-            'img_width' => (int) ($row['image_width'] ?? 0),
-            'img_height' => (int) ($row['image_height'] ?? 0),
-            'hero_alt' => (string) ($row['hero_alt'] ?? ''),
+            'img' => $image,
+            'img_width' => $imageWidth,
+            'img_height' => $imageHeight,
+            'hero_alt' => $heroAlt,
+            'gallery' => $gallery,
             'intro' => (string) ($row['intro'] ?? ''),
             'description' => is_array($description) ? array_values(array_filter(array_map('strval', $description))) : [],
             'metrics' => is_array($metrics) ? $metrics : [],
@@ -183,20 +307,22 @@ if (!function_exists('commar_seed_static_projects')) {
     function commar_seed_static_projects(): void
     {
         $db = commar_db();
-        $count = (int) $db->query('SELECT COUNT(*) FROM commar_works')->fetchColumn();
-        if ($count > 0) {
-            return;
-        }
+        $existingSlugs = $db->query('SELECT slug FROM commar_works')->fetchAll(PDO::FETCH_COLUMN);
+        $existingSlugs = is_array($existingSlugs) ? array_flip(array_map('strval', $existingSlugs)) : [];
 
         $statement = $db->prepare(
             'INSERT INTO commar_works
-             (slug, title, category, location, year, summary, image, image_width, image_height, hero_alt, intro, description_json, metrics_json, status, created_at, updated_at)
+             (slug, title, category, location, year, summary, image, image_width, image_height, gallery_json, hero_alt, intro, description_json, metrics_json, status, created_at, updated_at)
              VALUES
-             (:slug, :title, :category, :location, :year, :summary, :image, :image_width, :image_height, :hero_alt, :intro, :description_json, :metrics_json, :status, :created_at, :updated_at)'
+             (:slug, :title, :category, :location, :year, :summary, :image, :image_width, :image_height, :gallery_json, :hero_alt, :intro, :description_json, :metrics_json, :status, :created_at, :updated_at)'
         );
         $now = date('Y-m-d H:i:s');
 
         foreach (commar_static_projects() as $project) {
+            if (isset($existingSlugs[$project['slug']])) {
+                continue;
+            }
+
             $statement->execute([
                 'slug' => $project['slug'],
                 'title' => $project['title'],
@@ -207,6 +333,7 @@ if (!function_exists('commar_seed_static_projects')) {
                 'image' => $project['img'],
                 'image_width' => (int) $project['img_width'],
                 'image_height' => (int) $project['img_height'],
+                'gallery_json' => json_encode($project['gallery'] ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                 'hero_alt' => $project['hero_alt'],
                 'intro' => $project['intro'],
                 'description_json' => json_encode($project['description'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
@@ -215,6 +342,7 @@ if (!function_exists('commar_seed_static_projects')) {
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
+            $existingSlugs[$project['slug']] = true;
         }
     }
 }

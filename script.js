@@ -1,6 +1,6 @@
 // Home nav contrast mode
 const homeNav = document.querySelector('#home-nav');
-const navContrastHero = document.querySelector('#hero-home, .about-hero, .service-detail-hero, .project-detail-hero');
+const navContrastHero = document.querySelector('#hero-home, .about-hero, .service-detail-hero, .project-detail-hero, .article-hero');
 const heroTypewriter = document.querySelector('[data-hero-typewriter]');
 const heroCarousel = document.querySelector('[data-hero-carousel]');
 
@@ -85,6 +85,28 @@ if (homeNav && navContrastHero) {
 } else if (homeNav) {
     homeNav.classList.add('home-nav-scrolled');
 }
+
+document.querySelectorAll('[data-work-gallery]').forEach((gallery) => {
+    const mainImage = gallery.querySelector('[data-work-gallery-main]');
+    const thumbs = Array.from(gallery.querySelectorAll('[data-work-gallery-thumb]'));
+
+    if (!mainImage || thumbs.length === 0) {
+        return;
+    }
+
+    thumbs.forEach((thumb) => {
+        thumb.addEventListener('click', () => {
+            const nextSrc = thumb.dataset.src || '';
+            if (nextSrc === '') {
+                return;
+            }
+
+            mainImage.src = nextSrc;
+            mainImage.alt = thumb.dataset.alt || '';
+            thumbs.forEach((item) => item.classList.toggle('is-active', item === thumb));
+        });
+    });
+});
 
 // Organic scroll reveal
 const scrollRevealItems = Array.from(document.querySelectorAll('[data-scroll-reveal]'));

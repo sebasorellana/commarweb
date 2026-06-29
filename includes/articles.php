@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/site.php';
 require_once __DIR__ . '/db.php';
 
 if (!function_exists('commar_normalize_article_row')) {

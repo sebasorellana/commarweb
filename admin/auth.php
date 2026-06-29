@@ -26,6 +26,23 @@ function commar_admin_require_login(): void
     }
 }
 
+function commar_admin_csrf_token(): string
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function commar_admin_verify_csrf_token(?string $token = null): bool
+{
+    $token = $token ?? $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
+    if (empty($token) || empty($_SESSION['csrf_token'])) {
+        return false;
+    }
+    return hash_equals($_SESSION['csrf_token'], $token);
+}
+
 function commar_admin_h(string $value): string
 {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');

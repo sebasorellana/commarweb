@@ -19,6 +19,11 @@
             'robots' => 'noindex, follow',
         ];
     } else {
+        if (strpos((string) ($_SERVER['REQUEST_URI'] ?? ''), 'obra.php?slug=') !== false) {
+            header('Location: ' . commar_url(commar_work_url($project['slug'])), true, 301);
+            exit;
+        }
+
         $otherProjects = array_values(array_filter(
             commar_projects(),
             static fn (array $item): bool => $item['slug'] !== $project['slug']
@@ -27,7 +32,7 @@
         $seo = [
             'title' => $project['title'],
             'description' => $project['summary'],
-            'path' => 'obra.php?slug=' . $project['slug'],
+            'path' => commar_work_url($project['slug']),
             'image' => $project['img'],
             'image_alt' => $project['hero_alt'],
             'og_type' => 'article',
@@ -38,7 +43,7 @@
                     'name' => $project['title'],
                     'description' => $project['summary'],
                     'image' => commar_absolute_url($project['img']),
-                    'url' => commar_absolute_url('obra.php?slug=' . $project['slug']),
+                    'url' => commar_absolute_url(commar_work_url($project['slug'])),
                     'creator' => [
                         '@type' => 'Organization',
                         'name' => 'COMMAR GROUP',
@@ -153,7 +158,7 @@
                                         </div>
                                         <h3 class="project-card-title"><?php echo htmlspecialchars($relatedProject['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
                                         <p class="project-card-summary"><?php echo htmlspecialchars($relatedProject['summary'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                        <a href="<?php echo htmlspecialchars('obra.php?slug=' . $relatedProject['slug'], ENT_QUOTES, 'UTF-8'); ?>" class="project-card-cta">
+                                        <a href="<?php echo htmlspecialchars(commar_url(commar_work_url($relatedProject['slug'])), ENT_QUOTES, 'UTF-8'); ?>" class="project-card-cta">
                                             <div class="project-card-cta-line"></div>
                                             <span class="project-card-cta-text">Explorar proyecto</span>
                                         </a>

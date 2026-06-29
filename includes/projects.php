@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/site.php';
+require_once __DIR__ . '/db.php';
 
 if (!function_exists('commar_slugify')) {
     function commar_slugify(string $value): string
@@ -25,6 +26,50 @@ if (!function_exists('commar_project_gallery_item')) {
             'alt' => $alt,
         ];
     }
+}
+
+function commar_projects(): array
+{
+    static $projects = null;
+    if ($projects !== null) {
+        return $projects;
+    }
+
+    $db = commar_db();
+    $statement = $db->query("SELECT * FROM commar_works WHERE status = 'published' ORDER BY title ASC");
+    $works = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    $projects = array_map(static function (array $work): array {
+        return [
+            'id' => str_pad((string) $work['id'], 2, '0', STR_PAD_LEFT),
+            'slug' => (string) $work['slug'],
+            'title' => (string) $work['title'],
+            'category' => (string) $work['category'],
+            'location' => (string) $work['location'],
+            'year' => (string) $work['year'],
+            'summary' => (string) $work['summary'],
+            'img' => (string) $work['image'],
+            'img_width' => (int) $work['image_width'],
+            'img_height' => (int) $work['image_height'],
+            'hero_alt' => (string) $work['hero_alt'],
+            'intro' => (string) $work['intro'],
+            'description' => json_decode((string) ($work['description_json'] ?? '[]'), true) ?: [],
+            'metrics' => json_decode((string) ($work['metrics_json'] ?? '[]'), true) ?: [],
+            'gallery' => [], // La galería se puede implementar después si es necesario
+        ];
+    }, $works);
+
+    return $projects;
+}
+
+function commar_project_by_slug(string $slug): ?array
+{
+    foreach (commar_projects() as $project) {
+        if ($project['slug'] === $slug) {
+            return $project;
+        }
+    }
+    return null;
 }
 
 if (!function_exists('commar_static_projects')) {
@@ -347,24 +392,6 @@ if (!function_exists('commar_seed_static_projects')) {
     }
 }
 
-if (!function_exists('commar_projects')) {
-    function commar_projects(): array
-    {
-        commar_seed_static_projects();
-
-        $statement = commar_db()->query(
-            "SELECT * FROM commar_works WHERE status = 'published' ORDER BY title ASC"
-        );
-        $projects = [];
-
-        foreach ($statement->fetchAll() as $index => $row) {
-            $projects[] = commar_normalize_work_row($row, $index);
-        }
-
-        return $projects;
-    }
-}
-
 if (!function_exists('commar_admin_projects')) {
     function commar_admin_projects(): array
     {
@@ -387,18 +414,5 @@ if (!function_exists('commar_admin_project_by_id')) {
         $project = $statement->fetch();
 
         return is_array($project) ? $project : null;
-    }
-}
-
-if (!function_exists('commar_project_by_slug')) {
-    function commar_project_by_slug(string $slug): ?array
-    {
-        foreach (commar_projects() as $project) {
-            if ($project['slug'] === $slug) {
-                return $project;
-            }
-        }
-
-        return null;
     }
 }

@@ -16,7 +16,7 @@ if (!function_exists('commar_normalize_article_row')) {
             'description' => (string) $article['description'],
             'category' => (string) $article['category'],
             'year' => (string) $article['year'],
-            'url' => 'articulo.php?slug=' . rawurlencode((string) $article['slug']),
+            'url' => commar_article_url((string) $article['slug']),
             'image' => $image,
             'image_width' => (int) ($article['image_width'] ?? 0),
             'image_height' => (int) ($article['image_height'] ?? 0),

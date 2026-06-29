@@ -10,6 +10,11 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
     $articleTitle = 'Artículo no encontrado';
     $articleDescription = 'El artículo solicitado no está disponible.';
 } else {
+    if (strpos((string) ($_SERVER['REQUEST_URI'] ?? ''), 'articulo.php?slug=') !== false) {
+        header('Location: ' . commar_url(commar_article_url($article['slug'])), true, 301);
+        exit;
+    }
+
     $articleTitle = $article['title'];
     $articleDescription = $article['description'];
 }
@@ -21,7 +26,7 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
     $seo = [
         'title' => $articleTitle,
         'description' => $articleDescription,
-        'path' => $article ? 'articulo.php?slug=' . rawurlencode($article['slug']) : 'blog.php',
+        'path' => $article ? commar_article_url($article['slug']) : 'blog.php',
         'image' => $article['image'] ?? 'img/logo-commar-500.png',
         'image_alt' => $articleTitle,
         'image_width' => $article['image_width'] ?? null,
@@ -47,7 +52,7 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
                         'url' => commar_absolute_url('img/logo-commar-500.png'),
                     ],
                 ],
-                'mainEntityOfPage' => commar_absolute_url('articulo.php?slug=' . rawurlencode($article['slug'])),
+                'mainEntityOfPage' => commar_absolute_url(commar_article_url($article['slug'])),
                 'inLanguage' => commar_lang_attr(),
             ],
         ] : [],
@@ -57,11 +62,11 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
-    <link rel="stylesheet" href="style.css?v=20260628-blog-header">
+    <link rel="stylesheet" href="style.css?v=20260508-1">
 </head>
 <body>
     <?php
-    $headerVariant = 'home';
+    $headerVariant = 'default';
     $menuItems = [
         ['label' => 'Inicio', 'href' => 'index.php'],
         ['label' => 'El estudio', 'href' => 'el-estudio.php'],
@@ -100,9 +105,17 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
 
                 <div class="article-body-section">
                     <div class="article-body">
-                        <?php foreach ($article['content'] as $paragraph): ?>
-                            <p><?php echo nl2br(htmlspecialchars((string) $paragraph, ENT_QUOTES, 'UTF-8')); ?></p>
-                        <?php endforeach; ?>
+                        <?php
+                        $contentHtml = trim((string) ($article['content_html'] ?? ''));
+                        if ($contentHtml !== '') {
+                            echo $contentHtml; // Sanitizado al guardar
+                        } else {
+                            // Fallback para contenido antiguo sin HTML
+                            foreach ($article['content'] as $paragraph) {
+                                echo '<p>' . htmlspecialchars((string) $paragraph, ENT_QUOTES, 'UTF-8') . '</p>';
+                            }
+                        }
+                        ?>
                     </div>
                 </div>
 
@@ -139,7 +152,7 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
                 <?php endif; ?>
 
                 <?php
-                $articlePath = 'articulo.php?slug=' . rawurlencode($article['slug']);
+                $articlePath = commar_article_url($article['slug']);
                 include __DIR__ . '/includes/article-share.php';
                 ?>
             </article>
@@ -147,6 +160,6 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
     </main>
 
     <?php include __DIR__ . '/includes/footer.php'; ?>
-    <script src="script.js?v=20260628-blog-header" defer></script>
+    <script src="script.js?v=20260508-1" defer></script>
 </body>
 </html>

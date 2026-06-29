@@ -119,7 +119,7 @@ $contactEmail = commar_contact_email();
                     static fn (array $project, int $index): array => [
                         '@type' => 'ListItem',
                         'position' => $index + 1,
-                        'url' => commar_absolute_url('obra.php?slug=' . $project['slug']),
+                        'url' => commar_absolute_url(commar_work_url($project['slug'])),
                         'name' => $project['title'],
                     ],
                     $projects,

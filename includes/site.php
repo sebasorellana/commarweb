@@ -32,6 +32,20 @@ if (!function_exists('commar_absolute_url')) {
     }
 }
 
+if (!function_exists('commar_article_url')) {
+    function commar_article_url(string $slug): string
+    {
+        return 'articulos/' . rawurlencode($slug);
+    }
+}
+
+if (!function_exists('commar_work_url')) {
+    function commar_work_url(string $slug): string
+    {
+        return 'obras/' . rawurlencode($slug);
+    }
+}
+
 if (!function_exists('commar_whatsapp_url')) {
     function commar_whatsapp_url(?string $customMessage = null): string
     {

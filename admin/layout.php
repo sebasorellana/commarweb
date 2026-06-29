@@ -8,6 +8,7 @@ function commar_admin_nav(string $active): void
         ['id' => 'home', 'label' => 'Página Home', 'href' => 'home.php', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'],
         ['id' => 'works', 'label' => 'Obras', 'href' => 'works.php', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01"/><path d="M9 13v.01"/><path d="M9 17v.01"/></svg>'],
         ['id' => 'blog', 'label' => 'Blog', 'href' => 'blog.php', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>'],
+        ['id' => 'jobs', 'label' => 'Trabaja con nosotros', 'href' => 'jobs.php', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>'],
         ['id' => 'newsletter', 'label' => 'Suscripciones', 'href' => 'newsletter-submissions.php', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a2 2 0 0 1-2.06 0L2 7"/></svg>'],
         ['id' => 'settings', 'label' => 'Configuraciones', 'href' => 'settings.php', 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'],
     ];
@@ -37,6 +38,21 @@ function commar_admin_home_nav(string $active): void
     ];
     ?>
     <nav class="admin-subnav" aria-label="Submenú de Página Home">
+        <?php foreach ($items as $item): ?>
+            <a href="<?php echo commar_admin_h($item['href']); ?>" class="<?php echo $active === $item['id'] ? 'is-active' : ''; ?>"><?php echo commar_admin_h($item['label']); ?></a>
+        <?php endforeach; ?>
+    </nav>
+    <?php
+}
+
+function commar_admin_works_nav(string $active): void
+{
+    $items = [
+        ['id' => 'works', 'label' => 'Obras', 'href' => 'works.php'],
+        ['id' => 'categories', 'label' => 'Categorías', 'href' => 'work-categories.php'],
+    ];
+    ?>
+    <nav class="admin-subnav" aria-label="Submenú de obras">
         <?php foreach ($items as $item): ?>
             <a href="<?php echo commar_admin_h($item['href']); ?>" class="<?php echo $active === $item['id'] ? 'is-active' : ''; ?>"><?php echo commar_admin_h($item['label']); ?></a>
         <?php endforeach; ?>

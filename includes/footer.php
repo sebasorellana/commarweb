@@ -1,10 +1,13 @@
 <?php
+require_once __DIR__ . '/jobs.php';
+
 $footerEmail = commar_contact_email();
 $footerAddressLines = commar_contact_address_lines();
 $instagramUrl = trim((string) commar_setting('instagram_url'));
 $linkedinUrl = trim((string) commar_setting('linkedin_url'));
 $footerScript = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
 $shouldRenderNewsletter = !in_array($footerScript, ['index.php'], true);
+$footerActiveJobs = commar_active_jobs();
 ?>
     <?php if ($shouldRenderNewsletter): ?>
         <?php $newsletterTitleId = 'newsletter-title-footer'; ?>
@@ -35,6 +38,9 @@ $shouldRenderNewsletter = !in_array($footerScript, ['index.php'], true);
                     <a href="<?php echo htmlspecialchars(commar_url('obra-viva.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.obra_viva'), ENT_QUOTES, 'UTF-8'); ?></a>
                     <a href="<?php echo htmlspecialchars(commar_url('obras.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.works'), ENT_QUOTES, 'UTF-8'); ?></a>
                     <a href="<?php echo htmlspecialchars(commar_url('blog.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.blog'), ENT_QUOTES, 'UTF-8'); ?></a>
+                    <?php if (!empty($footerActiveJobs)): ?>
+                        <a href="<?php echo htmlspecialchars(commar_url('trabaja-con-nosotros.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link">Trabajá con nosotros</a>
+                    <?php endif; ?>
                     <a href="<?php echo htmlspecialchars(commar_url('contacto.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.contact'), ENT_QUOTES, 'UTF-8'); ?></a>
                 </nav>
                 <div class="footer-column">

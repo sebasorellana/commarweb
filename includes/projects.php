@@ -28,6 +28,167 @@ if (!function_exists('commar_project_gallery_item')) {
     }
 }
 
+if (!function_exists('commar_seed_work_categories')) {
+    function commar_seed_work_categories(): void
+    {
+        static $seeded = false;
+        if ($seeded) {
+            return;
+        }
+
+        $db = commar_db();
+        $names = [];
+
+        try {
+            $existingCategories = $db->query("SELECT DISTINCT category FROM commar_works WHERE category <> ''")->fetchAll(PDO::FETCH_COLUMN);
+            foreach ($existingCategories as $categoryName) {
+                $names[] = (string) $categoryName;
+            }
+        } catch (PDOException $exception) {
+            // If the works table is not ready yet, static categories below are enough.
+        }
+
+        foreach (commar_static_projects() as $project) {
+            $names[] = (string) ($project['category'] ?? '');
+        }
+
+        $names = array_values(array_unique(array_filter(array_map('trim', $names))));
+        sort($names, SORT_NATURAL | SORT_FLAG_CASE);
+
+        $statement = $db->prepare(
+            'INSERT IGNORE INTO commar_work_categories (slug, name, display_order, created_at, updated_at)
+             VALUES (:slug, :name, :display_order, :created_at, :updated_at)'
+        );
+        $now = date('Y-m-d H:i:s');
+
+        foreach ($names as $index => $name) {
+            $statement->execute([
+                'slug' => commar_slugify($name),
+                'name' => $name,
+                'display_order' => ($index + 1) * 10,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+
+        $seeded = true;
+    }
+}
+
+if (!function_exists('commar_admin_work_categories')) {
+    function commar_admin_work_categories(): array
+    {
+        commar_seed_work_categories();
+
+        $statement = commar_db()->query(
+            'SELECT * FROM commar_work_categories ORDER BY display_order ASC, name ASC'
+        );
+
+        return $statement->fetchAll();
+    }
+}
+
+if (!function_exists('commar_admin_work_category_by_id')) {
+    function commar_admin_work_category_by_id(int $id): ?array
+    {
+        commar_seed_work_categories();
+
+        $statement = commar_db()->prepare('SELECT * FROM commar_work_categories WHERE id = :id LIMIT 1');
+        $statement->execute(['id' => $id]);
+        $category = $statement->fetch();
+
+        return is_array($category) ? $category : null;
+    }
+}
+
+if (!function_exists('commar_admin_save_work_category')) {
+    function commar_admin_save_work_category(string $name, int $displayOrder = 0, int $id = 0): bool
+    {
+        $name = trim($name);
+        if ($name === '') {
+            return false;
+        }
+
+        $db = commar_db();
+        $slug = commar_slugify($name);
+        $now = date('Y-m-d H:i:s');
+
+        if ($id > 0) {
+            $existing = commar_admin_work_category_by_id($id);
+            if (!$existing) {
+                return false;
+            }
+
+            $oldName = (string) ($existing['name'] ?? '');
+            $db->beginTransaction();
+
+            try {
+                $statement = $db->prepare(
+                    'UPDATE commar_work_categories
+                     SET slug = :slug, name = :name, display_order = :display_order, updated_at = :updated_at
+                     WHERE id = :id'
+                );
+                $statement->execute([
+                    'id' => $id,
+                    'slug' => $slug,
+                    'name' => $name,
+                    'display_order' => $displayOrder,
+                    'updated_at' => $now,
+                ]);
+
+                if ($oldName !== '' && $oldName !== $name) {
+                    $workStatement = $db->prepare('UPDATE commar_works SET category = :new_name WHERE category = :old_name');
+                    $workStatement->execute([
+                        'new_name' => $name,
+                        'old_name' => $oldName,
+                    ]);
+                }
+
+                $db->commit();
+                return true;
+            } catch (Throwable $exception) {
+                $db->rollBack();
+                throw $exception;
+            }
+        }
+
+        $statement = $db->prepare(
+            'INSERT INTO commar_work_categories (slug, name, display_order, created_at, updated_at)
+             VALUES (:slug, :name, :display_order, :created_at, :updated_at)'
+        );
+
+        return $statement->execute([
+            'slug' => $slug,
+            'name' => $name,
+            'display_order' => $displayOrder,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+    }
+}
+
+if (!function_exists('commar_admin_delete_work_category')) {
+    function commar_admin_delete_work_category(int $id): bool
+    {
+        $category = commar_admin_work_category_by_id($id);
+        if (!$category) {
+            return false;
+        }
+
+        $usageStatement = commar_db()->prepare('SELECT COUNT(*) FROM commar_works WHERE category = :category AND status <> :deleted');
+        $usageStatement->execute([
+            'category' => (string) $category['name'],
+            'deleted' => 'deleted',
+        ]);
+        if ((int) $usageStatement->fetchColumn() > 0) {
+            return false;
+        }
+
+        $statement = commar_db()->prepare('DELETE FROM commar_work_categories WHERE id = :id');
+        return $statement->execute(['id' => $id]);
+    }
+}
+
 function commar_projects(): array
 {
     static $projects = null;

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/db.php';
+require_once dirname(__DIR__) . '/includes/projects.php';
 
 commar_admin_require_login();
 
@@ -169,6 +170,12 @@ $heroAlt = trim((string) ($_POST['hero_alt'] ?? ''));
 if ($title === '' || $category === '' || $summary === '' || $intro === '' || empty($description)) {
     http_response_code(422);
     exit('Faltan campos obligatorios.');
+}
+
+$validCategories = array_map(static fn(array $item): string => (string) $item['name'], commar_admin_work_categories());
+if (!in_array($category, $validCategories, true)) {
+    http_response_code(422);
+    exit('La categoría seleccionada no es válida.');
 }
 
 $db = commar_db();

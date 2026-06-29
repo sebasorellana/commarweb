@@ -4,10 +4,58 @@ require_once dirname(__DIR__) . '/includes/projects.php';
 
 commar_admin_require_login();
 
-$works = commar_admin_projects();
+if (!function_exists('commar_admin_search_lower')) {
+    function commar_admin_search_lower(string $value): string
+    {
+        return function_exists('mb_strtolower') ? mb_strtolower($value, 'UTF-8') : strtolower($value);
+    }
+}
+
+$allWorks = commar_admin_projects();
+$searchQuery = trim((string) ($_GET['q'] ?? ''));
+$works = $allWorks;
+
+if ($searchQuery !== '') {
+    $normalizedQuery = commar_admin_search_lower($searchQuery);
+    $works = array_values(array_filter($allWorks, static function (array $work) use ($normalizedQuery): bool {
+        $searchable = implode(' ', [
+            (string) ($work['title'] ?? ''),
+            (string) ($work['category'] ?? ''),
+            (string) ($work['location'] ?? ''),
+            (string) ($work['year'] ?? ''),
+            (string) ($work['summary'] ?? ''),
+            (string) ($work['slug'] ?? ''),
+        ]);
+
+        return strpos(commar_admin_search_lower($searchable), $normalizedQuery) !== false;
+    }));
+}
+
+$totalWorks = count($allWorks);
+$visibleWorks = count($works);
+$perPage = 20;
+$totalPages = max(1, (int) ceil($visibleWorks / $perPage));
+$currentPage = max(1, (int) ($_GET['page'] ?? 1));
+$currentPage = min($currentPage, $totalPages);
+$offset = ($currentPage - 1) * $perPage;
+$paginatedWorks = array_slice($works, $offset, $perPage);
+$firstVisible = $visibleWorks > 0 ? $offset + 1 : 0;
+$lastVisible = min($offset + $perPage, $visibleWorks);
 $updated = ($_GET['updated'] ?? '') === '1';
 $created = ($_GET['created'] ?? '') === '1';
 $deleted = ($_GET['deleted'] ?? '') === '1';
+
+if (!function_exists('commar_admin_works_page_url')) {
+    function commar_admin_works_page_url(int $page, string $searchQuery): string
+    {
+        $params = ['page' => $page];
+        if ($searchQuery !== '') {
+            $params['q'] = $searchQuery;
+        }
+
+        return 'works.php?' . http_build_query($params);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -15,7 +63,7 @@ $deleted = ($_GET['deleted'] ?? '') === '1';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Obras | MOnkey CMS</title>
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="admin.css?v=20260629-admin-works-ui">
 </head>
 <body class="admin-page">
     <div class="admin-shell">
@@ -23,6 +71,7 @@ $deleted = ($_GET['deleted'] ?? '') === '1';
         <div class="admin-main">
             <?php commar_admin_header('Obras'); ?>
             <main class="admin-content">
+                <?php commar_admin_works_nav('works'); ?>
                 <section class="admin-panel admin-wide-panel">
                     <div class="admin-page-actions">
                         <div>
@@ -42,6 +91,25 @@ $deleted = ($_GET['deleted'] ?? '') === '1';
                         <p class="admin-alert admin-alert-success">Obra eliminada.</p>
                     <?php endif; ?>
 
+                    <form action="works.php" method="get" class="admin-list-search" role="search">
+                        <label for="works-search">
+                            <span>Buscar obras</span>
+                            <input id="works-search" type="search" name="q" value="<?php echo commar_admin_h($searchQuery); ?>" placeholder="Buscar por obra, categoría, ubicación o año">
+                        </label>
+                        <button type="submit" class="admin-search-submit">Buscar</button>
+                        <?php if ($searchQuery !== ''): ?>
+                            <a href="works.php" class="admin-search-clear">Limpiar</a>
+                        <?php endif; ?>
+                    </form>
+
+                    <p class="admin-list-count">
+                        <?php if ($searchQuery !== ''): ?>
+                            Mostrando <?php echo $firstVisible; ?>-<?php echo $lastVisible; ?> de <?php echo $visibleWorks; ?> resultados. Total cargadas: <?php echo $totalWorks; ?>.
+                        <?php else: ?>
+                            Mostrando <?php echo $firstVisible; ?>-<?php echo $lastVisible; ?> de <?php echo $totalWorks; ?> obras cargadas.
+                        <?php endif; ?>
+                    </p>
+
                     <?php if (empty($works)): ?>
                         <p class="admin-empty">No hay obras cargadas.</p>
                     <?php else: ?>
@@ -57,7 +125,7 @@ $deleted = ($_GET['deleted'] ?? '') === '1';
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($works as $work): ?>
+                                    <?php foreach ($paginatedWorks as $work): ?>
                                         <tr>
                                             <td>
                                                 <div class="admin-post-title">
@@ -88,6 +156,26 @@ $deleted = ($_GET['deleted'] ?? '') === '1';
                                 </tbody>
                             </table>
                         </div>
+
+                        <?php if ($totalPages > 1): ?>
+                            <nav class="admin-pagination" aria-label="Paginación de obras">
+                                <a class="<?php echo $currentPage <= 1 ? 'is-disabled' : ''; ?>" href="<?php echo $currentPage <= 1 ? '#' : commar_admin_h(commar_admin_works_page_url($currentPage - 1, $searchQuery)); ?>">Anterior</a>
+                                <?php for ($page = 1; $page <= $totalPages; $page++): ?>
+                                    <?php
+                                    $isEdge = $page === 1 || $page === $totalPages;
+                                    $isNear = abs($page - $currentPage) <= 2;
+                                    if (!$isEdge && !$isNear) {
+                                        if ($page === 2 || $page === $totalPages - 1) {
+                                            echo '<span class="admin-pagination-gap">...</span>';
+                                        }
+                                        continue;
+                                    }
+                                    ?>
+                                    <a class="<?php echo $page === $currentPage ? 'is-active' : ''; ?>" href="<?php echo commar_admin_h(commar_admin_works_page_url($page, $searchQuery)); ?>"><?php echo $page; ?></a>
+                                <?php endfor; ?>
+                                <a class="<?php echo $currentPage >= $totalPages ? 'is-disabled' : ''; ?>" href="<?php echo $currentPage >= $totalPages ? '#' : commar_admin_h(commar_admin_works_page_url($currentPage + 1, $searchQuery)); ?>">Siguiente</a>
+                            </nav>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </section>
             </main>

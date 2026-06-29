@@ -210,6 +210,53 @@ if (!function_exists('commar_db_ensure_schema')) {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
         );
 
+        $pdo->exec(
+            "CREATE TABLE IF NOT EXISTS `commar_work_categories` (
+                `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `slug` VARCHAR(180) NOT NULL,
+                `name` VARCHAR(120) NOT NULL,
+                `display_order` INT NOT NULL DEFAULT 0,
+                `created_at` DATETIME NOT NULL,
+                `updated_at` DATETIME NOT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uniq_commar_work_categories_slug` (`slug`),
+                UNIQUE KEY `uniq_commar_work_categories_name` (`name`),
+                KEY `idx_commar_work_categories_order` (`display_order`, `name`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
+
+        $pdo->exec(
+            "CREATE TABLE IF NOT EXISTS `commar_jobs` (
+                `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `title` VARCHAR(180) NOT NULL,
+                `description` LONGTEXT NOT NULL,
+                `status` ENUM('active', 'inactive', 'deleted') NOT NULL DEFAULT 'active',
+                `created_at` DATETIME NOT NULL,
+                `updated_at` DATETIME NOT NULL,
+                `deleted_at` DATETIME NULL,
+                PRIMARY KEY (`id`),
+                KEY `idx_commar_jobs_status_updated` (`status`, `updated_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
+
+        $pdo->exec(
+            "CREATE TABLE IF NOT EXISTS `commar_job_applications` (
+                `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `job_id` INT UNSIGNED NOT NULL,
+                `full_name` VARCHAR(160) NOT NULL,
+                `email` VARCHAR(255) NOT NULL,
+                `phone` VARCHAR(80) NOT NULL DEFAULT '',
+                `message` TEXT NOT NULL,
+                `cv_path` VARCHAR(255) NOT NULL,
+                `cv_original_name` VARCHAR(255) NOT NULL,
+                `ip_address` VARCHAR(45) NOT NULL DEFAULT '',
+                `user_agent` VARCHAR(255) NOT NULL DEFAULT '',
+                `submitted_at` DATETIME NOT NULL,
+                PRIMARY KEY (`id`),
+                KEY `idx_commar_job_applications_job` (`job_id`, `submitted_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
+
         foreach ([
             "ALTER TABLE `commar_articles` ADD COLUMN IF NOT EXISTS `tags_json` LONGTEXT NULL AFTER `gallery_json`",
             "ALTER TABLE `commar_articles` ADD COLUMN IF NOT EXISTS `youtube_url` VARCHAR(255) NOT NULL DEFAULT '' AFTER `gallery_json`",

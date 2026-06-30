@@ -129,7 +129,7 @@
                 <div class="about-team-grid">
                     <?php foreach ($teamMembers as $member): ?>
                         <article class="about-team-card">
-                            <img src="<?php echo htmlspecialchars($member['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($member['name'] . ' ' . $member['surname'] . ' - ' . $member['position'], ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo (int) $member['width']; ?>" height="<?php echo (int) $member['height']; ?>" loading="lazy" decoding="async" class="about-team-image">
+                            <img src="<?php echo htmlspecialchars($member['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($member['name'] . ' ' . $member['surname'] . ' - ' . $member['position'], ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo (int) $member['width']; ?>" height="<?php echo (int) $member['height']; ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="about-team-image">
                             <div class="about-team-copy">
                                 <div>
                                     <h3><?php echo htmlspecialchars($member['name'] . ' ' . $member['surname'], ENT_QUOTES, 'UTF-8'); ?></h3>
@@ -153,8 +153,8 @@
         <section class="about-section about-history" aria-labelledby="about-history-title">
             <div class="site-shell-wide about-history-grid">
                 <div class="about-founder-card" data-history-images-reveal>
-                    <img src="img/reunion.jpg" alt="Reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="lazy" decoding="async" class="about-founder-image">
-                    <img src="img/reunion2.jpg" alt="Segunda reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="lazy" decoding="async" class="about-founder-image">
+                    <img src="img/reunion.jpg" alt="Reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="about-founder-image">
+                    <img src="img/reunion2.jpg" alt="Segunda reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="about-founder-image">
                 </div>
 
                 <div class="about-history-content">

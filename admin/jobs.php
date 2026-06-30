@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/layout.php';
 require_once dirname(__DIR__) . '/includes/jobs.php';
+require_once dirname(__DIR__) . '/includes/images.php';
 
 commar_admin_require_login();
 
@@ -13,17 +14,6 @@ function commar_admin_upload_job_image(int $jobId = 0): array
 
     if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
         throw new RuntimeException('No se pudo subir la imagen.');
-    }
-
-    $imageInfo = getimagesize((string) ($file['tmp_name'] ?? ''));
-    if ($imageInfo === false) {
-        throw new RuntimeException('La imagen no es válida.');
-    }
-
-    $extensions = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
-    $extension = $extensions[$imageInfo[2]] ?? null;
-    if ($extension === null) {
-        throw new RuntimeException('Formato no soportado. Usá JPG, PNG o WEBP.');
     }
 
     $uploadDir = dirname(__DIR__) . '/img/jobs';
@@ -39,18 +29,16 @@ function commar_admin_upload_job_image(int $jobId = 0): array
         throw new RuntimeException('La carpeta img/jobs no tiene permisos de escritura.');
     }
 
-    $fileName = 'job-' . ($jobId > 0 ? $jobId : 'new') . '-' . date('YmdHis') . '-' . bin2hex(random_bytes(4)) . '.' . $extension;
-    $relativePath = 'img/jobs/' . $fileName;
-    $targetPath = dirname(__DIR__) . '/' . $relativePath;
-
-    if (!move_uploaded_file((string) $file['tmp_name'], $targetPath)) {
-        throw new RuntimeException('No se pudo guardar la imagen.');
-    }
+    $image = commar_admin_store_uploaded_image(
+        (string) $file['tmp_name'],
+        'img/jobs/job-' . ($jobId > 0 ? $jobId : 'new') . '-' . date('YmdHis') . '-' . bin2hex(random_bytes(4)),
+        'imagen'
+    );
 
     return [
-        'path' => $relativePath,
-        'width' => (int) $imageInfo[0],
-        'height' => (int) $imageInfo[1],
+        'path' => $image['path'],
+        'width' => (int) $image['width'],
+        'height' => (int) $image['height'],
     ];
 }
 

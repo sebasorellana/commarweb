@@ -3,6 +3,7 @@ require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/db.php';
 require_once dirname(__DIR__) . '/includes/articles.php';
 require_once dirname(__DIR__) . '/includes/media.php';
+require_once dirname(__DIR__) . '/includes/images.php';
 
 commar_admin_require_login();
 
@@ -101,39 +102,10 @@ function commar_admin_save_image(string $slug, ?array $currentArticle = null): a
         throw new RuntimeException('No se pudo cargar la imagen.');
     }
 
-    $tmpName = (string) $_FILES['image']['tmp_name'];
-    $imageInfo = getimagesize($tmpName);
+    $image = commar_admin_store_uploaded_image((string) $_FILES['image']['tmp_name'], 'img/blog/' . $slug);
+    commar_media_register($image['path'], 'featured', (int) $image['width'], (int) $image['height'], $slug);
 
-    if ($imageInfo === false) {
-        throw new RuntimeException('La imagen no es válida.');
-    }
-
-    $extensions = [
-        IMAGETYPE_JPEG => 'jpg',
-        IMAGETYPE_PNG => 'png',
-        IMAGETYPE_WEBP => 'webp',
-    ];
-
-    $extension = $extensions[$imageInfo[2]] ?? null;
-    if ($extension === null) {
-        throw new RuntimeException('Formato de imagen no soportado.');
-    }
-
-    $relativePath = 'img/blog/' . $slug . '.' . $extension;
-    $targetPath = dirname(__DIR__) . '/' . $relativePath;
-    $targetDir = dirname($targetPath);
-
-    if (!is_dir($targetDir) && !mkdir($targetDir, 0775, true)) {
-        throw new RuntimeException('No se pudo crear la carpeta de imágenes.');
-    }
-
-    if (!move_uploaded_file($tmpName, $targetPath)) {
-        throw new RuntimeException('No se pudo guardar la imagen.');
-    }
-
-    commar_media_register($relativePath, 'featured', (int) $imageInfo[0], (int) $imageInfo[1], $slug);
-
-    return ['path' => $relativePath, 'width' => $imageInfo[0], 'height' => $imageInfo[1]];
+    return ['path' => $image['path'], 'width' => $image['width'], 'height' => $image['height']];
 }
 
 function commar_admin_save_gallery_images(string $slug): array
@@ -154,40 +126,17 @@ function commar_admin_save_gallery_images(string $slug): array
             throw new RuntimeException('No se pudo cargar una imagen de galería.');
         }
 
-        $imageInfo = getimagesize((string) $tmpName);
-        if ($imageInfo === false) {
-            throw new RuntimeException('Una imagen de galería no es válida.');
-        }
-
-        $extensions = [
-            IMAGETYPE_JPEG => 'jpg',
-            IMAGETYPE_PNG => 'png',
-            IMAGETYPE_WEBP => 'webp',
-        ];
-
-        $extension = $extensions[$imageInfo[2]] ?? null;
-        if ($extension === null) {
-            throw new RuntimeException('Formato de imagen de galería no soportado.');
-        }
-
-        $relativePath = 'img/blog/' . $slug . '-gallery-' . date('YmdHis') . '-' . ($index + 1) . '.' . $extension;
-        $targetPath = dirname(__DIR__) . '/' . $relativePath;
-        $targetDir = dirname($targetPath);
-
-        if (!is_dir($targetDir) && !mkdir($targetDir, 0775, true)) {
-            throw new RuntimeException('No se pudo crear la carpeta de imágenes.');
-        }
-
-        if (!move_uploaded_file((string) $tmpName, $targetPath)) {
-            throw new RuntimeException('No se pudo guardar una imagen de galería.');
-        }
-
-        commar_media_register($relativePath, 'gallery', (int) $imageInfo[0], (int) $imageInfo[1], $slug);
+        $image = commar_admin_store_uploaded_image(
+            (string) $tmpName,
+            'img/blog/' . $slug . '-gallery-' . date('YmdHis') . '-' . ($index + 1),
+            'imagen de galería'
+        );
+        commar_media_register($image['path'], 'gallery', (int) $image['width'], (int) $image['height'], $slug);
 
         $gallery[] = [
-            'path' => $relativePath,
-            'width' => $imageInfo[0],
-            'height' => $imageInfo[1],
+            'path' => $image['path'],
+            'width' => $image['width'],
+            'height' => $image['height'],
         ];
     }
 

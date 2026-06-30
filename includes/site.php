@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/i18n.php';
 require_once __DIR__ . '/settings.php';
+require_once __DIR__ . '/images.php';
 
 if (!function_exists('commar_base_url')) {
     function commar_base_url(): string

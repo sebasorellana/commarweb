@@ -67,7 +67,7 @@ $seo = [
                                 <div class="job-card-copy">
                                     <?php if (!empty($job['image'])): ?>
                                         <figure class="job-card-media">
-                                            <img src="<?php echo htmlspecialchars((string) $job['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars((string) $job['title'], ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo (int) ($job['image_width'] ?? 1200); ?>" height="<?php echo (int) ($job['image_height'] ?? 800); ?>" loading="lazy">
+                                            <img src="<?php echo htmlspecialchars((string) $job['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars((string) $job['title'], ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo (int) ($job['image_width'] ?? 1200); ?>" height="<?php echo (int) ($job['image_height'] ?? 800); ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>">
                                         </figure>
                                     <?php endif; ?>
                                     <span class="jobs-kicker">Búsqueda activa</span>

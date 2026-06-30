@@ -696,6 +696,16 @@ img {
     color: #6c757d;
 }
 
+.admin-status-pill.is-admin-role {
+    background-color: #e7f0ff;
+    color: var(--admin-primary-color);
+}
+
+.admin-status-pill.is-editor-role {
+    background-color: #eef8e7;
+    color: #427a20;
+}
+
 .admin-table-actions {
     display: flex;
     align-items: center;
@@ -755,6 +765,7 @@ img {
 .admin-user-form input[type="text"],
 .admin-user-form input[type="email"],
 .admin-user-form input[type="password"],
+.admin-user-form select,
 .admin-article-form input[type="text"],
 .admin-article-form input[type="url"],
 .admin-article-form input[type="file"],
@@ -776,6 +787,7 @@ img {
 }
 
 .admin-form select,
+.admin-user-form select,
 .admin-article-form select {
     padding-right: 2.4rem;
     background-image:
@@ -864,6 +876,7 @@ img {
 .admin-form select:focus,
 .admin-form textarea:focus,
 .admin-user-form input:focus,
+.admin-user-form select:focus,
 .admin-article-form input:focus,
 .admin-article-form select:focus,
 .admin-article-form textarea:focus {
@@ -1322,6 +1335,106 @@ img {
 
 .admin-user-form button[type="submit"] {
     width: 100%;
+}
+
+.admin-users-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-users-summary article {
+    padding: 1rem;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.admin-users-summary span {
+    display: block;
+    color: var(--admin-text-secondary);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.admin-users-summary strong {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 1.35rem;
+    line-height: 1.2;
+}
+
+.admin-user-row-action {
+    margin: 0;
+}
+
+.admin-modal-target {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.admin-modal-target:target {
+    display: flex;
+}
+
+.admin-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 13, 21, 0.58);
+}
+
+.admin-modal-card {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 520px);
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    padding: 1.5rem;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+}
+
+.admin-modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--admin-border-color);
+}
+
+.admin-modal-head h2 {
+    margin: 0.2rem 0 0;
+    font-size: 1.25rem;
+    line-height: 1.2;
+}
+
+.admin-modal-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 50%;
+    color: var(--admin-text-secondary);
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+.admin-modal-close:hover {
+    color: var(--admin-text-primary);
+    background: var(--admin-bg);
 }
 
 /* Settings Page */

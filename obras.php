@@ -156,7 +156,7 @@
                                                 <?php $galleryPath = (string) ($galleryItem['path'] ?? ''); ?>
                                                 <?php if ($galleryPath !== ''): ?>
                                                     <button type="button" class="works-directory-thumb<?php echo $galleryIndex === 0 ? ' is-active' : ''; ?>" data-work-gallery-thumb data-src="<?php echo htmlspecialchars($galleryPath, ENT_QUOTES, 'UTF-8'); ?>" data-alt="<?php echo htmlspecialchars((string) ($galleryItem['alt'] ?? $selectedProject['hero_alt']), ENT_QUOTES, 'UTF-8'); ?>" aria-label="Ver imagen <?php echo $galleryIndex + 1; ?> de <?php echo htmlspecialchars($selectedProject['title'], ENT_QUOTES, 'UTF-8'); ?>">
-                                                        <img src="<?php echo htmlspecialchars($galleryPath, ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) ($galleryItem['width'] ?? 160); ?>" height="<?php echo (int) ($galleryItem['height'] ?? 120); ?>" loading="lazy" decoding="async">
+                                                        <img src="<?php echo htmlspecialchars($galleryPath, ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) ($galleryItem['width'] ?? 160); ?>" height="<?php echo (int) ($galleryItem['height'] ?? 120); ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async">
                                                     </button>
                                                 <?php endif; ?>
                                             <?php endforeach; ?>

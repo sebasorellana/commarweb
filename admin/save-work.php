@@ -2,6 +2,7 @@
 require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/db.php';
 require_once dirname(__DIR__) . '/includes/projects.php';
+require_once dirname(__DIR__) . '/includes/images.php';
 
 commar_admin_require_login();
 
@@ -101,13 +102,6 @@ function commar_admin_save_work_gallery_images(string $slug, string $heroAlt, in
         return $gallery;
     }
 
-    $uploadDir = dirname(__DIR__) . '/img/obras';
-    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true)) {
-        http_response_code(500);
-        exit('No se pudo crear la carpeta de imágenes.');
-    }
-
-    $extensions = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
     $tmpNames = is_array($files['tmp_name']) ? $files['tmp_name'] : [];
 
     foreach ($tmpNames as $index => $tmpName) {
@@ -125,30 +119,21 @@ function commar_admin_save_work_gallery_images(string $slug, string $heroAlt, in
             exit('No se pudo subir una de las imágenes.');
         }
 
-        $imageInfo = getimagesize((string) $tmpName);
-        if ($imageInfo === false) {
-            http_response_code(422);
-            exit('Una de las imágenes no es válida.');
-        }
-
-        $extension = $extensions[$imageInfo[2]] ?? null;
-        if ($extension === null) {
-            http_response_code(422);
-            exit('Formato no soportado. Usá JPG, PNG o WEBP.');
-        }
-
-        $relativePath = 'img/obras/' . $slug . '-gallery-' . date('YmdHis') . '-' . ($index + 1) . '.' . $extension;
-        $targetPath = dirname(__DIR__) . '/' . $relativePath;
-
-        if (!move_uploaded_file((string) $tmpName, $targetPath)) {
+        try {
+            $image = commar_admin_store_uploaded_image(
+                (string) $tmpName,
+                'img/obras/' . $slug . '-gallery-' . date('YmdHis') . '-' . ($index + 1),
+                'imagen'
+            );
+        } catch (RuntimeException $exception) {
             http_response_code(500);
-            exit('No se pudo guardar una de las imágenes.');
+            exit($exception->getMessage());
         }
 
         $gallery[] = [
-            'path' => $relativePath,
-            'width' => (int) $imageInfo[0],
-            'height' => (int) $imageInfo[1],
+            'path' => $image['path'],
+            'width' => (int) $image['width'],
+            'height' => (int) $image['height'],
             'alt' => $heroAlt,
         ];
     }

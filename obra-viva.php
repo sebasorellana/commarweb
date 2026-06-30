@@ -72,7 +72,7 @@
         <section class="service-detail-section" aria-labelledby="obra-viva-what-title">
             <div class="site-shell-wide obra-viva-what-layout">
                 <div class="obra-viva-what-heading">
-                    <img src="img/obra-viva-logo1.png" alt="Obra Viva" width="835" height="729" loading="lazy" decoding="async" class="obra-viva-section-logo">
+                    <img src="img/obra-viva-logo1.png" alt="Obra Viva" width="835" height="729" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="obra-viva-section-logo">
                     <div>
                         <span class="service-detail-kicker">¿Qué es Obra Viva?</span>
                         <h2 id="obra-viva-what-title" class="service-detail-heading">El backbone administrativo de la obra.</h2>
@@ -207,7 +207,7 @@
         <section class="service-detail-cta-section" aria-labelledby="obra-viva-cta-title">
             <div class="site-shell-wide service-detail-cta">
                 <div class="obra-viva-cta-heading">
-                    <img src="img/obra-viva-logo2.png" alt="Obra Viva" width="814" height="782" loading="lazy" decoding="async" class="obra-viva-cta-logo">
+                    <img src="img/obra-viva-logo2.png" alt="Obra Viva" width="814" height="782" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="obra-viva-cta-logo">
                     <div>
                         <span class="service-detail-kicker">Consulta</span>
                         <h2 id="obra-viva-cta-title" class="service-detail-cta-title">Delegá la gestión administrativa de tu obra.</h2>

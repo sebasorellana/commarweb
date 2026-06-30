@@ -145,7 +145,7 @@
                             <?php foreach (array_slice($otherProjects, 0, 3) as $relatedProject): ?>
                                 <article class="project-item project-card">
                                     <div class="project-card-media img-reveal-container">
-                                        <img src="<?php echo htmlspecialchars($relatedProject['img'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($relatedProject['title'] . ' - ' . $relatedProject['category'], ENT_QUOTES, 'UTF-8'); ?>" width="2000" height="1333" loading="lazy" decoding="async" class="project-card-image">
+                                        <img src="<?php echo htmlspecialchars($relatedProject['img'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($relatedProject['title'] . ' - ' . $relatedProject['category'], ENT_QUOTES, 'UTF-8'); ?>" width="2000" height="1333" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="project-card-image">
                                         <div class="project-card-badge">
                                             <?php echo htmlspecialchars($relatedProject['id'], ENT_QUOTES, 'UTF-8'); ?> // <?php echo htmlspecialchars($relatedProject['category'], ENT_QUOTES, 'UTF-8'); ?>
                                         </div>

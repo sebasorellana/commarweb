@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/db.php';
+require_once dirname(__DIR__) . '/includes/images.php';
 
 commar_admin_require_login();
 
@@ -29,40 +30,21 @@ $imageWidth = 0;
 $imageHeight = 0;
 
 if (!empty($_FILES['image']['tmp_name']) && ($_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
-    $tmpName = (string) $_FILES['image']['tmp_name'];
-    $imageInfo = getimagesize($tmpName);
-
-    if ($imageInfo === false) {
-        http_response_code(422);
-        exit('La imagen no es válida.');
-    }
-
-    $extensions = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
-    $extension = $extensions[$imageInfo[2]] ?? null;
-
-    if ($extension === null) {
-        http_response_code(422);
-        exit('Formato no soportado. Usá JPG, PNG o WEBP.');
-    }
-
-    $uploadDir = dirname(__DIR__) . '/img/obras';
-    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true)) {
-        http_response_code(500);
-        exit('No se pudo crear la carpeta de imágenes.');
-    }
-
     $slug = preg_replace('/[^a-z0-9]+/', '-', strtolower($title));
-    $relativePath = 'img/obras/' . $slug . '-' . date('YmdHis') . '.' . $extension;
-    $targetPath = dirname(__DIR__) . '/' . $relativePath;
-
-    if (!move_uploaded_file($tmpName, $targetPath)) {
-        http_response_code(500);
-        exit('No se pudo guardar la imagen.');
+    try {
+        $image = commar_admin_store_uploaded_image(
+            (string) $_FILES['image']['tmp_name'],
+            'img/obras/' . $slug . '-' . date('YmdHis'),
+            'imagen'
+        );
+    } catch (RuntimeException $exception) {
+        http_response_code(422);
+        exit($exception->getMessage());
     }
 
-    $imagePath = $relativePath;
-    $imageWidth = (int) $imageInfo[0];
-    $imageHeight = (int) $imageInfo[1];
+    $imagePath = $image['path'];
+    $imageWidth = (int) $image['width'];
+    $imageHeight = (int) $image['height'];
 }
 
 $db = commar_db();

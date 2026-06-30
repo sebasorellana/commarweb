@@ -61,7 +61,7 @@
                     <?php foreach ($articles as $article): ?>
                         <article class="blog-card">
                             <a href="<?php echo htmlspecialchars(commar_url($article['url']), ENT_QUOTES, 'UTF-8'); ?>" class="blog-card-media<?php echo $article['image'] === '' ? ' is-placeholder' : ''; ?>" aria-label="<?php echo htmlspecialchars($article['title'], ENT_QUOTES, 'UTF-8'); ?>">
-                                <img src="<?php echo htmlspecialchars($article['display_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $article['display_image_width']; ?>" height="<?php echo (int) $article['display_image_height']; ?>" loading="lazy" decoding="async" class="blog-card-image">
+                                <img src="<?php echo htmlspecialchars($article['display_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $article['display_image_width']; ?>" height="<?php echo (int) $article['display_image_height']; ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="blog-card-image">
                             </a>
                             <div class="blog-card-copy">
                                 <span class="blog-card-meta"><?php echo htmlspecialchars($article['category'], ENT_QUOTES, 'UTF-8'); ?> // <?php echo htmlspecialchars($article['year'], ENT_QUOTES, 'UTF-8'); ?></span>

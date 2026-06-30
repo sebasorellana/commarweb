@@ -121,7 +121,7 @@
                                 <span><?php echo htmlspecialchars($service['index'], ENT_QUOTES, 'UTF-8'); ?></span>
                             </a>
                             <div class="services-page-card-media">
-                                <img src="<?php echo htmlspecialchars($service['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo (int) $service['image_width']; ?>" height="<?php echo (int) $service['image_height']; ?>" loading="lazy" decoding="async">
+                                <img src="<?php echo htmlspecialchars($service['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo (int) $service['image_width']; ?>" height="<?php echo (int) $service['image_height']; ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async">
                             </div>
                             <div class="services-page-card-copy">
                                 <h2><?php echo htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h2>

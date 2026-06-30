@@ -159,7 +159,7 @@ $contactEmail = commar_contact_email();
         <div class="hero-reveal-container">
             <div class="hero-reveal-media" aria-hidden="true" data-hero-carousel data-hero-carousel-speed="<?php echo $homeHeroCarouselSpeed; ?>">
                 <?php foreach ($homeHeroImages as $index => $image): ?>
-                    <img src="<?php echo htmlspecialchars((string) $image['path'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) ($image['width'] ?? $homeHeroWidth); ?>" height="<?php echo (int) ($image['height'] ?? $homeHeroHeight); ?>" fetchpriority="<?php echo $index === 0 ? 'high' : 'auto'; ?>" loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>" decoding="async" class="hero-reveal-image<?php echo $index === 0 ? ' is-active' : ''; ?>">
+                    <img src="<?php echo htmlspecialchars((string) $image['path'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) ($image['width'] ?? $homeHeroWidth); ?>" height="<?php echo (int) ($image['height'] ?? $homeHeroHeight); ?>" fetchpriority="<?php echo $index === 0 ? 'high' : 'auto'; ?>" loading="<?php echo commar_image_loading_attr($index === 0 ? 'eager' : 'lazy'); ?>" decoding="async" class="hero-reveal-image<?php echo $index === 0 ? ' is-active' : ''; ?>">
                 <?php endforeach; ?>
                 <div class="hero-reveal-overlay" aria-hidden="true"></div>
             </div>
@@ -191,7 +191,7 @@ $contactEmail = commar_contact_email();
                 <div class="studio-overview-media" data-scroll-reveal="left">
                     <picture>
                         <source srcset="img/romina-lo-conte-mobile.jpg" media="(max-width: 767px)">
-                        <img src="img/romina-lo-conte.jpg" alt="Retrato de la arquitecta Romina Lo Conte, fundadora y directora creativa de COMMAR GROUP" width="852" height="1280" loading="lazy" decoding="async" class="studio-overview-image">
+                        <img src="img/romina-lo-conte.jpg" alt="Retrato de la arquitecta Romina Lo Conte, fundadora y directora creativa de COMMAR GROUP" width="852" height="1280" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="studio-overview-image">
                     </picture>
                 </div>
 
@@ -266,7 +266,7 @@ $contactEmail = commar_contact_email();
         <div class="shader-carousel" data-project-carousel>
             <div class="shader-carousel-media" aria-hidden="true">
                 <?php foreach ($featuredProjects as $projectIndex => $project): ?>
-                    <img src="<?php echo htmlspecialchars($project['img'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $project['img_width']; ?>" height="<?php echo (int) $project['img_height']; ?>" loading="<?php echo $projectIndex === 0 ? 'eager' : 'lazy'; ?>" decoding="async" class="shader-carousel-image<?php echo $projectIndex === 0 ? ' is-active' : ''; ?>">
+                    <img src="<?php echo htmlspecialchars($project['img'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $project['img_width']; ?>" height="<?php echo (int) $project['img_height']; ?>" loading="<?php echo commar_image_loading_attr($projectIndex === 0 ? 'eager' : 'lazy'); ?>" decoding="async" class="shader-carousel-image<?php echo $projectIndex === 0 ? ' is-active' : ''; ?>">
                 <?php endforeach; ?>
             </div>
             <div class="shader-carousel-scrim" aria-hidden="true"></div>
@@ -307,7 +307,7 @@ $contactEmail = commar_contact_email();
                     <?php foreach (array_slice($articles, 0, 3) as $articleIndex => $article): ?>
                         <article class="insight-card" data-scroll-reveal="up" style="--reveal-delay: <?php echo htmlspecialchars(number_format($articleIndex * 0.08, 2, '.', ''), ENT_QUOTES, 'UTF-8'); ?>s;">
                             <a href="<?php echo htmlspecialchars($article['url'], ENT_QUOTES, 'UTF-8'); ?>" class="insight-card-media<?php echo $article['image'] === '' ? ' is-placeholder' : ''; ?>" aria-label="<?php echo htmlspecialchars($article['title'], ENT_QUOTES, 'UTF-8'); ?>">
-                                <img src="<?php echo htmlspecialchars($article['display_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $article['display_image_width']; ?>" height="<?php echo (int) $article['display_image_height']; ?>" loading="lazy" decoding="async" class="insight-card-image">
+                                <img src="<?php echo htmlspecialchars($article['display_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $article['display_image_width']; ?>" height="<?php echo (int) $article['display_image_height']; ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="insight-card-image">
                             </a>
                             <div class="insight-card-copy">
                                 <span class="insight-card-meta"><?php echo htmlspecialchars($article['category'], ENT_QUOTES, 'UTF-8'); ?> // <?php echo htmlspecialchars($article['year'], ENT_QUOTES, 'UTF-8'); ?></span>

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/settings.php';
+require_once dirname(__DIR__) . '/includes/images.php';
 
 commar_admin_require_login();
 
@@ -10,12 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 commar_admin_require_valid_csrf();
-
-$extensions = [
-    IMAGETYPE_JPEG => 'jpg',
-    IMAGETYPE_PNG => 'png',
-    IMAGETYPE_WEBP => 'webp',
-];
 
 $settings = commar_settings();
 $textMode = (string) ($_POST['home_hero_text_mode'] ?? 'animated_static');
@@ -60,31 +55,21 @@ if (is_array($files) && isset($files['tmp_name']) && is_array($files['tmp_name']
                 exit('Una de las imágenes no se pudo cargar correctamente.');
             }
 
-            $tmpName = (string) $files['tmp_name'][$index];
-            $imageInfo = getimagesize($tmpName);
-            if ($imageInfo === false) {
+            try {
+                $image = commar_admin_store_uploaded_image(
+                    (string) $files['tmp_name'][$index],
+                    'img/admin/home-hero-' . date('YmdHis') . '-' . ($position + 1),
+                    'imagen'
+                );
+            } catch (RuntimeException $exception) {
                 http_response_code(422);
-                exit('Una de las imágenes no es válida.');
-            }
-
-            $extension = $extensions[$imageInfo[2]] ?? null;
-            if ($extension === null) {
-                http_response_code(422);
-                exit('Formato no soportado. Usá JPG, PNG o WEBP.');
-            }
-
-            $relativePath = 'img/admin/home-hero-' . date('YmdHis') . '-' . ($position + 1) . '.' . $extension;
-            $targetPath = dirname(__DIR__) . '/' . $relativePath;
-
-            if (!move_uploaded_file($tmpName, $targetPath)) {
-                http_response_code(500);
-                exit('No se pudo guardar una de las imágenes.');
+                exit($exception->getMessage());
             }
 
             $uploadedImages[] = [
-                'path' => $relativePath,
-                'width' => (int) $imageInfo[0],
-                'height' => (int) $imageInfo[1],
+                'path' => $image['path'],
+                'width' => (int) $image['width'],
+                'height' => (int) $image['height'],
             ];
         }
     }

@@ -143,7 +143,7 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
                                         alt=""
                                         width="<?php echo (int) ($image['width'] ?? 1000); ?>"
                                         height="<?php echo (int) ($image['height'] ?? 1000); ?>"
-                                        loading="lazy"
+                                        loading="<?php echo commar_image_loading_attr('lazy'); ?>"
                                         decoding="async">
                                 </figure>
                             <?php endforeach; ?>

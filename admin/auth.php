@@ -69,6 +69,47 @@ function commar_admin_require_login(): void
     }
 }
 
+function commar_admin_normalize_role(string $role): string
+{
+    return $role === 'editor' ? 'editor' : 'admin';
+}
+
+function commar_admin_current_role(): string
+{
+    static $role = null;
+
+    if ($role !== null) {
+        return $role;
+    }
+
+    $role = commar_admin_normalize_role((string) ($_SESSION['commar_role'] ?? 'admin'));
+    if (commar_admin_is_logged_in() && !empty($_SESSION['commar_user_id'])) {
+        $currentUser = commar_admin_get_current_user();
+        if ($currentUser !== null) {
+            $role = commar_admin_normalize_role((string) ($currentUser['role'] ?? 'admin'));
+            $_SESSION['commar_username'] = $currentUser['username'];
+            $_SESSION['commar_role'] = $role;
+        }
+    }
+
+    return $role;
+}
+
+function commar_admin_is_administrator(): bool
+{
+    return commar_admin_is_logged_in() && commar_admin_current_role() === 'admin';
+}
+
+function commar_admin_require_administrator(): void
+{
+    commar_admin_require_login();
+
+    if (!commar_admin_is_administrator()) {
+        http_response_code(403);
+        exit('No tenés permisos para acceder a esta sección.');
+    }
+}
+
 function commar_admin_csrf_token(): string
 {
     if (empty($_SESSION['csrf_token'])) {
@@ -218,39 +259,115 @@ function commar_admin_login(string $username, string $password): bool
     $_SESSION['commar_admin'] = true;
     $_SESSION['commar_user_id'] = $user['id'];
     $_SESSION['commar_username'] = $user['username'];
+    $_SESSION['commar_role'] = commar_admin_normalize_role((string) ($user['role'] ?? 'admin'));
     $_SESSION['commar_last_activity'] = time();
 
     return true;
 }
 
-function commar_admin_create_user(string $username, string $password, string $email = ''): bool
+function commar_admin_create_user(string $username, string $password, string $email = '', string $role = 'editor'): bool
 {
     if (commar_admin_get_user($username) !== null) {
         return false; // User already exists
     }
 
+    $role = commar_admin_normalize_role($role);
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
     $statement = commar_db()->prepare(
-        'INSERT INTO commar_users (username, password_hash, email) VALUES (:username, :password_hash, :email)'
+        'INSERT INTO commar_users (username, password_hash, email, role) VALUES (:username, :password_hash, :email, :role)'
     );
 
     return $statement->execute([
         'username' => $username,
         'password_hash' => $passwordHash,
         'email' => $email,
+        'role' => $role,
     ]);
 }
 
 function commar_admin_get_all_users(): array
 {
-    $statement = commar_db()->query('SELECT id, username, email, created_at, updated_at FROM commar_users ORDER BY created_at DESC');
+    $statement = commar_db()->query('SELECT id, username, email, role, created_at, updated_at FROM commar_users ORDER BY created_at DESC');
     return $statement->fetchAll();
+}
+
+function commar_admin_get_user_by_id(int $userId): ?array
+{
+    $statement = commar_db()->prepare('SELECT id, username, email, role, created_at, updated_at FROM commar_users WHERE id = :id LIMIT 1');
+    $statement->execute(['id' => $userId]);
+    $user = $statement->fetch();
+
+    return is_array($user) ? $user : null;
+}
+
+function commar_admin_count_administrators(): int
+{
+    $statement = commar_db()->query("SELECT COUNT(*) FROM commar_users WHERE role = 'admin'");
+    return (int) $statement->fetchColumn();
+}
+
+function commar_admin_update_user(int $userId, string $username, string $email, string $role): bool
+{
+    $currentUser = commar_admin_get_user_by_id($userId);
+    if ($currentUser === null) {
+        return false;
+    }
+
+    $existingUser = commar_admin_get_user($username);
+    if ($existingUser !== null && (int) $existingUser['id'] !== $userId) {
+        return false;
+    }
+
+    $role = commar_admin_normalize_role($role);
+    if ((string) ($currentUser['role'] ?? 'admin') === 'admin' && $role !== 'admin' && commar_admin_count_administrators() <= 1) {
+        return false;
+    }
+
+    $statement = commar_db()->prepare(
+        'UPDATE commar_users SET username = :username, email = :email, role = :role WHERE id = :id'
+    );
+
+    $updated = $statement->execute([
+        'username' => $username,
+        'email' => $email,
+        'role' => $role,
+        'id' => $userId,
+    ]);
+
+    if ($updated && (int) ($_SESSION['commar_user_id'] ?? 0) === $userId) {
+        $_SESSION['commar_username'] = $username;
+        $_SESSION['commar_role'] = $role;
+    }
+
+    return $updated;
+}
+
+function commar_admin_update_user_password(int $userId, string $password): bool
+{
+    if (commar_admin_get_user_by_id($userId) === null) {
+        return false;
+    }
+
+    $statement = commar_db()->prepare('UPDATE commar_users SET password_hash = :password_hash WHERE id = :id');
+    return $statement->execute([
+        'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+        'id' => $userId,
+    ]);
 }
 
 function commar_admin_delete_user(int $userId): bool
 {
     // Don't allow deleting the current user
     if (($userId ?? 0) === ($_SESSION['commar_user_id'] ?? 0)) {
+        return false;
+    }
+
+    $user = commar_admin_get_user_by_id($userId);
+    if ($user === null) {
+        return false;
+    }
+
+    if ((string) ($user['role'] ?? 'admin') === 'admin' && commar_admin_count_administrators() <= 1) {
         return false;
     }
 
@@ -376,7 +493,7 @@ function commar_admin_get_current_user(): ?array
         return null;
     }
 
-    $statement = commar_db()->prepare('SELECT id, username, email, created_at, updated_at FROM commar_users WHERE id = :id LIMIT 1');
+    $statement = commar_db()->prepare('SELECT id, username, email, role, created_at, updated_at FROM commar_users WHERE id = :id LIMIT 1');
     $statement->execute(['id' => $userId]);
     $user = $statement->fetch();
 

@@ -17,7 +17,7 @@ $footerActiveJobs = commar_active_jobs();
         <div class="site-shell-wide footer-shell">
             <div class="footer-top">
                 <a href="<?php echo htmlspecialchars(commar_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-logo-link" aria-label="COMMAR GROUP - Inicio">
-                    <img src="img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578" loading="lazy" decoding="async" class="footer-logo-image">
+                    <img src="img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="footer-logo-image">
                 </a>
 
                 <div class="footer-contact-card">

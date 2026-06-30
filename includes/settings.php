@@ -24,6 +24,10 @@ if (!function_exists('commar_default_settings')) {
             'maintenance_enabled' => '0',
             'maintenance_title' => 'Sitio en mantenimiento',
             'maintenance_message' => 'Estamos realizando tareas de actualización. Volveremos a estar disponibles en breve.',
+            'image_webp_enabled' => '1',
+            'image_webp_quality' => '82',
+            'image_max_width' => '2000',
+            'image_lazyload_enabled' => '1',
         ];
     }
 }

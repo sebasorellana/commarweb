@@ -2,7 +2,7 @@
 require_once __DIR__ . '/layout.php';
 require_once dirname(__DIR__) . '/includes/settings.php';
 
-commar_admin_require_login();
+commar_admin_require_administrator();
 
 $settings = commar_settings();
 $updated = ($_GET['updated'] ?? '') === '1';

@@ -11,8 +11,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $reset !== null) {
     $password = (string) ($_POST['password'] ?? '');
     $passwordConfirm = (string) ($_POST['password_confirm'] ?? '');
 
-    if (strlen($password) < 6) {
-        $message = 'La clave debe tener al menos 6 caracteres.';
+    if (!commar_admin_verify_csrf_token()) {
+        $message = 'La sesión expiró. Volvé a intentar.';
+        $messageType = 'error';
+    } elseif (strlen($password) < 8) {
+        $message = 'La clave debe tener al menos 8 caracteres.';
         $messageType = 'error';
     } elseif ($password !== $passwordConfirm) {
         $message = 'Las claves no coinciden.';
@@ -57,11 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $reset !== null) {
                         <input type="hidden" name="token" value="<?php echo commar_admin_h($token); ?>">
                         <label>
                             <span>Nueva clave</span>
-                            <input type="password" name="password" autocomplete="new-password" minlength="6" required>
+                            <input type="password" name="password" autocomplete="new-password" minlength="8" required>
                         </label>
                         <label>
                             <span>Repetir clave</span>
-                            <input type="password" name="password_confirm" autocomplete="new-password" minlength="6" required>
+                            <input type="password" name="password_confirm" autocomplete="new-password" minlength="8" required>
                         </label>
                         <button type="submit" class="admin-login-submit">Guardar clave</button>
                     <?php elseif (!$passwordChanged): ?>

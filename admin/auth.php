@@ -7,10 +7,50 @@ require_once dirname(__DIR__) . '/includes/db.php';
 
 if (!headers_sent()) {
     header('X-Robots-Tag: noindex, nofollow, noarchive', true);
+    header('X-Frame-Options: DENY', true);
+    header('X-Content-Type-Options: nosniff', true);
+    header('Referrer-Policy: same-origin', true);
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()', true);
 }
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
+    $secureCookie = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+        || (($_SERVER['SERVER_PORT'] ?? '') === '443');
+
+    ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
+    ini_set('session.cookie_httponly', '1');
+    ini_set('session.cookie_secure', $secureCookie ? '1' : '0');
+    ini_set('session.cookie_samesite', 'Lax');
     session_start();
+}
+
+if (!defined('COMMAR_ADMIN_SESSION_TTL')) {
+    define('COMMAR_ADMIN_SESSION_TTL', 1800);
+}
+
+if (!defined('COMMAR_ADMIN_LOGIN_MAX_ATTEMPTS')) {
+    define('COMMAR_ADMIN_LOGIN_MAX_ATTEMPTS', 5);
+}
+
+if (!defined('COMMAR_ADMIN_LOGIN_LOCK_SECONDS')) {
+    define('COMMAR_ADMIN_LOGIN_LOCK_SECONDS', 900);
+}
+
+if (($_SESSION['commar_admin'] ?? false) === true) {
+    $lastActivity = (int) ($_SESSION['commar_last_activity'] ?? time());
+    if (time() - $lastActivity > COMMAR_ADMIN_SESSION_TTL) {
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], (bool) $params['secure'], (bool) $params['httponly']);
+        }
+        session_destroy();
+        session_start();
+    } else {
+        $_SESSION['commar_last_activity'] = time();
+    }
 }
 
 function commar_admin_is_logged_in(): bool
@@ -51,6 +91,84 @@ function commar_admin_h(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
+function commar_admin_client_ip(): string
+{
+    $candidates = [
+        (string) ($_SERVER['HTTP_CF_CONNECTING_IP'] ?? ''),
+        (string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? ''),
+        (string) ($_SERVER['REMOTE_ADDR'] ?? ''),
+    ];
+
+    foreach ($candidates as $candidate) {
+        $candidate = trim(explode(',', $candidate)[0] ?? '');
+        if ($candidate !== '' && filter_var($candidate, FILTER_VALIDATE_IP)) {
+            return $candidate;
+        }
+    }
+
+    return 'unknown';
+}
+
+function commar_admin_rate_limit_path(string $identifier): string
+{
+    $dir = dirname(__DIR__) . '/data/admin-rate-limit';
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
+    }
+
+    return $dir . '/' . hash('sha256', $identifier) . '.json';
+}
+
+function commar_admin_login_rate_key(string $username): string
+{
+    return strtolower(trim($username)) . '|' . commar_admin_client_ip();
+}
+
+function commar_admin_login_is_limited(string $username): bool
+{
+    $path = commar_admin_rate_limit_path(commar_admin_login_rate_key($username));
+    if (!is_file($path)) {
+        return false;
+    }
+
+    $data = json_decode((string) file_get_contents($path), true);
+    if (!is_array($data)) {
+        return false;
+    }
+
+    $lockedUntil = (int) ($data['locked_until'] ?? 0);
+    if ($lockedUntil <= time()) {
+        @unlink($path);
+        return false;
+    }
+
+    return true;
+}
+
+function commar_admin_record_login_failure(string $username): void
+{
+    $path = commar_admin_rate_limit_path(commar_admin_login_rate_key($username));
+    $data = is_file($path) ? json_decode((string) file_get_contents($path), true) : [];
+    $data = is_array($data) ? $data : [];
+    $attempts = (int) ($data['attempts'] ?? 0) + 1;
+
+    $payload = [
+        'attempts' => $attempts,
+        'updated_at' => time(),
+        'locked_until' => $attempts >= COMMAR_ADMIN_LOGIN_MAX_ATTEMPTS ? time() + COMMAR_ADMIN_LOGIN_LOCK_SECONDS : 0,
+    ];
+
+    @file_put_contents($path, json_encode($payload, JSON_UNESCAPED_SLASHES), LOCK_EX);
+}
+
+function commar_admin_clear_login_failures(string $username): void
+{
+    $path = commar_admin_rate_limit_path(commar_admin_login_rate_key($username));
+    if (is_file($path)) {
+        @unlink($path);
+    }
+}
+
 function commar_admin_get_user(string $username): ?array
 {
     $statement = commar_db()->prepare('SELECT * FROM commar_users WHERE username = :username LIMIT 1');
@@ -81,18 +199,26 @@ function commar_admin_verify_password(string $password, string $hash): bool
 
 function commar_admin_login(string $username, string $password): bool
 {
+    if (commar_admin_login_is_limited($username)) {
+        return false;
+    }
+
     $user = commar_admin_get_user($username);
     if ($user === null) {
+        commar_admin_record_login_failure($username);
         return false;
     }
 
     if (!commar_admin_verify_password($password, $user['password_hash'])) {
+        commar_admin_record_login_failure($username);
         return false;
     }
 
+    commar_admin_clear_login_failures($username);
     $_SESSION['commar_admin'] = true;
     $_SESSION['commar_user_id'] = $user['id'];
     $_SESSION['commar_username'] = $user['username'];
+    $_SESSION['commar_last_activity'] = time();
 
     return true;
 }
@@ -255,4 +381,40 @@ function commar_admin_get_current_user(): ?array
     $user = $statement->fetch();
 
     return is_array($user) ? $user : null;
+}
+
+function commar_admin_require_valid_csrf(): void
+{
+    if (!commar_admin_verify_csrf_token()) {
+        http_response_code(403);
+        exit('Token de seguridad inválido.');
+    }
+}
+
+function commar_admin_inject_csrf_fields(string $html): string
+{
+    if (stripos($html, '<form') === false || stripos($html, 'method="post"') === false && stripos($html, "method='post'") === false) {
+        return $html;
+    }
+
+    $tokenField = '<input type="hidden" name="csrf_token" value="' . commar_admin_h(commar_admin_csrf_token()) . '">';
+
+    return preg_replace_callback(
+        '#<form\b([^>]*)>#i',
+        static function (array $matches) use ($tokenField): string {
+            $form = $matches[0];
+            $attributes = $matches[1] ?? '';
+
+            if (!preg_match('/\bmethod\s*=\s*([\'"])post\1/i', $attributes)) {
+                return $form;
+            }
+
+            return $form . "\n                    " . $tokenField;
+        },
+        $html
+    ) ?? $html;
+}
+
+if (PHP_SAPI !== 'cli' && !defined('COMMAR_ADMIN_DISABLE_CSRF_INJECTION')) {
+    ob_start('commar_admin_inject_csrf_fields');
 }

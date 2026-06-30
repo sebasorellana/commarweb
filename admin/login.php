@@ -7,13 +7,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = (string) ($_POST['username'] ?? '');
     $password = (string) ($_POST['password'] ?? '');
 
-    if (commar_admin_login($username, $password)) {
+    if (!commar_admin_verify_csrf_token()) {
+        $error = 'La sesión expiró. Volvé a intentar.';
+    } elseif (commar_admin_login($username, $password)) {
         session_regenerate_id(true);
         header('Location: index.php');
         exit;
+    } else {
+        $error = commar_admin_login_is_limited($username)
+            ? 'Demasiados intentos. Probá nuevamente en unos minutos.'
+            : 'Usuario o clave incorrectos.';
     }
-
-    $error = 'Usuario o clave incorrectos.';
 }
 ?>
 <!DOCTYPE html>
@@ -31,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <main class="admin-auth">
             <section class="admin-auth-stage" aria-label="Acceso al panel de administracion">
                 <form method="post" class="admin-login-card">
+                    <input type="hidden" name="csrf_token" value="<?php echo commar_admin_csrf_token(); ?>">
                     <div class="admin-login-head">
                         <img src="../img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578">
                         <div>

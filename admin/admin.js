@@ -87,6 +87,7 @@ document.querySelectorAll('[data-article-form]').forEach((form) => {
         const title = form.querySelector('[name="title"]')?.value.trim() || '';
         const description = form.querySelector('[name="description"]')?.value.trim() || '';
         const content = source?.value.trim() || '';
+        const csrfToken = form.querySelector('[name="csrf_token"]')?.value || '';
 
         if (!title || !description || !content) {
             if (aiImageStatus) {
@@ -109,7 +110,7 @@ document.querySelectorAll('[data-article-form]').forEach((form) => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: new URLSearchParams({ title, description, content }),
+                body: new URLSearchParams({ title, description, content, csrf_token: csrfToken }),
             });
             const contentType = response.headers.get('content-type') || '';
 

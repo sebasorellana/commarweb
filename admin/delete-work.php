@@ -9,6 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+commar_admin_require_valid_csrf();
+
 $id = (int) ($_POST['id'] ?? 0);
 if ($id <= 0) {
     http_response_code(400);

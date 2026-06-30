@@ -12,6 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+if (!commar_admin_verify_csrf_token()) {
+    http_response_code(403);
+    echo json_encode(['ok' => false, 'error' => 'Token de seguridad inválido. Recargá el admin e intentá nuevamente.'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 function commar_admin_ai_image_response(int $status, string $error): void
 {
     http_response_code($status);

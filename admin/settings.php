@@ -9,6 +9,8 @@ $updated = ($_GET['updated'] ?? '') === '1';
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    commar_admin_require_valid_csrf();
+
     $settings['contact_email'] = trim((string) ($_POST['contact_email'] ?? ''));
     $settings['contact_address'] = trim((string) ($_POST['contact_address'] ?? ''));
     $settings['contact_form_email'] = trim((string) ($_POST['contact_form_email'] ?? ''));

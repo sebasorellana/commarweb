@@ -9,6 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+commar_admin_require_valid_csrf();
+
 $lang = (string) ($_POST['lang'] ?? '');
 $workIds = $_POST['work_ids'] ?? [];
 

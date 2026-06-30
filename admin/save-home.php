@@ -9,6 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+commar_admin_require_valid_csrf();
+
 $extensions = [
     IMAGETYPE_JPEG => 'jpg',
     IMAGETYPE_PNG => 'png',

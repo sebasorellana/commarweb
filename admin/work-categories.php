@@ -10,6 +10,8 @@ $message = '';
 $messageType = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    commar_admin_require_valid_csrf();
+
     $action = (string) ($_POST['action'] ?? '');
     $id = (int) ($_POST['id'] ?? 0);
 

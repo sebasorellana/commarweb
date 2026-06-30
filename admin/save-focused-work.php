@@ -9,6 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+commar_admin_require_valid_csrf();
+
 $id = (int) ($_POST['id'] ?? 0);
 $isEditing = $id > 0;
 

@@ -10,6 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+commar_admin_require_valid_csrf();
+
 $slug = trim((string) ($_POST['slug'] ?? ''));
 if (!preg_match('/^[a-z0-9-]+$/', $slug)) {
     http_response_code(400);

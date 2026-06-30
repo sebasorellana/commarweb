@@ -7,7 +7,10 @@ $messageType = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $identifier = trim((string) ($_POST['identifier'] ?? ''));
 
-    if ($identifier === '') {
+    if (!commar_admin_verify_csrf_token()) {
+        $message = 'La sesión expiró. Volvé a intentar.';
+        $messageType = 'error';
+    } elseif ($identifier === '') {
         $message = 'Ingresá tu usuario o email.';
         $messageType = 'error';
     } else {

@@ -328,6 +328,10 @@ img {
     gap: 1rem;
 }
 
+.admin-logout-form {
+    margin: 0;
+}
+
 .admin-topbar-action {
     display: inline-flex;
     align-items: center;

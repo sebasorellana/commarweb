@@ -58,6 +58,64 @@ if (!function_exists('commar_media_allowed_extensions')) {
     }
 }
 
+if (!function_exists('commar_media_normalize_path')) {
+    function commar_media_normalize_path(string $path): string
+    {
+        $path = html_entity_decode(trim($path), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $path = rawurldecode($path);
+        $path = strtok($path, '?#') ?: $path;
+        $path = str_replace('\\', '/', $path);
+        $path = preg_replace('#^https?://[^/]+/#i', '', $path) ?? $path;
+
+        while (str_starts_with($path, '../')) {
+            $path = substr($path, 3);
+        }
+
+        $path = ltrim($path, '/');
+        $parts = [];
+        foreach (explode('/', $path) as $part) {
+            if ($part === '' || $part === '.') {
+                continue;
+            }
+            if ($part === '..') {
+                array_pop($parts);
+                continue;
+            }
+            $parts[] = $part;
+        }
+
+        $normalized = implode('/', $parts);
+        $position = strpos($normalized, 'img/');
+        if ($position === false) {
+            $position = strpos($normalized, 'uploads/');
+        }
+
+        return $position === false ? $normalized : substr($normalized, $position);
+    }
+}
+
+if (!function_exists('commar_media_path_aliases')) {
+    function commar_media_path_aliases(string $path): array
+    {
+        $path = commar_media_normalize_path($path);
+        if ($path === '') {
+            return [];
+        }
+
+        $aliases = [$path];
+        if (preg_match('/\.(jpe?g|png)$/i', $path)) {
+            $aliases[] = preg_replace('/\.(jpe?g|png)$/i', '.webp', $path) ?? $path;
+        } elseif (preg_match('/\.webp$/i', $path)) {
+            $base = preg_replace('/\.webp$/i', '', $path) ?? $path;
+            foreach (['jpg', 'jpeg', 'png'] as $extension) {
+                $aliases[] = $base . '.' . $extension;
+            }
+        }
+
+        return array_values(array_unique($aliases));
+    }
+}
+
 if (!function_exists('commar_media_collect_paths')) {
     function commar_media_collect_paths($value, array &$paths): void
     {
@@ -74,9 +132,12 @@ if (!function_exists('commar_media_collect_paths')) {
         }
 
         $extensions = implode('|', array_map('preg_quote', commar_media_allowed_extensions()));
-        if (preg_match_all('#(?:img|uploads)/[a-zA-Z0-9._/\- %]+\.(?:' . $extensions . ')#i', $value, $matches)) {
+        if (preg_match_all('#(?:https?://[^"\'\s\)]+/|/|\.\./|)(?:img|uploads)/[a-zA-Z0-9._/\- %]+?\.(?:' . $extensions . ')(?:\?[^"\'\s\)]*)?#i', $value, $matches)) {
             foreach ($matches[0] as $path) {
-                $paths[] = ltrim($path, '/');
+                $normalized = commar_media_normalize_path($path);
+                if ($normalized !== '') {
+                    $paths[] = $normalized;
+                }
             }
         }
 
@@ -92,13 +153,56 @@ if (!function_exists('commar_media_usage_index')) {
     {
         $usage = [];
         $add = static function (string $path, string $section, string $detail = '') use (&$usage): void {
-            $path = ltrim($path, '/');
-            if ($path === '') {
-                return;
-            }
             $label = $detail !== '' ? $section . ': ' . $detail : $section;
-            $usage[$path][] = $label;
+            foreach (commar_media_path_aliases($path) as $alias) {
+                $usage[$alias][] = $label;
+            }
         };
+
+        $scanSource = static function (string $content, string $section, string $detail = '') use ($add): void {
+            $paths = [];
+            commar_media_collect_paths($content, $paths);
+            foreach ($paths as $path) {
+                $add($path, $section, $detail);
+            }
+        };
+
+        $root = dirname(__DIR__);
+        $staticFiles = array_merge(
+            glob($root . '/*.php') ?: [],
+            glob($root . '/includes/*.php') ?: [],
+            glob($root . '/data/blog/*.json') ?: [],
+            [$root . '/style.css']
+        );
+        $staticLabels = [
+            'index.php' => 'Home',
+            'el-estudio.php' => 'El estudio',
+            'servicios.php' => 'Servicios',
+            'servicio-proyectos.php' => 'Servicio Proyecto',
+            'obra-viva.php' => 'Obra Viva',
+            'obras.php' => 'Obras',
+            'obra.php' => 'Ficha de obra',
+            'blog.php' => 'Blog',
+            'articulo.php' => 'Artículo',
+            'trabaja-con-nosotros.php' => 'Trabaja con nosotros',
+            'contacto.php' => 'Contacto',
+            'footer.php' => 'Footer',
+            'header.php' => 'Header',
+            'projects.php' => 'Obras',
+            'articles.php' => 'Blog',
+            'settings.php' => 'Configuraciones',
+            'site.php' => 'Sitio',
+            'style.css' => 'CSS del sitio',
+        ];
+
+        foreach ($staticFiles as $file) {
+            if (!is_file($file)) {
+                continue;
+            }
+            $basename = basename($file);
+            $section = $staticLabels[$basename] ?? (str_contains($file, '/data/blog/') ? 'Blog estático' : 'Archivo del sitio');
+            $scanSource((string) file_get_contents($file), $section, $basename);
+        }
 
         try {
             $db = commar_db();
@@ -190,7 +294,11 @@ if (!function_exists('commar_media_scan_files')) {
                     continue;
                 }
 
-                $relativePath = ltrim(str_replace($root . '/', '', $file->getPathname()), '/');
+                $relativePath = commar_media_normalize_path(str_replace($root . '/', '', $file->getPathname()));
+                $itemUsage = [];
+                foreach (commar_media_path_aliases($relativePath) as $alias) {
+                    $itemUsage = array_merge($itemUsage, $usage[$alias] ?? []);
+                }
                 $imageInfo = commar_media_kind($relativePath) === 'image' ? @getimagesize($file->getPathname()) : false;
                 $files[] = [
                     'path' => $relativePath,
@@ -201,7 +309,7 @@ if (!function_exists('commar_media_scan_files')) {
                     'modified_at' => date('Y-m-d H:i:s', $file->getMTime()),
                     'width' => is_array($imageInfo) ? (int) $imageInfo[0] : 0,
                     'height' => is_array($imageInfo) ? (int) $imageInfo[1] : 0,
-                    'usage' => $usage[$relativePath] ?? [],
+                    'usage' => array_values(array_unique($itemUsage)),
                 ];
             }
         }

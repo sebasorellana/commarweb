@@ -38,18 +38,23 @@ jobs:
           test -n "$CPANEL_PUBLIC_PATH" || (echo "Falta el secret CPANEL_PUBLIC_PATH" && exit 1)
           ssh -i ~/.ssh/cpanel_deploy_key -p "${CPANEL_PORT:-22}" "$CPANEL_USER@$CPANEL_HOST" "
             set -e
-            if [ -d '$CPANEL_REPO_PATH/.git' ]; then
+            if git -C '$CPANEL_REPO_PATH' rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+              echo 'Repositorio existente detectado. Actualizando main...'
+              git -C '$CPANEL_REPO_PATH' remote set-url origin '$CPANEL_GIT_URL'
               cd '$CPANEL_REPO_PATH'
               git pull --ff-only origin main
             else
-              mkdir -p '$CPANEL_REPO_PATH'
+              mkdir -p \"\$(dirname '$CPANEL_REPO_PATH')\"
               if [ -z \"\$(ls -A '$CPANEL_REPO_PATH')\" ]; then
+                echo 'Repositorio ausente o carpeta vacia. Clonando...'
                 git clone '$CPANEL_GIT_URL' '$CPANEL_REPO_PATH'
                 cd '$CPANEL_REPO_PATH'
               else
-                echo 'CPANEL_REPO_PATH existe pero no es un repositorio Git: $CPANEL_REPO_PATH'
-                echo 'La carpeta debe estar vacia o contener un checkout con .git.'
-                exit 1
+                BACKUP_PATH='$CPANEL_REPO_PATH-backup-'\"\$(date +%Y%m%d%H%M%S)\"
+                echo 'CPANEL_REPO_PATH existe pero no es un repositorio Git valido. Moviendo a backup...'
+                mv '$CPANEL_REPO_PATH' \"\$BACKUP_PATH\"
+                git clone '$CPANEL_GIT_URL' '$CPANEL_REPO_PATH'
+                cd '$CPANEL_REPO_PATH'
               fi
             fi
             tar --exclude='.git' --exclude='admin/config.php' --exclude='includes/db-config.php' --exclude='.DS_Store' -cf - . | tar -xf - -C '$CPANEL_PUBLIC_PATH'

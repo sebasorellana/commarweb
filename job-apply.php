@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/site.php';
 require_once __DIR__ . '/includes/jobs.php';
+require_once __DIR__ . '/includes/media.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . commar_url('trabaja-con-nosotros.php'));
@@ -53,6 +54,8 @@ if (!move_uploaded_file((string) $file['tmp_name'], $targetPath)) {
     header('Location: ' . commar_url('trabaja-con-nosotros.php?status=error'));
     exit;
 }
+
+commar_media_register($relativePath, 'document', 0, 0, (string) ($file['name'] ?? 'CV'));
 
 $statement = commar_db()->prepare(
     'INSERT INTO commar_job_applications

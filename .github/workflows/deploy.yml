@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -15,6 +16,8 @@ jobs:
           CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
           CPANEL_PORT: ${{ secrets.CPANEL_PORT }}
         run: |
+          test -n "$CPANEL_SSH_PRIVATE_KEY" || (echo "Falta el secret CPANEL_SSH_PRIVATE_KEY" && exit 1)
+          test -n "$CPANEL_HOST" || (echo "Falta el secret CPANEL_HOST" && exit 1)
           mkdir -p ~/.ssh
           printf '%s\n' "$CPANEL_SSH_PRIVATE_KEY" > ~/.ssh/cpanel_deploy_key
           chmod 600 ~/.ssh/cpanel_deploy_key
@@ -28,6 +31,10 @@ jobs:
           CPANEL_REPO_PATH: ${{ secrets.CPANEL_REPO_PATH }}
           CPANEL_PUBLIC_PATH: ${{ secrets.CPANEL_PUBLIC_PATH }}
         run: |
+          test -n "$CPANEL_HOST" || (echo "Falta el secret CPANEL_HOST" && exit 1)
+          test -n "$CPANEL_USER" || (echo "Falta el secret CPANEL_USER" && exit 1)
+          test -n "$CPANEL_REPO_PATH" || (echo "Falta el secret CPANEL_REPO_PATH" && exit 1)
+          test -n "$CPANEL_PUBLIC_PATH" || (echo "Falta el secret CPANEL_PUBLIC_PATH" && exit 1)
           ssh -i ~/.ssh/cpanel_deploy_key -p "${CPANEL_PORT:-22}" "$CPANEL_USER@$CPANEL_HOST" "
             set -e
             cd '$CPANEL_REPO_PATH'

@@ -4,6 +4,56 @@ require_once dirname(__DIR__) . '/includes/jobs.php';
 
 commar_admin_require_login();
 
+function commar_admin_upload_job_image(int $jobId = 0): array
+{
+    $file = $_FILES['image'] ?? null;
+    if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return [];
+    }
+
+    if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('No se pudo subir la imagen.');
+    }
+
+    $imageInfo = getimagesize((string) ($file['tmp_name'] ?? ''));
+    if ($imageInfo === false) {
+        throw new RuntimeException('La imagen no es válida.');
+    }
+
+    $extensions = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_WEBP => 'webp'];
+    $extension = $extensions[$imageInfo[2]] ?? null;
+    if ($extension === null) {
+        throw new RuntimeException('Formato no soportado. Usá JPG, PNG o WEBP.');
+    }
+
+    $uploadDir = dirname(__DIR__) . '/img/jobs';
+    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true)) {
+        throw new RuntimeException('No se pudo crear la carpeta de imágenes. Verificá que img/jobs exista y tenga permisos de escritura.');
+    }
+
+    if (!is_writable($uploadDir)) {
+        @chmod($uploadDir, 0777);
+    }
+
+    if (!is_writable($uploadDir)) {
+        throw new RuntimeException('La carpeta img/jobs no tiene permisos de escritura.');
+    }
+
+    $fileName = 'job-' . ($jobId > 0 ? $jobId : 'new') . '-' . date('YmdHis') . '-' . bin2hex(random_bytes(4)) . '.' . $extension;
+    $relativePath = 'img/jobs/' . $fileName;
+    $targetPath = dirname(__DIR__) . '/' . $relativePath;
+
+    if (!move_uploaded_file((string) $file['tmp_name'], $targetPath)) {
+        throw new RuntimeException('No se pudo guardar la imagen.');
+    }
+
+    return [
+        'path' => $relativePath,
+        'width' => (int) $imageInfo[0],
+        'height' => (int) $imageInfo[1],
+    ];
+}
+
 $editingId = (int) ($_GET['edit'] ?? 0);
 $editingJob = $editingId > 0 ? commar_job_by_id($editingId, false) : null;
 $message = '';
@@ -25,12 +75,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = trim((string) ($_POST['description'] ?? ''));
         $status = (string) ($_POST['status'] ?? 'inactive');
 
-        if (commar_save_job($title, $description, $status, $id)) {
+        try {
+            $image = commar_admin_upload_job_image($id);
+        } catch (RuntimeException $exception) {
+            $message = $exception->getMessage();
+            $messageType = 'error';
+            $image = null;
+        }
+
+        if (is_array($image) && commar_save_job($title, $description, $status, $image, $id)) {
             header('Location: jobs.php?' . ($id > 0 ? 'updated=1' : 'created=1'));
             exit;
         }
-        $message = 'Completá título y descripción.';
-        $messageType = 'error';
+        if ($message === '') {
+            $message = 'Completá título y descripción.';
+            $messageType = 'error';
+        }
     }
 }
 
@@ -39,6 +99,7 @@ $created = ($_GET['created'] ?? '') === '1';
 $updated = ($_GET['updated'] ?? '') === '1';
 $deleted = ($_GET['deleted'] ?? '') === '1';
 $formTitle = $editingJob ? 'Editar búsqueda' : 'Nueva búsqueda';
+$descriptionHtml = commar_job_description_html((string) ($editingJob['description'] ?? ''));
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -73,7 +134,7 @@ $formTitle = $editingJob ? 'Editar búsqueda' : 'Nueva búsqueda';
                                 <span class="admin-kicker">Formulario</span>
                                 <h3><?php echo commar_admin_h($formTitle); ?></h3>
                             </div>
-                            <form action="jobs.php" method="post" class="admin-form">
+                            <form action="jobs.php" method="post" enctype="multipart/form-data" class="admin-form" data-article-form>
                                 <?php if ($editingJob): ?>
                                     <input type="hidden" name="id" value="<?php echo (int) $editingJob['id']; ?>">
                                 <?php endif; ?>
@@ -81,11 +142,30 @@ $formTitle = $editingJob ? 'Editar búsqueda' : 'Nueva búsqueda';
                                     Título
                                     <input type="text" name="title" value="<?php echo commar_admin_h((string) ($editingJob['title'] ?? '')); ?>" required maxlength="180">
                                 </label>
+                                <div class="admin-rich-field">
+                                    <span class="admin-field-label">Descripción</span>
+                                    <div class="admin-editor-toolbar" aria-label="Herramientas de texto">
+                                        <button type="button" data-editor-command="bold">B</button>
+                                        <button type="button" data-editor-command="italic">I</button>
+                                        <button type="button" data-editor-command="insertUnorderedList">Lista</button>
+                                        <button type="button" data-editor-command="formatBlock" data-editor-value="p">P</button>
+                                    </div>
+                                    <div class="admin-rich-editor admin-rich-editor-compact" contenteditable="true" data-rich-editor><?php echo $descriptionHtml; ?></div>
+                                    <textarea class="admin-content-source" data-content-source><?php echo commar_admin_h(strip_tags(str_replace(['</p>', '<br>', '<br />'], ["\n\n", "\n", "\n"], $descriptionHtml))); ?></textarea>
+                                    <textarea name="description" class="admin-content-source" data-content-html><?php echo commar_admin_h($descriptionHtml); ?></textarea>
+                                </div>
+                                <span class="admin-help">Se muestra como detalle de la búsqueda en la web. Podés usar negritas, itálicas y listas.</span>
                                 <label>
-                                    Descripción
-                                    <textarea name="description" rows="9" required><?php echo commar_admin_h((string) ($editingJob['description'] ?? '')); ?></textarea>
-                                    <span class="admin-help">Se muestra como detalle de la búsqueda en la web.</span>
+                                    Imagen
+                                    <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
+                                    <span class="admin-help">Formato JPG, PNG o WEBP. Si editás y no subís una nueva, se conserva la actual.</span>
                                 </label>
+                                <?php if (!empty($editingJob['image'])): ?>
+                                    <figure class="admin-hero-preview">
+                                        <img src="../<?php echo commar_admin_h((string) $editingJob['image']); ?>" alt="" loading="lazy">
+                                        <figcaption>Imagen actual</figcaption>
+                                    </figure>
+                                <?php endif; ?>
                                 <label>
                                     Estado
                                     <select name="status">
@@ -116,6 +196,7 @@ $formTitle = $editingJob ? 'Editar búsqueda' : 'Nueva búsqueda';
                                         <thead>
                                             <tr>
                                                 <th>Búsqueda</th>
+                                                <th>Imagen</th>
                                                 <th>Estado</th>
                                                 <th>Acciones</th>
                                             </tr>
@@ -127,9 +208,16 @@ $formTitle = $editingJob ? 'Editar búsqueda' : 'Nueva búsqueda';
                                                         <div class="admin-post-title">
                                                             <div>
                                                                 <strong><?php echo commar_admin_h((string) $job['title']); ?></strong>
-                                                                <span><?php echo commar_admin_h((string) $job['description']); ?></span>
+                                                                <span><?php echo commar_admin_h(trim(strip_tags((string) $job['description']))); ?></span>
                                                             </div>
                                                         </div>
+                                                    </td>
+                                                    <td>
+                                                        <?php if (!empty($job['image'])): ?>
+                                                            <img src="../<?php echo commar_admin_h((string) $job['image']); ?>" alt="" width="72" height="48" class="admin-table-thumb">
+                                                        <?php else: ?>
+                                                            <span class="admin-empty-inline">Sin imagen</span>
+                                                        <?php endif; ?>
                                                     </td>
                                                     <td><span class="admin-status-pill <?php echo $job['status'] === 'active' ? 'is-published' : 'is-draft'; ?>"><?php echo $job['status'] === 'active' ? 'Activa' : 'Inactiva'; ?></span></td>
                                                     <td>
@@ -155,5 +243,6 @@ $formTitle = $editingJob ? 'Editar búsqueda' : 'Nueva búsqueda';
             <?php commar_admin_footer(); ?>
         </div>
     </div>
+    <script src="admin.js?v=20260629-jobs-editor" defer></script>
 </body>
 </html>

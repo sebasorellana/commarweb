@@ -1,6 +1,43 @@
 <?php
 require_once __DIR__ . '/db.php';
 
+if (!function_exists('commar_job_description_html')) {
+    function commar_job_description_html(string $description): string
+    {
+        $description = trim($description);
+        if ($description === '') {
+            return '<p><br></p>';
+        }
+
+        if ($description === strip_tags($description)) {
+            $paragraphs = preg_split('/\R{2,}/', $description) ?: [];
+            $html = '';
+            foreach ($paragraphs as $paragraph) {
+                $paragraph = trim($paragraph);
+                if ($paragraph !== '') {
+                    $html .= '<p>' . nl2br(htmlspecialchars($paragraph, ENT_QUOTES, 'UTF-8')) . '</p>';
+                }
+            }
+
+            return $html !== '' ? $html : '<p><br></p>';
+        }
+
+        return commar_sanitize_job_description_html($description);
+    }
+}
+
+if (!function_exists('commar_sanitize_job_description_html')) {
+    function commar_sanitize_job_description_html(string $html): string
+    {
+        $html = preg_replace('#<(script|style)\b[^>]*>.*?</\1>#is', '', $html) ?? '';
+        $html = strip_tags($html, '<p><br><strong><b><em><i><ul><ol><li><a>');
+        $html = preg_replace('/\s+on[a-z]+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $html) ?? '';
+        $html = preg_replace('/href\s*=\s*([\'"])\s*javascript:[^\'"]*\1/i', 'href="#"', $html) ?? '';
+
+        return trim($html) !== '' ? trim($html) : '<p><br></p>';
+    }
+}
+
 if (!function_exists('commar_active_jobs')) {
     function commar_active_jobs(): array
     {
@@ -43,11 +80,14 @@ if (!function_exists('commar_job_by_id')) {
 }
 
 if (!function_exists('commar_save_job')) {
-    function commar_save_job(string $title, string $description, string $status, int $id = 0): bool
+    function commar_save_job(string $title, string $description, string $status, array $image = [], int $id = 0): bool
     {
         $title = trim($title);
-        $description = trim($description);
+        $description = commar_sanitize_job_description_html($description);
         $status = $status === 'active' ? 'active' : 'inactive';
+        $imagePath = (string) ($image['path'] ?? '');
+        $imageWidth = (int) ($image['width'] ?? 0);
+        $imageHeight = (int) ($image['height'] ?? 0);
 
         if ($title === '' || $description === '') {
             return false;
@@ -57,9 +97,16 @@ if (!function_exists('commar_save_job')) {
         $now = date('Y-m-d H:i:s');
 
         if ($id > 0) {
+            $current = commar_job_by_id($id, false);
+            if ($current && $imagePath === '') {
+                $imagePath = (string) ($current['image'] ?? '');
+                $imageWidth = (int) ($current['image_width'] ?? 0);
+                $imageHeight = (int) ($current['image_height'] ?? 0);
+            }
+
             $statement = $db->prepare(
                 'UPDATE commar_jobs
-                 SET title = :title, description = :description, status = :status, updated_at = :updated_at
+                 SET title = :title, description = :description, image = :image, image_width = :image_width, image_height = :image_height, status = :status, updated_at = :updated_at
                  WHERE id = :id AND status <> :deleted'
             );
 
@@ -67,6 +114,9 @@ if (!function_exists('commar_save_job')) {
                 'id' => $id,
                 'title' => $title,
                 'description' => $description,
+                'image' => $imagePath,
+                'image_width' => $imageWidth,
+                'image_height' => $imageHeight,
                 'status' => $status,
                 'updated_at' => $now,
                 'deleted' => 'deleted',
@@ -74,13 +124,16 @@ if (!function_exists('commar_save_job')) {
         }
 
         $statement = $db->prepare(
-            'INSERT INTO commar_jobs (title, description, status, created_at, updated_at)
-             VALUES (:title, :description, :status, :created_at, :updated_at)'
+            'INSERT INTO commar_jobs (title, description, image, image_width, image_height, status, created_at, updated_at)
+             VALUES (:title, :description, :image, :image_width, :image_height, :status, :created_at, :updated_at)'
         );
 
         return $statement->execute([
             'title' => $title,
             'description' => $description,
+            'image' => $imagePath,
+            'image_width' => $imageWidth,
+            'image_height' => $imageHeight,
             'status' => $status,
             'created_at' => $now,
             'updated_at' => $now,

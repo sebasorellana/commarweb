@@ -12,7 +12,12 @@ if (!function_exists('commar_base_url')) {
         $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
         $basePath = ($scriptDir === '/' || $scriptDir === '.') ? '' : $scriptDir;
 
-        if ($host === 'commar.group' || $host === 'www.commar.group') {
+        if (
+            $host === 'commar.group'
+            || $host === 'www.commar.group'
+            || $host === 'commargroup.com.ar'
+            || $host === 'www.commargroup.com.ar'
+        ) {
             $basePath = '';
             $scheme = 'https';
         }
@@ -29,6 +34,23 @@ if (!function_exists('commar_absolute_url')) {
         }
 
         return rtrim(commar_base_url(), '/') . '/' . ltrim($path, '/');
+    }
+}
+
+if (!function_exists('commar_current_absolute_url')) {
+    function commar_current_absolute_url(): string
+    {
+        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+        $scheme = $https ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? parse_url(commar_base_url(), PHP_URL_HOST) ?: 'localhost';
+        $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
+
+        if ($requestUri === '') {
+            $requestUri = '/';
+        }
+
+        return $scheme . '://' . $host . $requestUri;
     }
 }
 
@@ -113,6 +135,36 @@ if (!function_exists('commar_admin_session_active')) {
     }
 }
 
+if (!function_exists('commar_is_social_crawler')) {
+    function commar_is_social_crawler(): bool
+    {
+        $userAgent = strtolower((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
+        if ($userAgent === '') {
+            return false;
+        }
+
+        $crawlers = [
+            'facebookexternalhit',
+            'facebot',
+            'twitterbot',
+            'linkedinbot',
+            'whatsapp',
+            'telegrambot',
+            'slackbot',
+            'discordbot',
+            'pinterest',
+        ];
+
+        foreach ($crawlers as $crawler) {
+            if (strpos($userAgent, $crawler) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
 if (!function_exists('commar_whatsapp_number_label')) {
     function commar_whatsapp_number_label(): string
     {
@@ -130,9 +182,16 @@ if (!function_exists('commar_render_maintenance_page')) {
         $email = commar_contact_email();
         $whatsappLabel = commar_whatsapp_number_label();
         $whatsappUrl = commar_whatsapp_url('Hola COMMAR GROUP, quisiera recibir mas informacion.');
+        $metaTitle = $title . ' | COMMAR GROUP';
+        $metaDescription = trim(preg_replace('/\s+/', ' ', strip_tags($message)) ?? '') ?: 'COMMAR GROUP se encuentra realizando tareas de mantenimiento.';
+        $canonicalUrl = commar_current_absolute_url();
+        $ogImage = commar_absolute_url('img/logo-commar-500.png');
+        $isSocialCrawler = commar_is_social_crawler();
 
-        http_response_code(503);
-        header('Retry-After: 3600');
+        http_response_code($isSocialCrawler ? 200 : 503);
+        if (!$isSocialCrawler) {
+            header('Retry-After: 3600');
+        }
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Pragma: no-cache');
         header('Expires: 0');
@@ -143,8 +202,28 @@ if (!function_exists('commar_render_maintenance_page')) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title><?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?> | COMMAR GROUP</title>
+    <title><?php echo htmlspecialchars($metaTitle, ENT_QUOTES, 'UTF-8'); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8'); ?>">
+    <link rel="canonical" href="<?php echo htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8'); ?>">
     <link rel="icon" type="image/png" href="img/logo-commar-500.png">
+    <link rel="apple-touch-icon" href="img/logo-commar-500.png">
+    <meta property="og:locale" content="es_AR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="COMMAR GROUP">
+    <meta property="og:title" content="<?php echo htmlspecialchars($metaTitle, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:description" content="<?php echo htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:url" content="<?php echo htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:image" content="<?php echo htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:image:secure_url" content="<?php echo htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="500">
+    <meta property="og:image:height" content="578">
+    <meta property="og:image:alt" content="COMMAR GROUP">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="<?php echo htmlspecialchars($metaTitle, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta name="twitter:description" content="<?php echo htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta name="twitter:image" content="<?php echo htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta name="twitter:image:alt" content="COMMAR GROUP">
     <style>
         * { box-sizing: border-box; }
         body {

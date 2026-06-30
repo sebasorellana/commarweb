@@ -658,6 +658,20 @@ img {
     overflow: hidden;
 }
 
+.admin-table-thumb {
+    display: block;
+    width: 72px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: var(--admin-bg);
+}
+
+.admin-empty-inline {
+    color: var(--admin-text-secondary);
+    font-size: 0.82rem;
+}
+
 .admin-status-pill {
     display: inline-block;
     padding: 0.25rem 0.6rem;
@@ -1430,6 +1444,10 @@ img {
     padding: 1rem;
     line-height: 1.7;
     outline: none;
+}
+
+.admin-rich-editor-compact {
+    min-height: 220px;
 }
 
 .admin-rich-editor p {

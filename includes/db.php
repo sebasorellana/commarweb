@@ -230,6 +230,9 @@ if (!function_exists('commar_db_ensure_schema')) {
                 `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
                 `title` VARCHAR(180) NOT NULL,
                 `description` LONGTEXT NOT NULL,
+                `image` VARCHAR(255) NOT NULL DEFAULT '',
+                `image_width` INT UNSIGNED NOT NULL DEFAULT 0,
+                `image_height` INT UNSIGNED NOT NULL DEFAULT 0,
                 `status` ENUM('active', 'inactive', 'deleted') NOT NULL DEFAULT 'active',
                 `created_at` DATETIME NOT NULL,
                 `updated_at` DATETIME NOT NULL,
@@ -265,6 +268,9 @@ if (!function_exists('commar_db_ensure_schema')) {
             "ALTER TABLE `commar_articles` MODIFY COLUMN `image_width` INT UNSIGNED NOT NULL DEFAULT 0",
             "ALTER TABLE `commar_articles` MODIFY COLUMN `image_height` INT UNSIGNED NOT NULL DEFAULT 0",
             "ALTER TABLE `commar_works` ADD COLUMN IF NOT EXISTS `gallery_json` LONGTEXT NULL AFTER `image_height`",
+            "ALTER TABLE `commar_jobs` ADD COLUMN IF NOT EXISTS `image` VARCHAR(255) NOT NULL DEFAULT '' AFTER `description`",
+            "ALTER TABLE `commar_jobs` ADD COLUMN IF NOT EXISTS `image_width` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `image`",
+            "ALTER TABLE `commar_jobs` ADD COLUMN IF NOT EXISTS `image_height` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `image_width`",
         ] as $sql) {
             try {
                 $pdo->exec($sql);

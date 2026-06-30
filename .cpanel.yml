@@ -4,3 +4,5 @@ deployment:
     - export DEPLOYPATH=/home/commar/public_html/
     - /bin/cp -R * $DEPLOYPATH
     - /bin/cp .htaccess $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH/img/jobs
+    - /bin/chmod 777 $DEPLOYPATH/img/jobs

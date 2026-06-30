@@ -65,14 +65,15 @@ $seo = [
                         <?php foreach ($jobs as $job): ?>
                             <article class="job-card">
                                 <div class="job-card-copy">
+                                    <?php if (!empty($job['image'])): ?>
+                                        <figure class="job-card-media">
+                                            <img src="<?php echo htmlspecialchars((string) $job['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars((string) $job['title'], ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo (int) ($job['image_width'] ?? 1200); ?>" height="<?php echo (int) ($job['image_height'] ?? 800); ?>" loading="lazy">
+                                        </figure>
+                                    <?php endif; ?>
                                     <span class="jobs-kicker">Búsqueda activa</span>
                                     <h2><?php echo htmlspecialchars((string) $job['title'], ENT_QUOTES, 'UTF-8'); ?></h2>
                                     <div class="job-description">
-                                        <?php foreach (preg_split('/\R{2,}/', trim((string) $job['description'])) ?: [] as $paragraph): ?>
-                                            <?php if (trim($paragraph) !== ''): ?>
-                                                <p><?php echo nl2br(htmlspecialchars(trim($paragraph), ENT_QUOTES, 'UTF-8')); ?></p>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
+                                        <?php echo commar_job_description_html((string) $job['description']); ?>
                                     </div>
                                 </div>
 

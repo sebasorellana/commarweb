@@ -4061,6 +4061,28 @@ body.is-scroll-reveal-ready [data-scroll-reveal].is-visible {
     line-height: 1.7;
 }
 
+.job-description ul,
+.job-description ol {
+    margin: 0 0 1rem 1.25rem;
+    color: #4b5049;
+    line-height: 1.7;
+}
+
+.job-description li + li {
+    margin-top: 0.35rem;
+}
+
+.job-description strong,
+.job-description b {
+    color: #111;
+}
+
+.job-description a {
+    color: #111;
+    font-weight: 800;
+    text-underline-offset: 0.18em;
+}
+
 .job-card {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -4082,6 +4104,20 @@ body.is-scroll-reveal-ready [data-scroll-reveal].is-visible {
     color: #111;
     font-size: clamp(1.5rem, 3vw, 2.2rem);
     letter-spacing: 0;
+}
+
+.job-card-media {
+    margin: 0 0 1.25rem;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #e5e7df;
+}
+
+.job-card-media img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
 }
 
 .job-apply-form {

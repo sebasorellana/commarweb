@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://commar.group/sitemap.xml
+Sitemap: https://commargroup.com.ar/sitemap.xml

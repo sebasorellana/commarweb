@@ -1,5 +1,8 @@
 <?php
-require_once __DIR__ . '/config.php';
+$commarAdminConfigPath = __DIR__ . '/config.php';
+if (is_file($commarAdminConfigPath)) {
+    require_once $commarAdminConfigPath;
+}
 require_once dirname(__DIR__) . '/includes/db.php';
 
 if (!headers_sent()) {

@@ -63,6 +63,8 @@ if (!function_exists('commar_admin_works_page_url')) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Obras | MOnkey CMS</title>
+    <link rel="icon" type="image/png" href="../img/logo-commar-500.png">
+    <link rel="apple-touch-icon" href="../img/logo-commar-500.png">
     <link rel="stylesheet" href="admin.css?v=20260629-admin-works-ui">
 </head>
 <body class="admin-page">

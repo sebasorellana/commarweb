@@ -57,7 +57,13 @@ jobs:
                 cd '$CPANEL_REPO_PATH'
               fi
             fi
+            if [ ! -f '$CPANEL_PUBLIC_PATH/includes/db-config.php' ]; then
+              echo 'Falta el archivo de configuracion DB: $CPANEL_PUBLIC_PATH/includes/db-config.php'
+              echo 'Crealo en cPanel usando includes/db-config.example.php como referencia.'
+              exit 1
+            fi
             tar --exclude='.git' --exclude='admin/config.php' --exclude='includes/db-config.php' --exclude='.DS_Store' -cf - . | tar -xf - -C '$CPANEL_PUBLIC_PATH'
             mkdir -p '$CPANEL_PUBLIC_PATH/img/jobs'
             chmod 777 '$CPANEL_PUBLIC_PATH/img/jobs'
+            php -d display_errors=1 -d log_errors=0 '$CPANEL_PUBLIC_PATH/index.php' >/dev/null
           "

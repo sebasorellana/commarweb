@@ -16,6 +16,8 @@ $total = count($submissions);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suscripciones | MOnkey CMS</title>
+    <link rel="icon" type="image/png" href="../img/logo-commar-500.png">
+    <link rel="apple-touch-icon" href="../img/logo-commar-500.png">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body class="admin-page">

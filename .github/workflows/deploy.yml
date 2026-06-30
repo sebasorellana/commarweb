@@ -30,6 +30,7 @@ jobs:
           CPANEL_USER: ${{ secrets.CPANEL_USER }}
           CPANEL_REPO_PATH: ${{ secrets.CPANEL_REPO_PATH }}
           CPANEL_PUBLIC_PATH: ${{ secrets.CPANEL_PUBLIC_PATH }}
+          CPANEL_GIT_URL: https://github.com/${{ github.repository }}.git
         run: |
           test -n "$CPANEL_HOST" || (echo "Falta el secret CPANEL_HOST" && exit 1)
           test -n "$CPANEL_USER" || (echo "Falta el secret CPANEL_USER" && exit 1)
@@ -37,8 +38,20 @@ jobs:
           test -n "$CPANEL_PUBLIC_PATH" || (echo "Falta el secret CPANEL_PUBLIC_PATH" && exit 1)
           ssh -i ~/.ssh/cpanel_deploy_key -p "${CPANEL_PORT:-22}" "$CPANEL_USER@$CPANEL_HOST" "
             set -e
-            cd '$CPANEL_REPO_PATH'
-            git pull origin main
+            if [ -d '$CPANEL_REPO_PATH/.git' ]; then
+              cd '$CPANEL_REPO_PATH'
+              git pull --ff-only origin main
+            else
+              mkdir -p '$CPANEL_REPO_PATH'
+              if [ -z \"\$(ls -A '$CPANEL_REPO_PATH')\" ]; then
+                git clone '$CPANEL_GIT_URL' '$CPANEL_REPO_PATH'
+                cd '$CPANEL_REPO_PATH'
+              else
+                echo 'CPANEL_REPO_PATH existe pero no es un repositorio Git: $CPANEL_REPO_PATH'
+                echo 'La carpeta debe estar vacia o contener un checkout con .git.'
+                exit 1
+              fi
+            fi
             tar --exclude='.git' --exclude='admin/config.php' --exclude='includes/db-config.php' --exclude='.DS_Store' -cf - . | tar -xf - -C '$CPANEL_PUBLIC_PATH'
             mkdir -p '$CPANEL_PUBLIC_PATH/img/jobs'
             chmod 777 '$CPANEL_PUBLIC_PATH/img/jobs'

@@ -89,8 +89,8 @@ function commar_admin_settings_nav(string $active): void
 {
     $items = [
         ['id' => 'general', 'label' => 'General', 'href' => 'settings.php'],
-        ['id' => 'images', 'label' => 'Optimización de imágenes', 'href' => 'settings-images.php'],
-        ['id' => 'users', 'label' => 'Gestión de usuarios', 'href' => 'settings-users.php'],
+        ['id' => 'users', 'label' => 'Usuarios', 'href' => 'settings-users.php'],
+        ['id' => 'images', 'label' => 'Imágenes', 'href' => 'settings-images.php'],
     ];
     ?>
     <nav class="admin-subnav" aria-label="Submenú de configuraciones">

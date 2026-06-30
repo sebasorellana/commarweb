@@ -360,3 +360,7 @@ if (!function_exists('commar_render_maintenance_page')) {
 if (PHP_SAPI !== 'cli' && !defined('COMMAR_SKIP_MAINTENANCE') && !commar_is_admin_request() && !commar_admin_session_active() && commar_maintenance_enabled()) {
     commar_render_maintenance_page();
 }
+
+if (PHP_SAPI !== 'cli' && !commar_is_admin_request()) {
+    commar_image_start_public_rewrite();
+}

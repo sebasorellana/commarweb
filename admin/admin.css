@@ -789,6 +789,45 @@ img {
     padding: 0.5rem;
 }
 
+.admin-form .admin-checkbox-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: fit-content;
+    color: var(--admin-text-primary);
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-form .admin-checkbox-row input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.admin-form .admin-checkbox-row input[type="checkbox"]::before {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+    background: var(--admin-primary-color);
+    transform: scale(0);
+    transition: transform 0.16s ease;
+}
+
+.admin-form .admin-checkbox-row input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
 .admin-form input[type="file"]::file-selector-button,
 .admin-article-form input[type="file"]::file-selector-button {
     margin-right: 0.75rem;

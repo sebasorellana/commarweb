@@ -54,6 +54,18 @@ function commar_admin_upload_job_image(int $jobId = 0): array
     ];
 }
 
+function commar_admin_delete_job_image_file(string $relativePath): void
+{
+    if (!preg_match('#^img/jobs/[a-zA-Z0-9._-]+\.(jpe?g|png|webp)$#', $relativePath)) {
+        return;
+    }
+
+    $absolutePath = dirname(__DIR__) . '/' . $relativePath;
+    if (is_file($absolutePath)) {
+        @unlink($absolutePath);
+    }
+}
+
 $editingId = (int) ($_GET['edit'] ?? 0);
 $editingJob = $editingId > 0 ? commar_job_by_id($editingId, false) : null;
 $message = '';
@@ -74,9 +86,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = trim((string) ($_POST['title'] ?? ''));
         $description = trim((string) ($_POST['description'] ?? ''));
         $status = (string) ($_POST['status'] ?? 'inactive');
+        $currentJob = $id > 0 ? commar_job_by_id($id, false) : null;
 
         try {
             $image = commar_admin_upload_job_image($id);
+            if ($id > 0 && empty($image) && isset($_POST['remove_image'])) {
+                $image = ['remove' => true];
+            }
         } catch (RuntimeException $exception) {
             $message = $exception->getMessage();
             $messageType = 'error';
@@ -84,6 +100,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (is_array($image) && commar_save_job($title, $description, $status, $image, $id)) {
+            $currentImage = (string) ($currentJob['image'] ?? '');
+            $newImage = (string) ($image['path'] ?? '');
+            if ($currentImage !== '' && (!empty($image['remove']) || ($newImage !== '' && $newImage !== $currentImage))) {
+                commar_admin_delete_job_image_file($currentImage);
+            }
+
             header('Location: jobs.php?' . ($id > 0 ? 'updated=1' : 'created=1'));
             exit;
         }
@@ -165,6 +187,10 @@ $descriptionHtml = commar_job_description_html((string) ($editingJob['descriptio
                                         <img src="../<?php echo commar_admin_h((string) $editingJob['image']); ?>" alt="" loading="lazy">
                                         <figcaption>Imagen actual</figcaption>
                                     </figure>
+                                    <label class="admin-checkbox-row">
+                                        <input type="checkbox" name="remove_image" value="1">
+                                        <span>Eliminar imagen actual</span>
+                                    </label>
                                 <?php endif; ?>
                                 <label>
                                     Estado

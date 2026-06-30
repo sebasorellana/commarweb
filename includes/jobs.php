@@ -88,6 +88,7 @@ if (!function_exists('commar_save_job')) {
         $imagePath = (string) ($image['path'] ?? '');
         $imageWidth = (int) ($image['width'] ?? 0);
         $imageHeight = (int) ($image['height'] ?? 0);
+        $removeImage = !empty($image['remove']);
 
         if ($title === '' || $description === '') {
             return false;
@@ -98,7 +99,7 @@ if (!function_exists('commar_save_job')) {
 
         if ($id > 0) {
             $current = commar_job_by_id($id, false);
-            if ($current && $imagePath === '') {
+            if ($current && $imagePath === '' && !$removeImage) {
                 $imagePath = (string) ($current['image'] ?? '');
                 $imageWidth = (int) ($current['image_width'] ?? 0);
                 $imageHeight = (int) ($current['image_height'] ?? 0);

@@ -193,7 +193,7 @@ function commar_admin_user_role_label(string $role): string
                                         <?php
                                         $role = commar_admin_normalize_role((string) ($user['role'] ?? 'admin'));
                                         $isCurrentUser = $currentUser && (int) $user['id'] === (int) $currentUser['id'];
-                                        $initial = mb_strtoupper(mb_substr((string) $user['username'], 0, 1, 'UTF-8'), 'UTF-8');
+                                        $initial = commar_text_upper(commar_text_substr((string) $user['username'], 0, 1));
                                         $avatar = trim((string) ($user['avatar'] ?? ''));
                                         ?>
                                         <tr>

@@ -6,7 +6,7 @@ commar_admin_require_login();
 
 function commar_migrate_slugify(string $value): string
 {
-    $value = trim(mb_strtolower($value, 'UTF-8'));
+    $value = trim(commar_text_lower($value));
     $converted = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
     $value = $converted !== false ? $converted : $value;
     $value = preg_replace('/[^a-z0-9]+/', '-', strtolower($value)) ?? '';

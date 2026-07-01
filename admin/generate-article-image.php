@@ -27,7 +27,7 @@ function commar_admin_ai_image_response(int $status, string $error): void
 
 function commar_admin_ai_slug(string $value): string
 {
-    $value = trim(mb_strtolower($value, 'UTF-8'));
+    $value = trim(commar_text_lower($value));
     $converted = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
     $value = $converted !== false ? $converted : $value;
     $value = preg_replace('/[^a-z0-9]+/', '-', strtolower($value)) ?? '';
@@ -75,7 +75,7 @@ if ($title === '' || $description === '' || $content === '') {
     commar_admin_ai_image_response(422, 'Completá título, descripción y cuerpo antes de generar.');
 }
 
-$promptSource = mb_substr($title . '. ' . $description . '. ' . $content, 0, 650, 'UTF-8');
+$promptSource = commar_text_substr($title . '. ' . $description . '. ' . $content, 0, 650);
 $prompt = 'Editorial architectural feature image for a professional article. '
     . 'Subject: ' . $promptSource . '. '
     . 'Style: contemporary architecture, premium real estate editorial photography, natural light, refined materials, no text, no logos, no people, horizontal composition.';

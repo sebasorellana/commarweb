@@ -21,7 +21,7 @@ foreach (commar_dynamic_articles(false) as $existingArticle) {
         $tag = trim((string) $tag);
 
         if ($tag !== '') {
-            $availableTags[mb_strtolower($tag, 'UTF-8')] = $tag;
+            $availableTags[commar_text_lower($tag)] = $tag;
         }
     }
 }

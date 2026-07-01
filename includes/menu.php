@@ -34,7 +34,7 @@ if (!function_exists('commar_default_menu_items')) {
 if (!function_exists('commar_normalize_menu_items')) {
     function commar_menu_item_is_jobs_link(string $label, string $href): bool
     {
-        $value = mb_strtolower($label . ' ' . $href, 'UTF-8');
+        $value = commar_text_lower($label . ' ' . $href);
 
         return str_contains($value, 'trabaja-con-nosotros')
             || str_contains($value, 'trabajá con nosotros')
@@ -56,8 +56,8 @@ if (!function_exists('commar_normalize_menu_items')) {
             }
 
             $normalized[] = [
-                'label' => mb_substr($label, 0, 80, 'UTF-8'),
-                'href' => mb_substr($href, 0, 255, 'UTF-8'),
+                'label' => commar_text_substr($label, 0, 80),
+                'href' => commar_text_substr($href, 0, 255),
                 'enabled' => !empty($item['enabled']),
                 'order' => (int) ($item['order'] ?? ($index + 1)),
                 'requires_active_jobs' => $location === 'footer' && commar_menu_item_is_jobs_link($label, $href) && !empty($item['requires_active_jobs']),

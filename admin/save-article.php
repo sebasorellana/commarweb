@@ -16,7 +16,7 @@ commar_admin_require_valid_csrf();
 
 function commar_admin_slugify(string $value): string
 {
-    $value = trim(mb_strtolower($value, 'UTF-8'));
+    $value = trim(commar_text_lower($value));
     $converted = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
     $value = $converted !== false ? $converted : $value;
     $value = preg_replace('/[^a-z0-9]+/', '-', strtolower($value)) ?? '';
@@ -261,7 +261,7 @@ $paragraphs = array_values(array_filter(array_map('trim', $paragraphs), static f
 $contentHtml = commar_admin_sanitize_article_html($rawContentHtml);
 $tags = preg_split('/,/', $rawTags) ?: [];
 $tags = array_values(array_unique(array_filter(array_map(
-    static fn(string $tag): string => mb_substr(trim($tag), 0, 40, 'UTF-8'),
+    static fn(string $tag): string => commar_text_substr(trim($tag), 0, 40),
     $tags
 ), static fn(string $tag): bool => $tag !== '')));
 $now = date('c');

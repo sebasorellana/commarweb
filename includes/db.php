@@ -16,6 +16,31 @@ defined('COMMAR_DB_USER') || define('COMMAR_DB_USER', (string) ($commarDbConfig[
 defined('COMMAR_DB_PASSWORD') || define('COMMAR_DB_PASSWORD', (string) ($commarDbConfig['password'] ?? ''));
 defined('COMMAR_DB_CHARSET') || define('COMMAR_DB_CHARSET', (string) ($commarDbConfig['charset'] ?? 'utf8mb4'));
 
+if (!function_exists('commar_text_lower')) {
+    function commar_text_lower(string $value): string
+    {
+        return function_exists('mb_strtolower') ? mb_strtolower($value, 'UTF-8') : strtolower($value);
+    }
+}
+
+if (!function_exists('commar_text_upper')) {
+    function commar_text_upper(string $value): string
+    {
+        return function_exists('mb_strtoupper') ? mb_strtoupper($value, 'UTF-8') : strtoupper($value);
+    }
+}
+
+if (!function_exists('commar_text_substr')) {
+    function commar_text_substr(string $value, int $start, ?int $length = null): string
+    {
+        if (function_exists('mb_substr')) {
+            return $length === null ? mb_substr($value, $start, null, 'UTF-8') : mb_substr($value, $start, $length, 'UTF-8');
+        }
+
+        return $length === null ? substr($value, $start) : substr($value, $start, $length);
+    }
+}
+
 if (!function_exists('commar_db')) {
     function commar_db(): PDO
     {

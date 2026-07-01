@@ -174,9 +174,13 @@ function commar_admin_media_size(int $bytes): string
             <form action="media.php" method="post" enctype="multipart/form-data" class="admin-form">
                 <input type="hidden" name="csrf_token" value="<?php echo commar_admin_csrf_token(); ?>">
                 <input type="hidden" name="action" value="upload">
-                <label>
+                <label class="admin-file-control">
                     Archivos
-                    <input type="file" name="media_files[]" multiple accept="image/*,video/mp4,video/webm,video/quicktime,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                    <span class="admin-file-input-wrap">
+                        <span class="admin-file-button">Seleccionar archivos</span>
+                        <span class="admin-file-name" data-file-name>Sin archivos seleccionados</span>
+                        <input type="file" name="media_files[]" multiple accept="image/*,video/mp4,video/webm,video/quicktime,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" data-file-input>
+                    </span>
                     <span class="admin-help">Podés subir imágenes, videos y documentos.</span>
                 </label>
                 <button type="submit" class="admin-button-primary">Subir archivos</button>
@@ -238,5 +242,6 @@ function commar_admin_media_size(int $bytes): string
             </section>
         </div>
     <?php endforeach; ?>
+    <script src="admin.js?v=20260701-media-picker" defer></script>
 </body>
 </html>

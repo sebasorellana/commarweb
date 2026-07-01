@@ -72,9 +72,13 @@ $pageTitle = $isEditing ? 'Editar obra en foco' : 'Nueva obra en foco';
                                             <option value="pt" <?php echo ($work['lang'] ?? '') === 'pt' ? 'selected' : ''; ?>>Portugués</option>
                                         </select>
                                     </label>
-                                    <label>
+                                    <label class="admin-file-control">
                                         Imagen
-                                        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" <?php echo !$isEditing ? 'required' : ''; ?>>
+                                        <span class="admin-file-input-wrap">
+                                            <span class="admin-file-button">Subir imagen</span>
+                                            <span class="admin-file-name" data-file-name>Sin archivo seleccionado</span>
+                                            <input type="file" name="image" accept="image/jpeg,image/png,image/webp" <?php echo !$isEditing ? 'required' : ''; ?> data-file-input>
+                                        </span>
                                         <?php if ($isEditing && !empty($work['image'])): ?>
                                             <span class="admin-help">Imagen actual: <?php echo commar_admin_h($work['image']); ?>. Dejar vacío para no cambiar.</span>
                                             <img src="../<?php echo commar_admin_h($work['image']); ?>" alt="" style="max-width: 200px; margin-top: 0.5rem; border-radius: 0.3rem;">
@@ -94,5 +98,6 @@ $pageTitle = $isEditing ? 'Editar obra en foco' : 'Nueva obra en foco';
             <?php commar_admin_footer(); ?>
         </div>
     </div>
+    <script src="admin.js?v=20260701-media-picker" defer></script>
 </body>
 </html>

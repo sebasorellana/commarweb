@@ -74,6 +74,15 @@ function commar_admin_unique_slug(string $slug, string $dataDir, ?string $curren
 function commar_admin_save_image(string $slug, ?array $currentArticle = null): array
 {
     if (empty($_FILES['image']['tmp_name']) || ($_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        $mediaImage = commar_media_image_from_path((string) ($_POST['media_featured_image'] ?? ''));
+        if ($mediaImage !== null) {
+            return [
+                'path' => $mediaImage['path'],
+                'width' => $mediaImage['width'],
+                'height' => $mediaImage['height'],
+            ];
+        }
+
         $generatedImage = trim((string) ($_POST['generated_image'] ?? ''));
         if ($generatedImage !== '' && preg_match('#^img/blog/[a-zA-Z0-9._/-]+$#', $generatedImage)) {
             $generatedPath = dirname(__DIR__) . '/' . $generatedImage;
@@ -106,6 +115,28 @@ function commar_admin_save_image(string $slug, ?array $currentArticle = null): a
     commar_media_register($image['path'], 'featured', (int) $image['width'], (int) $image['height'], $slug);
 
     return ['path' => $image['path'], 'width' => $image['width'], 'height' => $image['height']];
+}
+
+function commar_admin_selected_gallery_media(): array
+{
+    $gallery = [];
+    $selected = $_POST['media_gallery_images'] ?? [];
+    $selected = is_array($selected) ? $selected : [];
+
+    foreach ($selected as $path) {
+        $mediaImage = commar_media_image_from_path((string) $path);
+        if ($mediaImage === null) {
+            continue;
+        }
+
+        $gallery[] = [
+            'path' => $mediaImage['path'],
+            'width' => $mediaImage['width'],
+            'height' => $mediaImage['height'],
+        ];
+    }
+
+    return $gallery;
 }
 
 function commar_admin_save_gallery_images(string $slug): array
@@ -199,7 +230,15 @@ foreach (($_POST['gallery_existing'] ?? []) as $galleryPath) {
     }
 }
 
-$gallery = array_merge($existingGallery, commar_admin_save_gallery_images($slug));
+$galleryByPath = [];
+foreach (array_merge($existingGallery, commar_admin_selected_gallery_media(), commar_admin_save_gallery_images($slug)) as $galleryItem) {
+    $path = (string) ($galleryItem['path'] ?? '');
+    if ($path === '' || isset($galleryByPath[$path])) {
+        continue;
+    }
+    $galleryByPath[$path] = $galleryItem;
+}
+$gallery = array_values($galleryByPath);
 $paragraphs = preg_split('/\R{2,}/', $rawContent) ?: [];
 $paragraphs = array_values(array_filter(array_map('trim', $paragraphs), static fn(string $paragraph): bool => $paragraph !== ''));
 $contentHtml = strip_tags($rawContentHtml, '<p><br><strong><b><em><i><ul><ol><li>');

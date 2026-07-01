@@ -265,7 +265,7 @@ function commar_admin_login(string $username, string $password): bool
     return true;
 }
 
-function commar_admin_create_user(string $username, string $password, string $email = '', string $role = 'editor'): bool
+function commar_admin_create_user(string $username, string $password, string $email = '', string $role = 'editor', string $avatar = ''): bool
 {
     if (commar_admin_get_user($username) !== null) {
         return false; // User already exists
@@ -274,26 +274,27 @@ function commar_admin_create_user(string $username, string $password, string $em
     $role = commar_admin_normalize_role($role);
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
     $statement = commar_db()->prepare(
-        'INSERT INTO commar_users (username, password_hash, email, role) VALUES (:username, :password_hash, :email, :role)'
+        'INSERT INTO commar_users (username, password_hash, email, avatar, role) VALUES (:username, :password_hash, :email, :avatar, :role)'
     );
 
     return $statement->execute([
         'username' => $username,
         'password_hash' => $passwordHash,
         'email' => $email,
+        'avatar' => $avatar,
         'role' => $role,
     ]);
 }
 
 function commar_admin_get_all_users(): array
 {
-    $statement = commar_db()->query('SELECT id, username, email, role, created_at, updated_at FROM commar_users ORDER BY created_at DESC');
+    $statement = commar_db()->query('SELECT id, username, email, avatar, role, created_at, updated_at FROM commar_users ORDER BY created_at DESC');
     return $statement->fetchAll();
 }
 
 function commar_admin_get_user_by_id(int $userId): ?array
 {
-    $statement = commar_db()->prepare('SELECT id, username, email, role, created_at, updated_at FROM commar_users WHERE id = :id LIMIT 1');
+    $statement = commar_db()->prepare('SELECT id, username, email, avatar, role, created_at, updated_at FROM commar_users WHERE id = :id LIMIT 1');
     $statement->execute(['id' => $userId]);
     $user = $statement->fetch();
 
@@ -306,7 +307,7 @@ function commar_admin_count_administrators(): int
     return (int) $statement->fetchColumn();
 }
 
-function commar_admin_update_user(int $userId, string $username, string $email, string $role): bool
+function commar_admin_update_user(int $userId, string $username, string $email, string $role, string $avatar = ''): bool
 {
     $currentUser = commar_admin_get_user_by_id($userId);
     if ($currentUser === null) {
@@ -324,12 +325,13 @@ function commar_admin_update_user(int $userId, string $username, string $email, 
     }
 
     $statement = commar_db()->prepare(
-        'UPDATE commar_users SET username = :username, email = :email, role = :role WHERE id = :id'
+        'UPDATE commar_users SET username = :username, email = :email, avatar = :avatar, role = :role WHERE id = :id'
     );
 
     $updated = $statement->execute([
         'username' => $username,
         'email' => $email,
+        'avatar' => $avatar,
         'role' => $role,
         'id' => $userId,
     ]);
@@ -493,7 +495,7 @@ function commar_admin_get_current_user(): ?array
         return null;
     }
 
-    $statement = commar_db()->prepare('SELECT id, username, email, role, created_at, updated_at FROM commar_users WHERE id = :id LIMIT 1');
+    $statement = commar_db()->prepare('SELECT id, username, email, avatar, role, created_at, updated_at FROM commar_users WHERE id = :id LIMIT 1');
     $statement->execute(['id' => $userId]);
     $user = $statement->fetch();
 

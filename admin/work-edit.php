@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/layout.php';
 require_once dirname(__DIR__) . '/includes/projects.php';
+require_once dirname(__DIR__) . '/includes/media.php';
 
 commar_admin_require_login();
 
@@ -45,6 +46,7 @@ if ($selectedCategory !== '' && !in_array($selectedCategory, $categoryNames, tru
 }
 
 $pageTitle = $isEditing ? 'Editar obra' : 'Nueva obra';
+$mediaImages = commar_media_image_items(60);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -153,11 +155,30 @@ $pageTitle = $isEditing ? 'Editar obra' : 'Nueva obra';
                                                 Texto alternativo
                                                 <input type="text" name="hero_alt" value="<?php echo commar_admin_h($work['hero_alt'] ?? ''); ?>">
                                             </label>
-                                            <label>
+                                            <label class="admin-file-control">
                                                 Cargar imágenes
-                                                <input type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple <?php echo !$isEditing ? 'required' : ''; ?> data-gallery-input>
+                                                <span class="admin-file-input-wrap">
+                                                    <span class="admin-file-button">Subir imágenes</span>
+                                                    <span class="admin-file-name" data-file-name>Sin archivos seleccionados</span>
+                                                    <input type="file" name="gallery_images[]" accept="image/jpeg,image/png,image/webp" multiple data-gallery-input data-file-input>
+                                                </span>
                                             </label>
                                             <span class="admin-help">Subí de 1 a 10 imágenes. La primera imagen del orden será la principal. Arrastrá para ordenar las existentes.</span>
+                                            <?php if (!empty($mediaImages)): ?>
+                                                <div class="admin-media-picker">
+                                                    <span class="admin-field-label">Elegir desde mediateca</span>
+                                                    <div class="admin-media-picker-grid">
+                                                        <?php foreach ($mediaImages as $item): ?>
+                                                            <?php $path = (string) $item['path']; ?>
+                                                            <label class="admin-media-choice">
+                                                                <input type="checkbox" name="media_gallery_images[]" value="<?php echo commar_admin_h($path); ?>">
+                                                                <img src="../<?php echo commar_admin_h($path); ?>" alt="">
+                                                            </label>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                    <a href="media.php#upload-media-modal" class="admin-secondary-link">Agregar archivo a mediateca</a>
+                                                </div>
+                                            <?php endif; ?>
                                             <div class="admin-gallery-list" data-gallery-list>
                                                 <?php foreach ($gallery as $galleryItem): ?>
                                                     <?php $galleryPath = (string) ($galleryItem['path'] ?? ''); ?>

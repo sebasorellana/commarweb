@@ -72,9 +72,13 @@ if (!is_array($heroImages) || count($heroImages) === 0) {
                             </label>
                         </div>
 
-                        <label>
+                        <label class="admin-file-control">
                             Imágenes de fondo
-                            <input type="file" name="home_hero_images[]" accept="image/jpeg,image/png,image/webp" multiple>
+                            <span class="admin-file-input-wrap">
+                                <span class="admin-file-button">Subir imágenes</span>
+                                <span class="admin-file-name" data-file-name>Sin archivos seleccionados</span>
+                                <input type="file" name="home_hero_images[]" accept="image/jpeg,image/png,image/webp" multiple data-file-input>
+                            </span>
                             <span class="admin-help">Podés subir hasta 3 imágenes. Si no cargás nuevas, se conservan las actuales.</span>
                         </label>
 
@@ -105,5 +109,6 @@ if (!is_array($heroImages) || count($heroImages) === 0) {
             <?php commar_admin_footer(); ?>
         </div>
     </div>
+    <script src="admin.js?v=20260701-media-picker" defer></script>
 </body>
 </html>

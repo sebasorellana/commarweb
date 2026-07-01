@@ -143,6 +143,7 @@ if (!function_exists('commar_db_ensure_schema')) {
                 `username` VARCHAR(50) NOT NULL,
                 `password_hash` VARCHAR(255) NOT NULL,
                 `email` VARCHAR(255) NOT NULL DEFAULT '',
+                `avatar` VARCHAR(255) NOT NULL DEFAULT '',
                 `role` VARCHAR(20) NOT NULL DEFAULT 'admin',
                 `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -272,6 +273,7 @@ if (!function_exists('commar_db_ensure_schema')) {
             "ALTER TABLE `commar_jobs` ADD COLUMN IF NOT EXISTS `image` VARCHAR(255) NOT NULL DEFAULT '' AFTER `description`",
             "ALTER TABLE `commar_jobs` ADD COLUMN IF NOT EXISTS `image_width` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `image`",
             "ALTER TABLE `commar_jobs` ADD COLUMN IF NOT EXISTS `image_height` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `image_width`",
+            "ALTER TABLE `commar_users` ADD COLUMN IF NOT EXISTS `avatar` VARCHAR(255) NOT NULL DEFAULT '' AFTER `email`",
             "ALTER TABLE `commar_users` ADD COLUMN IF NOT EXISTS `role` VARCHAR(20) NOT NULL DEFAULT 'admin' AFTER `email`",
         ] as $sql) {
             try {
@@ -300,6 +302,11 @@ if (!function_exists('commar_db_ensure_schema')) {
         }
 
         try {
+            $columnCheck = $pdo->query("SHOW COLUMNS FROM `commar_users` LIKE 'avatar'");
+            if ($columnCheck && !$columnCheck->fetch()) {
+                $pdo->exec("ALTER TABLE `commar_users` ADD COLUMN `avatar` VARCHAR(255) NOT NULL DEFAULT '' AFTER `email`");
+            }
+
             $columnCheck = $pdo->query("SHOW COLUMNS FROM `commar_users` LIKE 'role'");
             if ($columnCheck && !$columnCheck->fetch()) {
                 $pdo->exec("ALTER TABLE `commar_users` ADD COLUMN `role` VARCHAR(20) NOT NULL DEFAULT 'admin' AFTER `email`");

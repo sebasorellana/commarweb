@@ -3,6 +3,7 @@ require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/db.php';
 require_once dirname(__DIR__) . '/includes/projects.php';
 require_once dirname(__DIR__) . '/includes/images.php';
+require_once dirname(__DIR__) . '/includes/media.php';
 
 commar_admin_require_login();
 
@@ -141,6 +142,33 @@ function commar_admin_save_work_gallery_images(string $slug, string $heroAlt, in
     return $gallery;
 }
 
+function commar_admin_work_gallery_from_media(string $heroAlt, int $availableSlots): array
+{
+    $gallery = [];
+    $selected = $_POST['media_gallery_images'] ?? [];
+    $selected = is_array($selected) ? $selected : [];
+
+    foreach ($selected as $path) {
+        if (count($gallery) >= $availableSlots) {
+            break;
+        }
+
+        $mediaImage = commar_media_image_from_path((string) $path, $heroAlt);
+        if ($mediaImage === null) {
+            continue;
+        }
+
+        $gallery[] = [
+            'path' => $mediaImage['path'],
+            'width' => (int) $mediaImage['width'],
+            'height' => (int) $mediaImage['height'],
+            'alt' => $heroAlt,
+        ];
+    }
+
+    return $gallery;
+}
+
 $id = (int) ($_POST['id'] ?? 0);
 $isEditing = $id > 0;
 $title = trim((string) ($_POST['title'] ?? ''));
@@ -194,8 +222,17 @@ foreach ($postedExisting as $galleryPath) {
     }
 }
 
-$newGallery = commar_admin_save_work_gallery_images($slug, $heroAlt, 10 - count($existingGallery));
-$gallery = array_slice(array_merge($existingGallery, $newGallery), 0, 10);
+$mediaGallery = commar_admin_work_gallery_from_media($heroAlt, 10 - count($existingGallery));
+$uploadGallery = commar_admin_save_work_gallery_images($slug, $heroAlt, 10 - count($existingGallery) - count($mediaGallery));
+$galleryByPath = [];
+foreach (array_merge($existingGallery, $mediaGallery, $uploadGallery) as $galleryItem) {
+    $path = (string) ($galleryItem['path'] ?? '');
+    if ($path === '' || isset($galleryByPath[$path])) {
+        continue;
+    }
+    $galleryByPath[$path] = $galleryItem;
+}
+$gallery = array_slice(array_values($galleryByPath), 0, 10);
 
 if (empty($gallery)) {
     http_response_code(422);

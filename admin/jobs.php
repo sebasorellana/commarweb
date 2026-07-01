@@ -169,9 +169,13 @@ $descriptionHtml = commar_job_description_html((string) ($editingJob['descriptio
                                     <textarea name="description" class="admin-content-source" data-content-html><?php echo commar_admin_h($descriptionHtml); ?></textarea>
                                 </div>
                                 <span class="admin-help">Se muestra como detalle de la búsqueda en la web. Podés usar negritas, itálicas y listas.</span>
-                                <label>
+                                <label class="admin-file-control">
                                     Imagen
-                                    <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
+                                    <span class="admin-file-input-wrap">
+                                        <span class="admin-file-button">Subir imagen</span>
+                                        <span class="admin-file-name" data-file-name>Sin archivo seleccionado</span>
+                                        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" data-file-input>
+                                    </span>
                                     <span class="admin-help">Formato JPG, PNG o WEBP. Si editás y no subís una nueva, se conserva la actual.</span>
                                 </label>
                                 <?php if (!empty($editingJob['image'])): ?>

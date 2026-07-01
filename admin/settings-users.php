@@ -1,11 +1,32 @@
 <?php
 require_once __DIR__ . '/layout.php';
 require_once __DIR__ . '/auth.php';
+require_once dirname(__DIR__) . '/includes/media.php';
 
 commar_admin_require_administrator();
 
 $message = '';
 $messageType = '';
+
+function commar_admin_save_user_avatar(string $currentAvatar = ''): string
+{
+    if (empty($_FILES['avatar']['tmp_name']) || ($_FILES['avatar']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return $currentAvatar;
+    }
+
+    if (($_FILES['avatar']['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('No se pudo cargar el avatar.');
+    }
+
+    $image = commar_admin_store_uploaded_image(
+        (string) $_FILES['avatar']['tmp_name'],
+        'img/avatars/avatar-' . date('YmdHis'),
+        'avatar de usuario'
+    );
+    commar_media_register($image['path'], 'avatar', (int) $image['width'], (int) $image['height'], 'avatar de usuario');
+
+    return (string) $image['path'];
+}
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     if (!commar_admin_verify_csrf_token()) {
@@ -27,10 +48,20 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             } elseif (strlen($password) < 8) {
                 $message = 'La contraseña debe tener al menos 8 caracteres.';
                 $messageType = 'error';
-            } elseif (commar_admin_create_user($username, $password, $email, $role)) {
+            } else {
+                try {
+                    $avatar = commar_admin_save_user_avatar('');
+                } catch (RuntimeException $exception) {
+                    $message = $exception->getMessage();
+                    $messageType = 'error';
+                    $avatar = null;
+                }
+            }
+
+            if ($messageType !== 'error' && commar_admin_create_user($username, $password, $email, $role, (string) $avatar)) {
                 $message = 'Usuario creado exitosamente.';
                 $messageType = 'success';
-            } else {
+            } elseif ($messageType !== 'error') {
                 $message = 'No se pudo crear el usuario. Revisá que el nombre no exista.';
                 $messageType = 'error';
             }
@@ -38,14 +69,25 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $username = trim((string) ($_POST['username'] ?? ''));
             $email = trim((string) ($_POST['email'] ?? ''));
             $role = (string) ($_POST['role'] ?? 'editor');
+            $currentEditUser = $userId > 0 ? commar_admin_get_user_by_id($userId) : null;
+            $avatar = (string) ($currentEditUser['avatar'] ?? '');
 
             if ($userId <= 0 || $username === '') {
                 $message = 'El usuario es obligatorio.';
                 $messageType = 'error';
-            } elseif (commar_admin_update_user($userId, $username, $email, $role)) {
+            } else {
+                try {
+                    $avatar = commar_admin_save_user_avatar($avatar);
+                } catch (RuntimeException $exception) {
+                    $message = $exception->getMessage();
+                    $messageType = 'error';
+                }
+            }
+
+            if ($messageType !== 'error' && commar_admin_update_user($userId, $username, $email, $role, $avatar)) {
                 $message = 'Usuario actualizado.';
                 $messageType = 'success';
-            } else {
+            } elseif ($messageType !== 'error') {
                 $message = 'No se pudo actualizar. No podés repetir usuarios ni quitar el último administrador.';
                 $messageType = 'error';
             }
@@ -152,11 +194,18 @@ function commar_admin_user_role_label(string $role): string
                                         $role = commar_admin_normalize_role((string) ($user['role'] ?? 'admin'));
                                         $isCurrentUser = $currentUser && (int) $user['id'] === (int) $currentUser['id'];
                                         $initial = mb_strtoupper(mb_substr((string) $user['username'], 0, 1, 'UTF-8'), 'UTF-8');
+                                        $avatar = trim((string) ($user['avatar'] ?? ''));
                                         ?>
                                         <tr>
                                             <td>
                                                 <div class="admin-user-identity">
-                                                    <span class="admin-user-avatar"><?php echo commar_admin_h($initial); ?></span>
+                                                    <span class="admin-user-avatar <?php echo $avatar !== '' ? 'has-image' : ''; ?>">
+                                                        <?php if ($avatar !== ''): ?>
+                                                            <img src="../<?php echo commar_admin_h($avatar); ?>" alt="">
+                                                        <?php else: ?>
+                                                            <?php echo commar_admin_h($initial); ?>
+                                                        <?php endif; ?>
+                                                    </span>
                                                     <div>
                                                         <strong><?php echo commar_admin_h((string) $user['username']); ?></strong>
                                                         <?php if ($isCurrentUser): ?>
@@ -210,7 +259,7 @@ function commar_admin_user_role_label(string $role): string
                 </div>
                 <a href="#" class="admin-modal-close" aria-label="Cerrar">&times;</a>
             </div>
-            <form method="post" class="admin-user-form">
+            <form method="post" enctype="multipart/form-data" class="admin-user-form">
                 <input type="hidden" name="csrf_token" value="<?php echo commar_admin_csrf_token(); ?>">
                 <input type="hidden" name="action" value="create">
                 <label>
@@ -220,6 +269,15 @@ function commar_admin_user_role_label(string $role): string
                 <label>
                     Email
                     <input type="email" name="email" maxlength="255" autocomplete="email">
+                </label>
+                <label class="admin-file-control">
+                    Foto de avatar
+                    <span class="admin-file-input-wrap">
+                        <span class="admin-file-button">Seleccionar imagen</span>
+                        <span class="admin-file-name" data-file-name>Sin archivo seleccionado</span>
+                        <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" data-file-input>
+                    </span>
+                    <span class="admin-help">JPG, PNG o WEBP. Se optimiza automáticamente.</span>
                 </label>
                 <label>
                     Tipo de usuario
@@ -250,7 +308,7 @@ function commar_admin_user_role_label(string $role): string
                     </div>
                     <a href="#" class="admin-modal-close" aria-label="Cerrar">&times;</a>
                 </div>
-                <form method="post" class="admin-user-form">
+                <form method="post" enctype="multipart/form-data" class="admin-user-form">
                     <input type="hidden" name="csrf_token" value="<?php echo commar_admin_csrf_token(); ?>">
                     <input type="hidden" name="action" value="update">
                     <input type="hidden" name="user_id" value="<?php echo (int) $user['id']; ?>">
@@ -261,6 +319,15 @@ function commar_admin_user_role_label(string $role): string
                     <label>
                         Email
                         <input type="email" name="email" value="<?php echo commar_admin_h((string) $user['email']); ?>" maxlength="255" autocomplete="email">
+                    </label>
+                    <label class="admin-file-control">
+                        Foto de avatar
+                        <span class="admin-file-input-wrap">
+                            <span class="admin-file-button">Cambiar imagen</span>
+                            <span class="admin-file-name" data-file-name><?php echo trim((string) ($user['avatar'] ?? '')) !== '' ? basename((string) $user['avatar']) : 'Sin archivo seleccionado'; ?></span>
+                            <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" data-file-input>
+                        </span>
+                        <span class="admin-help">Si no cargás una imagen nueva, se mantiene la actual.</span>
                     </label>
                     <label>
                         Tipo de usuario
@@ -299,5 +366,6 @@ function commar_admin_user_role_label(string $role): string
             </section>
         </div>
     <?php endforeach; ?>
+    <script src="admin.js?v=20260701-media-picker" defer></script>
 </body>
 </html>

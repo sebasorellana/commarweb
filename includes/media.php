@@ -247,6 +247,14 @@ if (!function_exists('commar_media_usage_index')) {
                 }
             }
 
+            foreach ($db->query('SELECT username, avatar FROM commar_users')->fetchAll() as $row) {
+                $paths = [];
+                commar_media_collect_paths((string) ($row['avatar'] ?? ''), $paths);
+                foreach ($paths as $path) {
+                    $add($path, 'Usuarios', (string) ($row['username'] ?? 'Usuario'));
+                }
+            }
+
             foreach ($db->query('SELECT cv_path, cv_original_name FROM commar_job_applications')->fetchAll() as $row) {
                 $paths = [];
                 commar_media_collect_paths((string) ($row['cv_path'] ?? ''), $paths);
@@ -317,6 +325,42 @@ if (!function_exists('commar_media_scan_files')) {
         usort($files, static fn(array $a, array $b): int => strcmp((string) $b['modified_at'], (string) $a['modified_at']));
 
         return $files;
+    }
+}
+
+if (!function_exists('commar_media_image_items')) {
+    function commar_media_image_items(int $limit = 60): array
+    {
+        $images = array_values(array_filter(commar_media_scan_files(), static function (array $item): bool {
+            return ($item['kind'] ?? '') === 'image' && trim((string) ($item['path'] ?? '')) !== '';
+        }));
+
+        return $limit > 0 ? array_slice($images, 0, $limit) : $images;
+    }
+}
+
+if (!function_exists('commar_media_image_from_path')) {
+    function commar_media_image_from_path(string $path, string $alt = ''): ?array
+    {
+        $path = commar_media_normalize_path($path);
+        if ($path === '' || commar_media_kind($path) !== 'image') {
+            return null;
+        }
+
+        $root = dirname(__DIR__);
+        $absolutePath = $root . '/' . $path;
+        if (!is_file($absolutePath)) {
+            return null;
+        }
+
+        $imageInfo = @getimagesize($absolutePath);
+
+        return [
+            'path' => $path,
+            'width' => is_array($imageInfo) ? (int) $imageInfo[0] : 0,
+            'height' => is_array($imageInfo) ? (int) $imageInfo[1] : 0,
+            'alt' => $alt,
+        ];
     }
 }
 

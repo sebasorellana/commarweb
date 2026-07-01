@@ -40,6 +40,6 @@ commar_admin_require_login();
             <?php commar_admin_footer(); ?>
         </div>
     </div>
-    <script src="admin.js?v=20260513-2" defer></script>
+    <script src="admin.js?v=20260701-featured-media" defer></script>
 </body>
 </html>

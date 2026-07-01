@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/site.php';
+require_once __DIR__ . '/includes/integrations.php';
 
 $contactEmail = commar_contact_email();
 $contactFormEmail = commar_contact_form_email();
@@ -39,6 +40,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
     if (!filter_var($formData['email'], FILTER_VALIDATE_EMAIL)) {
         $formErrors[] = 'Ingresá un email válido.';
+    }
+
+    if (!commar_recaptcha_verify('contact')) {
+        $formErrors[] = 'No pudimos validar el captcha. Intentá nuevamente.';
     }
 
     $emailBody = implode("\n", [
@@ -144,7 +149,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                         </div>
                     <?php endif; ?>
 
-                    <form class="contact-form" action="<?php echo htmlspecialchars(commar_url('contacto.php'), ENT_QUOTES, 'UTF-8'); ?>" method="post">
+                    <form class="contact-form" action="<?php echo htmlspecialchars(commar_url('contacto.php'), ENT_QUOTES, 'UTF-8'); ?>" method="post"<?php echo commar_recaptcha_form_attributes('contact'); ?>>
                         <div class="contact-field">
                             <label for="contact-subject">Asunto</label>
                             <select id="contact-subject" name="subject">
@@ -179,6 +184,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                             <textarea id="contact-message" name="message" rows="7"><?php echo htmlspecialchars($formData['message'], ENT_QUOTES, 'UTF-8'); ?></textarea>
                         </div>
 
+                        <?php echo commar_recaptcha_field('contact'); ?>
                         <button type="submit" class="contact-submit">Enviar consulta</button>
                     </form>
                 </div>

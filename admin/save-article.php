@@ -32,8 +32,8 @@ function commar_admin_get_youtube_embed_url(string $url): string
         return '';
     }
 
-    // Regex to find YouTube video ID from various URL formats
-    $regex = '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/';
+    // Regex to find YouTube video ID from common URL formats.
+    $regex = '/(?:youtube(?:-nocookie)?\.com\/(?:.*[?&]v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
     if (preg_match($regex, $url, $matches)) {
         return 'https://www.youtube.com/embed/' . $matches[1];
     }
@@ -44,6 +44,23 @@ function commar_admin_get_youtube_embed_url(string $url): string
     }
 
     return ''; // Return empty if not a valid YouTube URL or ID
+}
+
+function commar_admin_sanitize_article_html(string $html): string
+{
+    $html = trim($html);
+
+    if ($html === '') {
+        return '';
+    }
+
+    $html = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $html) ?? '';
+    $html = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $html) ?? '';
+    $html = preg_replace('/\s+on[a-z]+\s*=\s*(["\']).*?\1/is', '', $html) ?? '';
+    $html = preg_replace('/\s+(style|class|id|data-[a-z0-9_-]+)\s*=\s*(["\']).*?\2/is', '', $html) ?? '';
+    $html = preg_replace('/(href|src)\s*=\s*(["\'])\s*javascript:[^"\']*\2/is', '$1="#"', $html) ?? '';
+
+    return trim(strip_tags($html, '<p><br><strong><b><em><i><u><s><ul><ol><li><h2><h3><blockquote><a><pre><code>'));
 }
 
 function commar_admin_unique_slug(string $slug, string $dataDir, ?string $currentSlug = null): string
@@ -241,7 +258,7 @@ foreach (array_merge($existingGallery, commar_admin_selected_gallery_media(), co
 $gallery = array_values($galleryByPath);
 $paragraphs = preg_split('/\R{2,}/', $rawContent) ?: [];
 $paragraphs = array_values(array_filter(array_map('trim', $paragraphs), static fn(string $paragraph): bool => $paragraph !== ''));
-$contentHtml = strip_tags($rawContentHtml, '<p><br><strong><b><em><i><ul><ol><li>');
+$contentHtml = commar_admin_sanitize_article_html($rawContentHtml);
 $tags = preg_split('/,/', $rawTags) ?: [];
 $tags = array_values(array_unique(array_filter(array_map(
     static fn(string $tag): string => mb_substr(trim($tag), 0, 40, 'UTF-8'),

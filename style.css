@@ -4973,3 +4973,14 @@ body.is-scroll-reveal-ready [data-scroll-reveal].is-visible {
     }
 
 }
+.commar-recaptcha {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.home-newsletter-form .commar-recaptcha,
+.contact-form .commar-recaptcha,
+.job-apply-form .commar-recaptcha {
+    grid-column: 1 / -1;
+}

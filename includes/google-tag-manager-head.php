@@ -1,5 +1,11 @@
 <?php
-$googleTagManagerId = 'GTM-P3GC4TVJ';
+require_once __DIR__ . '/integrations.php';
+
+$googleTagManagerId = commar_google_tag_manager_id();
+
+if ($googleTagManagerId === '') {
+    return;
+}
 ?>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

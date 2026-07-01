@@ -28,6 +28,13 @@ if (!function_exists('commar_default_settings')) {
             'image_webp_quality' => '82',
             'image_max_width' => '2000',
             'image_lazyload_enabled' => '1',
+            'google_tag_manager_id' => 'GTM-P3GC4TVJ',
+            'google_analytics_id' => '',
+            'recaptcha_enabled' => '0',
+            'recaptcha_version' => 'v3',
+            'recaptcha_site_key' => '',
+            'recaptcha_secret_key' => '',
+            'recaptcha_v3_score' => '0.5',
         ];
     }
 }

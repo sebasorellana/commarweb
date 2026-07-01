@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/site.php';
 require_once __DIR__ . '/includes/jobs.php';
 require_once __DIR__ . '/includes/media.php';
+require_once __DIR__ . '/includes/integrations.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . commar_url('trabaja-con-nosotros.php'));
@@ -22,6 +23,11 @@ $message = trim((string) ($_POST['message'] ?? ''));
 $file = $_FILES['cv'] ?? null;
 
 if (!$job || $fullName === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || !$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+    header('Location: ' . commar_url('trabaja-con-nosotros.php?status=error'));
+    exit;
+}
+
+if (!commar_recaptcha_verify('job_apply')) {
     header('Location: ' . commar_url('trabaja-con-nosotros.php?status=error'));
     exit;
 }

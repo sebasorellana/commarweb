@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/site.php';
 require_once __DIR__ . '/includes/jobs.php';
+require_once __DIR__ . '/includes/integrations.php';
 
 $jobs = commar_active_jobs();
 
@@ -26,6 +27,7 @@ $seo = [
     <link rel="stylesheet" href="style.css?v=20260629-jobs">
 </head>
 <body>
+    <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
     <?php
     $headerVariant = 'default';
     $menuItems = [
@@ -77,7 +79,7 @@ $seo = [
                                     </div>
                                 </div>
 
-                                <form class="job-apply-form" action="<?php echo htmlspecialchars(commar_url('job-apply.php'), ENT_QUOTES, 'UTF-8'); ?>" method="post" enctype="multipart/form-data">
+                                <form class="job-apply-form" action="<?php echo htmlspecialchars(commar_url('job-apply.php'), ENT_QUOTES, 'UTF-8'); ?>" method="post" enctype="multipart/form-data"<?php echo commar_recaptcha_form_attributes('job_apply'); ?>>
                                     <input type="hidden" name="job_id" value="<?php echo (int) $job['id']; ?>">
                                     <label>
                                         Nombre y apellido
@@ -100,6 +102,7 @@ $seo = [
                                         <textarea name="message" rows="4"></textarea>
                                     </label>
                                     <input type="text" name="company_name" value="" tabindex="-1" autocomplete="off" class="newsletter-honeypot" aria-hidden="true">
+                                    <?php echo commar_recaptcha_field('job_apply'); ?>
                                     <button type="submit">Enviar CV</button>
                                 </form>
                             </article>

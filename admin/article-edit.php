@@ -21,6 +21,7 @@ $content = $article !== null ? implode("\n\n", $article['content']) : '';
     <title>Editar artículo | MOnkey CMS</title>
     <link rel="icon" type="image/png" href="../img/logo-commar-500.png">
     <link rel="apple-touch-icon" href="../img/logo-commar-500.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body class="admin-page">
@@ -31,14 +32,6 @@ $content = $article !== null ? implode("\n\n", $article['content']) : '';
 
             <main class="admin-content">
                 <div>
-                    <div class="admin-page-actions">
-                        <div>
-                            <span class="admin-kicker">Blog</span>
-                            <h2>Editar artículo</h2>
-                        </div>
-                        <a href="blog.php" class="admin-secondary-link">Volver al listado</a>
-                    </div>
-
                     <?php if ($article === null): ?>
                         <p class="admin-alert admin-alert-error">El artículo solicitado no existe o no se puede editar.</p>
                     <?php else: ?>
@@ -50,6 +43,7 @@ $content = $article !== null ? implode("\n\n", $article['content']) : '';
             <?php commar_admin_footer(); ?>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="admin.js?v=20260701-featured-media" defer></script>
 </body>
 </html>

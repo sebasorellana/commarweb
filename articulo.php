@@ -18,6 +18,19 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
     $articleTitle = $article['title'];
     $articleDescription = $article['description'];
 }
+
+function commar_render_article_shortcodes(string $html): string
+{
+    return preg_replace_callback(
+        '/(?:<p>\s*)?\[youtube\s+id=(["\']?)([a-zA-Z0-9_-]{11})\1\]\s*(?:<\/p>)?/i',
+        static function (array $matches): string {
+            $id = htmlspecialchars($matches[2], ENT_QUOTES, 'UTF-8');
+
+            return '<div class="article-video-section article-video-section-inline"><div class="article-video-wrapper"><iframe src="https://www.youtube.com/embed/' . $id . '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen title="Video de YouTube integrado"></iframe></div></div>';
+        },
+        $html
+    ) ?? $html;
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars(commar_lang_attr(), ENT_QUOTES, 'UTF-8'); ?>">
@@ -108,7 +121,7 @@ if (!$article || ($article['status'] ?? 'published') !== 'published') {
                         <?php
                         $contentHtml = trim((string) ($article['content_html'] ?? ''));
                         if ($contentHtml !== '') {
-                            echo $contentHtml; // Sanitizado al guardar
+                            echo commar_render_article_shortcodes($contentHtml); // Sanitizado al guardar
                         } else {
                             // Fallback para contenido antiguo sin HTML
                             foreach ($article['content'] as $paragraph) {

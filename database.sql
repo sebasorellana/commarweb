@@ -71,7 +71,14 @@ CREATE TABLE IF NOT EXISTS `commar_newsletter_submissions` (
 INSERT INTO `commar_settings` (`setting_key`, `setting_value`, `updated_at`) VALUES
 ('home_hero_image', 'img/hero-home.jpg', NOW()),
 ('home_hero_width', '1200', NOW()),
-('home_hero_height', '1800', NOW())
+('home_hero_height', '1800', NOW()),
+('google_tag_manager_id', 'GTM-P3GC4TVJ', NOW()),
+('google_analytics_id', '', NOW()),
+('recaptcha_enabled', '0', NOW()),
+('recaptcha_version', 'v3', NOW()),
+('recaptcha_site_key', '', NOW()),
+('recaptcha_secret_key', '', NOW()),
+('recaptcha_v3_score', '0.5', NOW())
 ON DUPLICATE KEY UPDATE `setting_key` = VALUES(`setting_key`);
 
 INSERT INTO `commar_articles` (`slug`, `title`, `description`, `category`, `year`, `image`, `image_width`, `image_height`, `content_json`, `gallery_json`, `tags_json`, `status`, `published_at`, `updated_at`) VALUES

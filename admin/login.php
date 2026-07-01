@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </section>
         </main>
         <footer class="admin-footer">
-            <p>&copy; <?php echo date('Y'); ?> MOnkey CMS, diseñado y creado por <a href="https://monkey-art.net" target="_blank" rel="noopener noreferrer">MOnkey ARt</a>.</p>
+            <p><?php echo date('Y'); ?> &copy; MOnkey CMS v1.1 - Diseñado y Desarrollado por <a href="https://monkey-art.net" target="_blank" rel="noopener noreferrer">MOnkey ARt</a>.</p>
         </footer>
     </div>
 </body>

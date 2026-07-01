@@ -17,11 +17,16 @@ function commar_admin_nav(string $active): void
         $items = array_values(array_filter($items, static fn(array $item): bool => $item['id'] !== 'settings'));
     }
     ?>
-    <aside class="admin-sidebar">
-        <a href="index.php" class="admin-sidebar-brand">
-            <img src="../img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578">
-            <span>MOnkey CMS</span>
-        </a>
+    <aside class="admin-sidebar" id="admin-sidebar-menu">
+        <div class="admin-sidebar-head">
+            <a href="index.php" class="admin-sidebar-brand">
+                <img src="../img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578">
+                <span>MOnkey CMS</span>
+            </a>
+            <button type="button" class="admin-sidebar-close" aria-label="Cerrar menú" data-admin-menu-close>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
         <nav class="admin-sidebar-nav" aria-label="Navegación admin">
             <?php foreach ($items as $item): ?>
                 <a href="<?php echo commar_admin_h($item['href']); ?>" class="admin-sidebar-link <?php echo $active === $item['id'] ? 'is-active' : ''; ?>">
@@ -37,6 +42,7 @@ function commar_admin_nav(string $active): void
             </a>
         </div>
     </aside>
+    <button type="button" class="admin-sidebar-backdrop" aria-label="Cerrar menú" data-admin-menu-close></button>
     <div id="about-monkey-cms" class="admin-modal-target">
         <a href="#" class="admin-modal-backdrop" aria-label="Cerrar"></a>
         <section class="admin-modal-card admin-about-modal" role="dialog" aria-modal="true" aria-labelledby="about-monkey-cms-title">
@@ -97,6 +103,9 @@ function commar_admin_header(string $title, string $kicker = 'COMMAR GROUP'): vo
             <h1><?php echo commar_admin_h($title); ?></h1>
         </div>
         <div class="admin-topbar-actions">
+            <button type="button" class="admin-topbar-menu" aria-label="Abrir menú" aria-controls="admin-sidebar-menu" aria-expanded="false" data-admin-menu-toggle>
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+            </button>
             <a href="../index.php" target="_blank" rel="noopener" class="admin-topbar-action">Ver sitio</a>
             <form action="logout.php" method="post" class="admin-logout-form">
                 <input type="hidden" name="csrf_token" value="<?php echo commar_admin_csrf_token(); ?>">
@@ -116,6 +125,7 @@ function commar_admin_settings_nav(string $active): void
         ['id' => 'general', 'label' => 'General', 'href' => 'settings.php'],
         ['id' => 'users', 'label' => 'Usuarios', 'href' => 'settings-users.php'],
         ['id' => 'menu', 'label' => 'Menú', 'href' => 'settings-menu.php'],
+        ['id' => 'integrations', 'label' => 'Integraciones', 'href' => 'settings-integrations.php'],
         ['id' => 'images', 'label' => 'Imágenes', 'href' => 'settings-images.php'],
     ];
     ?>
@@ -131,7 +141,38 @@ function commar_admin_footer(): void
 {
     ?>
     <footer class="admin-footer admin-footer-dashboard">
-        <p>&copy; <?php echo date('Y'); ?> MOnkey CMS, diseñado y creado por <a href="https://monkey-art.net" target="_blank" rel="noopener noreferrer">MOnkey ARt</a>.</p>
+        <p><?php echo date('Y'); ?> &copy; MOnkey CMS v1.1 - Diseñado y Desarrollado por <a href="https://monkey-art.net" target="_blank" rel="noopener noreferrer">MOnkey ARt</a>.</p>
     </footer>
+    <script>
+        document.querySelectorAll('[data-admin-menu-toggle]').forEach(function (toggle) {
+            var closeButtons = document.querySelectorAll('[data-admin-menu-close]');
+            var setMenuOpen = function (isOpen) {
+                document.body.classList.toggle('is-admin-menu-open', isOpen);
+                toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            };
+
+            toggle.addEventListener('click', function () {
+                setMenuOpen(!document.body.classList.contains('is-admin-menu-open'));
+            });
+
+            closeButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    setMenuOpen(false);
+                });
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    setMenuOpen(false);
+                }
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 768) {
+                    setMenuOpen(false);
+                }
+            });
+        });
+    </script>
     <?php
 }

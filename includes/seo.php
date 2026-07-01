@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/site.php';
+require_once __DIR__ . '/integrations.php';
 
 $seo = $seo ?? [];
 $siteName = 'COMMAR GROUP';
@@ -23,6 +24,10 @@ $robots = $seo['robots'] ?? 'index, follow, max-image-preview:large, max-snippet
 $jsonLd = $seo['json_ld'] ?? [];
 $ogLocale = $seo['locale'] ?? commar_locale();
 include __DIR__ . '/google-tag-manager-head.php';
+$googleAnalyticsId = commar_google_analytics_id();
+$recaptchaEnabled = commar_recaptcha_enabled();
+$recaptchaSiteKey = commar_recaptcha_site_key();
+$recaptchaVersion = commar_recaptcha_version();
 ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -64,3 +69,43 @@ include __DIR__ . '/google-tag-manager-head.php';
 <?php foreach ($jsonLd as $schema): ?>
     <script type="application/ld+json"><?php echo json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?></script>
 <?php endforeach; ?>
+<?php if ($googleAnalyticsId !== ''): ?>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo htmlspecialchars($googleAnalyticsId, ENT_QUOTES, 'UTF-8'); ?>"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '<?php echo htmlspecialchars($googleAnalyticsId, ENT_QUOTES, 'UTF-8'); ?>');
+    </script>
+    <!-- End Google Analytics -->
+<?php endif; ?>
+<?php if ($recaptchaEnabled && $recaptchaSiteKey !== ''): ?>
+    <?php if ($recaptchaVersion === 'v2'): ?>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <?php else: ?>
+    <script src="https://www.google.com/recaptcha/api.js?render=<?php echo htmlspecialchars($recaptchaSiteKey, ENT_QUOTES, 'UTF-8'); ?>" defer></script>
+    <script>
+        document.addEventListener('submit', function (event) {
+            var form = event.target;
+            if (!form.matches('[data-recaptcha-form]') || form.dataset.recaptchaReady === '1') {
+                return;
+            }
+
+            var token = form.querySelector('[data-recaptcha-token]');
+            if (!token || !window.grecaptcha) {
+                return;
+            }
+
+            event.preventDefault();
+            window.grecaptcha.ready(function () {
+                window.grecaptcha.execute('<?php echo htmlspecialchars($recaptchaSiteKey, ENT_QUOTES, 'UTF-8'); ?>', { action: form.dataset.recaptchaAction || 'submit' }).then(function (value) {
+                    token.value = value;
+                    form.dataset.recaptchaReady = '1';
+                    form.requestSubmit ? form.requestSubmit() : form.submit();
+                });
+            });
+        }, true);
+    </script>
+    <?php endif; ?>
+<?php endif; ?>

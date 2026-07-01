@@ -11,6 +11,7 @@ commar_admin_require_login();
     <title>Nuevo artículo | MOnkey CMS</title>
     <link rel="icon" type="image/png" href="../img/logo-commar-500.png">
     <link rel="apple-touch-icon" href="../img/logo-commar-500.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body class="admin-page">
@@ -21,14 +22,6 @@ commar_admin_require_login();
 
             <main class="admin-content">
                 <div>
-                    <div class="admin-page-actions">
-                        <div>
-                            <span class="admin-kicker">Blog</span>
-                            <h2>Crear artículo</h2>
-                        </div>
-                        <a href="blog.php" class="admin-secondary-link">Volver al listado</a>
-                    </div>
-
                     <?php if (COMMAR_ADMIN_PASSWORD === 'admin123'): ?>
                         <p class="admin-alert admin-alert-warning">Clave inicial activa. Cambiala en <strong>admin/config.php</strong> antes de publicar el panel.</p>
                     <?php endif; ?>
@@ -40,6 +33,7 @@ commar_admin_require_login();
             <?php commar_admin_footer(); ?>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="admin.js?v=20260701-featured-media" defer></script>
 </body>
 </html>

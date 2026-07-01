@@ -91,6 +91,33 @@ document.querySelectorAll('[data-article-form]').forEach((form) => {
     const galleryInput = form.querySelector('[data-gallery-input]');
     const galleryPreview = form.querySelector('[data-gallery-preview]');
     const galleryList = form.querySelector('[data-gallery-list]');
+    const tagsValue = form.querySelector('[data-tags-value]');
+    const tagsField = form.querySelector('[data-tags-field]');
+    const tagsList = form.querySelector('[data-tags-list]');
+    const tagsInput = tagsField?.querySelector('input[type="text"]');
+    const tagsSuggestions = form.querySelector('[data-tags-suggestions]');
+    const youtubeUrlInput = form.querySelector('[data-youtube-url]');
+    const youtubeShortcodeWrap = form.querySelector('[data-youtube-shortcode-wrap]');
+    const youtubeShortcode = form.querySelector('[data-youtube-shortcode]');
+    const copyYoutubeShortcode = form.querySelector('[data-copy-youtube-shortcode]');
+    const insertYoutubeShortcode = form.querySelector('[data-insert-youtube-shortcode]');
+    let quillEditor = null;
+
+    if (editor?.matches('[data-article-rich-editor]') && window.Quill) {
+        quillEditor = new window.Quill(editor, {
+            theme: 'snow',
+            placeholder: 'Escribí el artículo...',
+            modules: {
+                toolbar: [
+                    [{ header: [2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['blockquote', 'link'],
+                    ['clean'],
+                ],
+            },
+        });
+    }
 
     const setFeaturedPreview = (path) => {
         if (!featuredPreview || !featuredPreviewWrap || !path) {
@@ -108,14 +135,18 @@ document.querySelectorAll('[data-article-form]').forEach((form) => {
             return;
         }
 
-        const blocks = Array.from(editor.querySelectorAll('p, li'))
-            .map((block) => block.innerText.trim())
-            .filter(Boolean);
-        const text = blocks.length > 0 ? blocks.join('\n\n') : editor.innerText.trim();
+        const text = quillEditor ? quillEditor.getText().trim() : (() => {
+            const blocks = Array.from(editor.querySelectorAll('p, li'))
+                .map((block) => block.innerText.trim())
+                .filter(Boolean);
+            return blocks.length > 0 ? blocks.join('\n\n') : editor.innerText.trim();
+        })();
         source.value = text;
 
         if (htmlSource) {
-            htmlSource.value = editor.innerHTML.trim();
+            htmlSource.value = quillEditor
+                ? (typeof quillEditor.getSemanticHTML === 'function' ? quillEditor.getSemanticHTML().trim() : quillEditor.root.innerHTML.trim())
+                : editor.innerHTML.trim();
         }
     };
 
@@ -130,8 +161,154 @@ document.querySelectorAll('[data-article-form]').forEach((form) => {
         });
     });
 
+    quillEditor?.on('text-change', syncEditor);
     editor?.addEventListener('input', syncEditor);
     form.addEventListener('submit', syncEditor);
+
+    if (tagsValue && tagsField && tagsList && tagsInput) {
+        let selectedTags = tagsValue.value.split(',')
+            .map((tag) => tag.trim())
+            .filter(Boolean);
+        const suggestedTags = (() => {
+            try {
+                const parsed = JSON.parse(tagsField.dataset.suggestions || '[]');
+                return Array.isArray(parsed) ? parsed.map((tag) => String(tag)) : [];
+            } catch (error) {
+                return [];
+            }
+        })();
+
+        const normalizeTag = (tag) => tag.trim().replace(/\s+/g, ' ').slice(0, 40);
+        const syncTags = () => {
+            selectedTags = Array.from(new Map(selectedTags.map((tag) => [tag.toLocaleLowerCase(), tag])).values());
+            tagsValue.value = selectedTags.join(', ');
+            tagsList.innerHTML = '';
+
+            selectedTags.forEach((tag) => {
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'admin-tag-chip';
+                chip.textContent = tag;
+                chip.setAttribute('aria-label', `Quitar ${tag}`);
+                chip.addEventListener('click', () => {
+                    selectedTags = selectedTags.filter((current) => current.toLocaleLowerCase() !== tag.toLocaleLowerCase());
+                    syncTags();
+                    renderSuggestions();
+                });
+                tagsList.append(chip);
+            });
+        };
+        const addTag = (value) => {
+            const tag = normalizeTag(value);
+            if (!tag) {
+                return;
+            }
+            if (!selectedTags.some((current) => current.toLocaleLowerCase() === tag.toLocaleLowerCase())) {
+                selectedTags.push(tag);
+            }
+            tagsInput.value = '';
+            syncTags();
+            renderSuggestions();
+        };
+        const renderSuggestions = () => {
+            if (!tagsSuggestions) {
+                return;
+            }
+            const query = tagsInput.value.trim().toLocaleLowerCase();
+            const available = suggestedTags
+                .filter((tag) => !selectedTags.some((current) => current.toLocaleLowerCase() === tag.toLocaleLowerCase()))
+                .filter((tag) => query === '' || tag.toLocaleLowerCase().includes(query))
+                .slice(0, 6);
+
+            tagsSuggestions.innerHTML = '';
+            available.forEach((tag) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = tag;
+                button.addEventListener('mousedown', (event) => event.preventDefault());
+                button.addEventListener('click', () => addTag(tag));
+                tagsSuggestions.append(button);
+            });
+        };
+
+        tagsInput.addEventListener('keydown', (event) => {
+            if (event.key === ',' || event.key === 'Enter') {
+                event.preventDefault();
+                addTag(tagsInput.value.replace(/,$/, ''));
+            }
+
+            if (event.key === 'Backspace' && tagsInput.value === '' && selectedTags.length > 0) {
+                selectedTags.pop();
+                syncTags();
+                renderSuggestions();
+            }
+        });
+        tagsInput.addEventListener('input', () => {
+            if (tagsInput.value.includes(',')) {
+                tagsInput.value.split(',').forEach(addTag);
+                return;
+            }
+            renderSuggestions();
+        });
+        tagsInput.addEventListener('blur', () => addTag(tagsInput.value));
+        form.addEventListener('submit', () => {
+            addTag(tagsInput.value);
+            syncTags();
+        });
+        syncTags();
+        renderSuggestions();
+    }
+
+    const getYoutubeId = (value) => {
+        const trimmed = value.trim();
+        if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
+            return trimmed;
+        }
+        const match = trimmed.match(/(?:youtube(?:-nocookie)?\.com\/(?:.*[?&]v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        return match ? match[1] : '';
+    };
+    const syncYoutubeShortcode = () => {
+        if (!youtubeUrlInput || !youtubeShortcode || !youtubeShortcodeWrap) {
+            return '';
+        }
+        const id = getYoutubeId(youtubeUrlInput.value);
+        const shortcode = id ? `[youtube id="${id}"]` : '';
+
+        youtubeShortcode.textContent = shortcode;
+        youtubeShortcodeWrap.hidden = shortcode === '';
+        return shortcode;
+    };
+
+    youtubeUrlInput?.addEventListener('input', syncYoutubeShortcode);
+    copyYoutubeShortcode?.addEventListener('click', async () => {
+        const shortcode = syncYoutubeShortcode();
+        if (!shortcode) {
+            return;
+        }
+
+        await navigator.clipboard?.writeText(shortcode);
+        copyYoutubeShortcode.textContent = 'Copiado';
+        setTimeout(() => {
+            copyYoutubeShortcode.textContent = 'Copiar';
+        }, 1400);
+    });
+    insertYoutubeShortcode?.addEventListener('click', () => {
+        const shortcode = syncYoutubeShortcode();
+        if (!shortcode) {
+            return;
+        }
+
+        if (quillEditor) {
+            const range = quillEditor.getSelection(true);
+            quillEditor.insertText(range.index, `\n${shortcode}\n`, 'user');
+            quillEditor.setSelection(range.index + shortcode.length + 2, 0);
+        } else {
+            editor?.focus();
+            document.execCommand('insertText', false, `\n${shortcode}\n`);
+        }
+        syncEditor();
+    });
+    syncYoutubeShortcode();
 
     const syncGalleryMediaOptionsFromHidden = () => {
         const selectedValues = new Set(Array.from(galleryMediaSelected?.querySelectorAll('input[name="media_gallery_images[]"]') || [])

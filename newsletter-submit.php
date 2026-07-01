@@ -1,6 +1,7 @@
 <?php
 define('COMMAR_SKIP_MAINTENANCE', true);
 require_once __DIR__ . '/includes/site.php';
+require_once __DIR__ . '/includes/integrations.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . commar_url('index.php'));
@@ -20,6 +21,11 @@ if ($honeypot !== '') {
 }
 
 if ($email === false) {
+    header('Location: ' . commar_url('newsletter-gracias.php?error=1'));
+    exit;
+}
+
+if (!commar_recaptcha_verify('newsletter')) {
     header('Location: ' . commar_url('newsletter-gracias.php?error=1'));
     exit;
 }

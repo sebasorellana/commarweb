@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__DIR__) . '/includes/media.php';
+require_once dirname(__DIR__) . '/includes/articles.php';
 
 $article = $article ?? null;
 $content = $content ?? '';
@@ -10,14 +11,30 @@ $featuredImage = $isEditing ? (string) ($article['image'] ?? '') : '';
 $gallery = is_array($article['gallery'] ?? null) ? $article['gallery'] : [];
 $tags = is_array($article['tags'] ?? null) ? $article['tags'] : [];
 $tagsValue = implode(', ', array_map('strval', $tags));
-$editorHtml = '';
+$storedHtml = trim((string) ($article['content_html'] ?? ''));
+$editorHtml = $storedHtml;
 $mediaImages = commar_media_image_items(48);
+$availableTags = [];
 
-foreach (preg_split('/\R{2,}/', trim($content)) ?: [] as $paragraph) {
-    $paragraph = trim($paragraph);
+foreach (commar_dynamic_articles(false) as $existingArticle) {
+    foreach (($existingArticle['tags'] ?? []) as $tag) {
+        $tag = trim((string) $tag);
 
-    if ($paragraph !== '') {
-        $editorHtml .= '<p>' . nl2br(commar_admin_h($paragraph)) . '</p>';
+        if ($tag !== '') {
+            $availableTags[mb_strtolower($tag, 'UTF-8')] = $tag;
+        }
+    }
+}
+
+ksort($availableTags);
+
+if ($editorHtml === '') {
+    foreach (preg_split('/\R{2,}/', trim($content)) ?: [] as $paragraph) {
+        $paragraph = trim($paragraph);
+
+        if ($paragraph !== '') {
+            $editorHtml .= '<p>' . nl2br(commar_admin_h($paragraph)) . '</p>';
+        }
     }
 }
 
@@ -42,13 +59,7 @@ if ($editorHtml === '') {
             </label>
             <div class="admin-rich-field">
                 <span class="admin-field-label">Cuerpo del artículo</span>
-                <div class="admin-editor-toolbar" aria-label="Herramientas de texto">
-                    <button type="button" data-editor-command="bold">B</button>
-                    <button type="button" data-editor-command="italic">I</button>
-                    <button type="button" data-editor-command="insertUnorderedList">Lista</button>
-                    <button type="button" data-editor-command="formatBlock" data-editor-value="p">P</button>
-                </div>
-                <div class="admin-rich-editor" contenteditable="true" data-rich-editor><?php echo $editorHtml; ?></div>
+                <div class="admin-rich-editor admin-article-rich-editor" contenteditable="true" data-rich-editor data-article-rich-editor><?php echo $editorHtml; ?></div>
                 <textarea name="content" class="admin-content-source" required data-content-source><?php echo commar_admin_h($content); ?></textarea>
                 <textarea name="content_html" class="admin-content-source" data-content-html><?php echo commar_admin_h((string) ($article['content_html'] ?? $editorHtml)); ?></textarea>
             </div>
@@ -59,14 +70,16 @@ if ($editorHtml === '') {
 
             <section class="admin-sidebar-card">
                 <h3>Estado</h3>
-                <label class="admin-radio-row">
-                    <input type="radio" name="status" value="draft" <?php echo $selectedStatus === 'draft' ? 'checked' : ''; ?>>
-                    Borrador
-                </label>
-                <label class="admin-radio-row">
-                    <input type="radio" name="status" value="published" <?php echo $selectedStatus !== 'draft' ? 'checked' : ''; ?>>
-                    Publicado
-                </label>
+                <div class="admin-status-options">
+                    <label class="admin-radio-row">
+                        <input type="radio" name="status" value="draft" <?php echo $selectedStatus === 'draft' ? 'checked' : ''; ?>>
+                        <span>Borrador</span>
+                    </label>
+                    <label class="admin-radio-row">
+                        <input type="radio" name="status" value="published" <?php echo $selectedStatus !== 'draft' ? 'checked' : ''; ?>>
+                        <span>Publicado</span>
+                    </label>
+                </div>
             </section>
 
             <section class="admin-sidebar-card">
@@ -84,7 +97,12 @@ if ($editorHtml === '') {
             <section class="admin-sidebar-card">
                 <label>
                     Tags
-                    <input type="text" name="tags" value="<?php echo commar_admin_h($tagsValue); ?>" maxlength="240" placeholder="obra, permisos, documentación">
+                    <input type="hidden" name="tags" value="<?php echo commar_admin_h($tagsValue); ?>" data-tags-value>
+                    <div class="admin-tags-field" data-tags-field data-suggestions="<?php echo commar_admin_h(json_encode(array_values($availableTags), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '[]'); ?>">
+                        <div class="admin-tags-list" data-tags-list></div>
+                        <input type="text" maxlength="40" placeholder="Agregar tag">
+                    </div>
+                    <div class="admin-tags-suggestions" data-tags-suggestions></div>
                     <span class="admin-help">Separá cada tag con coma.</span>
                 </label>
             </section>
@@ -92,9 +110,17 @@ if ($editorHtml === '') {
             <section class="admin-sidebar-card">
                 <label>
                     Video de YouTube (opcional)
-                    <input type="url" name="youtube_url" value="<?php echo commar_admin_h((string) ($article['youtube_url'] ?? '')); ?>" placeholder="https://www.youtube.com/watch?v=...">
+                    <input type="url" name="youtube_url" value="<?php echo commar_admin_h((string) ($article['youtube_url'] ?? '')); ?>" placeholder="https://www.youtube.com/watch?v=..." data-youtube-url>
                     <span class="admin-help">Copiá y pegá la URL completa del video.</span>
                 </label>
+                <div class="admin-youtube-shortcode" hidden data-youtube-shortcode-wrap>
+                    <span>Shortcode</span>
+                    <code data-youtube-shortcode></code>
+                    <div class="admin-youtube-actions">
+                        <button type="button" data-copy-youtube-shortcode>Copiar</button>
+                        <button type="button" data-insert-youtube-shortcode>Insertar</button>
+                    </div>
+                </div>
             </section>
 
             <section class="admin-sidebar-card">

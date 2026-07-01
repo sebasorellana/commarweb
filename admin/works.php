@@ -77,7 +77,6 @@ if (!function_exists('commar_admin_works_page_url')) {
                 <section class="admin-panel admin-wide-panel">
                     <div class="admin-page-actions">
                         <div>
-                            <span class="admin-kicker">Directorio</span>
                             <h2>Obras</h2>
                         </div>
                         <a href="work-edit.php" class="admin-primary-link">Nueva obra</a>

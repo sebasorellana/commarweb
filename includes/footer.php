@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/jobs.php';
+require_once __DIR__ . '/menu.php';
 
 $footerEmail = commar_contact_email();
 $footerAddressLines = commar_contact_address_lines();
@@ -8,6 +9,9 @@ $linkedinUrl = trim((string) commar_setting('linkedin_url'));
 $footerScript = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
 $shouldRenderNewsletter = !in_array($footerScript, ['index.php'], true);
 $footerActiveJobs = commar_active_jobs();
+$footerMenuItems = array_values(array_filter(commar_menu_items('footer'), static function (array $item) use ($footerActiveJobs): bool {
+    return empty($item['requires_active_jobs']) || !empty($footerActiveJobs);
+}));
 ?>
     <?php if ($shouldRenderNewsletter): ?>
         <?php $newsletterTitleId = 'newsletter-title-footer'; ?>
@@ -32,16 +36,9 @@ $footerActiveJobs = commar_active_jobs();
             <div class="footer-grid">
                 <nav class="footer-column" aria-label="Navegación del footer">
                     <p class="footer-column-label"><?php echo htmlspecialchars(commar_t('footer.map'), ENT_QUOTES, 'UTF-8'); ?></p>
-                    <a href="<?php echo htmlspecialchars(commar_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.home'), ENT_QUOTES, 'UTF-8'); ?></a>
-                    <a href="<?php echo htmlspecialchars(commar_url('el-estudio.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.studio'), ENT_QUOTES, 'UTF-8'); ?></a>
-                    <a href="<?php echo htmlspecialchars(commar_url('servicios.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.services'), ENT_QUOTES, 'UTF-8'); ?></a>
-                    <a href="<?php echo htmlspecialchars(commar_url('obra-viva.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.obra_viva'), ENT_QUOTES, 'UTF-8'); ?></a>
-                    <a href="<?php echo htmlspecialchars(commar_url('obras.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.works'), ENT_QUOTES, 'UTF-8'); ?></a>
-                    <a href="<?php echo htmlspecialchars(commar_url('blog.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.blog'), ENT_QUOTES, 'UTF-8'); ?></a>
-                    <?php if (!empty($footerActiveJobs)): ?>
-                        <a href="<?php echo htmlspecialchars(commar_url('trabaja-con-nosotros.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link">Trabajá con nosotros</a>
-                    <?php endif; ?>
-                    <a href="<?php echo htmlspecialchars(commar_url('contacto.php'), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_t('nav.contact'), ENT_QUOTES, 'UTF-8'); ?></a>
+                    <?php foreach ($footerMenuItems as $item): ?>
+                        <a href="<?php echo htmlspecialchars(commar_url((string) $item['href']), ENT_QUOTES, 'UTF-8'); ?>" class="footer-link"><?php echo htmlspecialchars(commar_nav_label((string) $item['label']), ENT_QUOTES, 'UTF-8'); ?></a>
+                    <?php endforeach; ?>
                 </nav>
                 <div class="footer-column">
                     <p class="footer-column-label"><?php echo htmlspecialchars(commar_t('footer.services'), ENT_QUOTES, 'UTF-8'); ?></p>

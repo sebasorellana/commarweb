@@ -29,7 +29,6 @@ $total = count($submissions);
                 <section class="admin-panel admin-wide-panel">
                     <div class="admin-page-actions">
                         <div>
-                            <span class="admin-kicker">Newsletter</span>
                             <h2>Submissions</h2>
                         </div>
                         <a href="newsletter-submissions-export.php" class="admin-primary-link">Exportar CSV</a>

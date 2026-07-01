@@ -68,7 +68,6 @@ $mediaImages = commar_media_image_items(60);
                 <section class="admin-panel admin-wide-panel">
                     <div class="admin-page-actions admin-work-edit-head">
                         <div>
-                            <span class="admin-kicker">Directorio de obras</span>
                             <h2><?php echo commar_admin_h($pageTitle); ?></h2>
                         </div>
                         <a href="works.php" class="admin-secondary-link">Volver al listado</a>

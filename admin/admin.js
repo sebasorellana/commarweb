@@ -17,6 +17,50 @@ document.querySelectorAll('[data-file-input]').forEach((input) => {
     });
 });
 
+document.querySelectorAll('[data-menu-sortable]').forEach((list) => {
+    const syncOrder = () => {
+        Array.from(list.querySelectorAll('.admin-menu-editor-row')).forEach((row, index) => {
+            const orderInput = row.querySelector('[data-menu-order]');
+            if (orderInput) {
+                orderInput.value = String(index + 1);
+            }
+        });
+    };
+
+    let draggedRow = null;
+
+    list.addEventListener('dragstart', (event) => {
+        const row = event.target.closest('.admin-menu-editor-row');
+        if (!row) {
+            return;
+        }
+
+        draggedRow = row;
+        row.classList.add('is-dragging');
+        event.dataTransfer.effectAllowed = 'move';
+    });
+
+    list.addEventListener('dragend', () => {
+        draggedRow?.classList.remove('is-dragging');
+        draggedRow = null;
+        syncOrder();
+    });
+
+    list.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        const target = event.target.closest('.admin-menu-editor-row');
+        if (!draggedRow || !target || target === draggedRow) {
+            return;
+        }
+
+        const targetBox = target.getBoundingClientRect();
+        const shouldInsertAfter = event.clientY > targetBox.top + targetBox.height / 2;
+        list.insertBefore(draggedRow, shouldInsertAfter ? target.nextSibling : target);
+    });
+
+    syncOrder();
+});
+
 document.querySelectorAll('[data-article-form]').forEach((form) => {
     const editor = form.querySelector('[data-rich-editor]');
     const source = form.querySelector('[data-content-source]');

@@ -111,7 +111,6 @@ function commar_admin_media_size(int $bytes): string
                 <section class="admin-panel admin-wide-panel">
                     <div class="admin-page-actions">
                         <div>
-                            <span class="admin-kicker">Archivos</span>
                             <h2>Biblioteca de medios</h2>
                         </div>
                         <a href="#upload-media-modal" class="admin-primary-link">Agregar medio</a>
@@ -175,7 +174,7 @@ function commar_admin_media_size(int $bytes): string
                 <input type="hidden" name="csrf_token" value="<?php echo commar_admin_csrf_token(); ?>">
                 <input type="hidden" name="action" value="upload">
                 <label class="admin-file-control">
-                    Archivos
+                    Medios
                     <span class="admin-file-input-wrap">
                         <span class="admin-file-button">Seleccionar archivos</span>
                         <span class="admin-file-name" data-file-name>Sin archivos seleccionados</span>

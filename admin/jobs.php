@@ -132,8 +132,7 @@ $descriptionHtml = commar_job_description_html((string) ($editingJob['descriptio
                 <section class="admin-panel admin-wide-panel">
                     <div class="admin-page-actions">
                         <div>
-                            <span class="admin-kicker">Búsquedas laborales</span>
-                            <h2>ABM</h2>
+                            <h2>Búsquedas laborales</h2>
                         </div>
                     </div>
 

@@ -30,7 +30,31 @@ function commar_admin_nav(string $active): void
                 </a>
             <?php endforeach; ?>
         </nav>
+        <div class="admin-sidebar-about">
+            <a href="#about-monkey-cms" class="admin-sidebar-link admin-sidebar-about-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                <span>Acerca de MOnkey CMS</span>
+            </a>
+        </div>
     </aside>
+    <div id="about-monkey-cms" class="admin-modal-target">
+        <a href="#" class="admin-modal-backdrop" aria-label="Cerrar"></a>
+        <section class="admin-modal-card admin-about-modal" role="dialog" aria-modal="true" aria-labelledby="about-monkey-cms-title">
+            <div class="admin-modal-head">
+                <div>
+                    <span class="admin-kicker">MOnkey ARt</span>
+                    <h2 id="about-monkey-cms-title">Acerca de MOnkey CMS</h2>
+                </div>
+                <a href="#" class="admin-modal-close" aria-label="Cerrar">&times;</a>
+            </div>
+            <div class="admin-about-body">
+                <span class="admin-about-version">v1.1</span>
+                <p>MOnkey CMS es una plataforma de gestión creada exclusivamente para COMMAR GROUP por el equipo de diseño y desarrollo de la Agencia MOnkey ARt.</p>
+                <p>Su arquitectura fue pensada para acompañar la identidad, el contenido y la evolución digital de la marca, integrando administración de sitio, publicaciones, obras, mediateca y herramientas operativas en un entorno propio, sobrio y eficiente.</p>
+                <p class="admin-about-rights">Todos los derechos reservados. MOnkey CMS, su diseño, estructura e implementación forman parte de un desarrollo a medida para COMMAR GROUP.</p>
+            </div>
+        </section>
+    </div>
     <?php
 }
 
@@ -91,6 +115,7 @@ function commar_admin_settings_nav(string $active): void
     $items = [
         ['id' => 'general', 'label' => 'General', 'href' => 'settings.php'],
         ['id' => 'users', 'label' => 'Usuarios', 'href' => 'settings-users.php'],
+        ['id' => 'menu', 'label' => 'Menú', 'href' => 'settings-menu.php'],
         ['id' => 'images', 'label' => 'Imágenes', 'href' => 'settings-images.php'],
     ];
     ?>

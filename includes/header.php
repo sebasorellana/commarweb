@@ -1,15 +1,9 @@
 <?php
+require_once __DIR__ . '/menu.php';
+
 $headerVariant = $headerVariant ?? 'home';
 $languageOptions = commar_supported_languages();
-$menuItems = $menuItems ?? [
-    ['label' => commar_t('nav.home'), 'href' => 'index.php'],
-    ['label' => commar_t('nav.studio'), 'href' => 'el-estudio.php'],
-    ['label' => commar_t('nav.services'), 'href' => 'servicios.php'],
-    ['label' => commar_t('nav.obra_viva'), 'href' => 'obra-viva.php'],
-    ['label' => commar_t('nav.works'), 'href' => 'obras.php'],
-    ['label' => commar_t('nav.blog'), 'href' => 'blog.php'],
-    ['label' => commar_t('nav.contact'), 'href' => 'contacto.php'],
-];
+$menuItems = $menuItems ?? commar_menu_items('header');
 ?>
 
 <?php if ($headerVariant === 'home'): ?>

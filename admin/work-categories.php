@@ -71,10 +71,8 @@ $formTitle = $editingCategory ? 'Editar categoría' : 'Nueva categoría';
                 <section class="admin-panel admin-wide-panel">
                     <div class="admin-page-actions">
                         <div>
-                            <span class="admin-kicker">Directorio de obras</span>
                             <h2>Categorías</h2>
                         </div>
-                        <a href="works.php" class="admin-secondary-link">Volver a obras</a>
                     </div>
 
                     <?php if ($created): ?>

@@ -35,7 +35,14 @@ $content = $article !== null ? implode("\n\n", $article['content']) : '';
                     <?php if ($article === null): ?>
                         <p class="admin-alert admin-alert-error">El artículo solicitado no existe o no se puede editar.</p>
                     <?php else: ?>
-                        <?php include __DIR__ . '/article-form.php'; ?>
+                        <?php
+                        try {
+                            include __DIR__ . '/article-form.php';
+                        } catch (Throwable $exception) {
+                            error_log('Article form error: ' . $exception->getMessage());
+                            echo '<p class="admin-alert admin-alert-error">No se pudo cargar el formulario del artículo. Revisá el log del servidor.</p>';
+                        }
+                        ?>
                     <?php endif; ?>
                 </div>
             </main>

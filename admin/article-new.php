@@ -22,11 +22,18 @@ commar_admin_require_login();
 
             <main class="admin-content">
                 <div>
-                    <?php if (COMMAR_ADMIN_PASSWORD === 'admin123'): ?>
+                    <?php if (defined('COMMAR_ADMIN_PASSWORD') && COMMAR_ADMIN_PASSWORD === 'admin123'): ?>
                         <p class="admin-alert admin-alert-warning">Clave inicial activa. Cambiala en <strong>admin/config.php</strong> antes de publicar el panel.</p>
                     <?php endif; ?>
 
-                    <?php include __DIR__ . '/article-form.php'; ?>
+                    <?php
+                    try {
+                        include __DIR__ . '/article-form.php';
+                    } catch (Throwable $exception) {
+                        error_log('Article form error: ' . $exception->getMessage());
+                        echo '<p class="admin-alert admin-alert-error">No se pudo cargar el formulario del artículo. Revisá el log del servidor.</p>';
+                    }
+                    ?>
                 </div>
             </main>
 

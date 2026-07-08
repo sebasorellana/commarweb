@@ -32,6 +32,7 @@ foreach ($postedMembers as $key => $member) {
     $imagePath = trim((string) ($member['image'] ?? ''));
     $imageWidth = max(0, (int) ($member['width'] ?? 0));
     $imageHeight = max(0, (int) ($member['height'] ?? 0));
+    $hidden = !empty($member['hidden']);
 
     $uploadError = $files['error'][$key] ?? UPLOAD_ERR_NO_FILE;
     if ($uploadError !== UPLOAD_ERR_NO_FILE) {
@@ -63,7 +64,7 @@ foreach ($postedMembers as $key => $member) {
         continue;
     }
 
-    if ($name === '' || $role === '' || $imagePath === '') {
+    if (!$hidden && ($name === '' || $role === '' || $imagePath === '')) {
         header('Location: team.php?error=' . rawurlencode('Cada miembro visible necesita nombre, rol y foto.'));
         exit;
     }
@@ -75,6 +76,7 @@ foreach ($postedMembers as $key => $member) {
         'name' => $name,
         'role' => $role,
         'linkedin' => trim((string) ($member['linkedin'] ?? '#')) ?: '#',
+        'hidden' => $hidden,
     ];
 }
 

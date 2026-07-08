@@ -2994,6 +2994,16 @@ img {
     opacity: 0.62;
 }
 
+.admin-team-card.is-hidden-member {
+    border-style: dashed;
+    background: #f8fafc;
+}
+
+.admin-team-card.is-hidden-member .admin-team-photo,
+.admin-team-card.is-hidden-member .admin-team-fields {
+    opacity: 0.78;
+}
+
 .admin-team-photo {
     display: grid;
     place-items: center;
@@ -3019,8 +3029,20 @@ img {
     min-width: 0;
 }
 
+.admin-team-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    align-items: center;
+}
+
+.admin-team-options .admin-checkbox-row {
+    width: auto;
+    margin: 0;
+}
+
 .admin-team-remove {
-    align-self: end;
+    color: var(--admin-danger-color);
 }
 
 .admin-team-savebar .admin-settings-savebar-inner {

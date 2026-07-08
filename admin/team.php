@@ -4,7 +4,7 @@ require_once dirname(__DIR__) . '/includes/team.php';
 
 commar_admin_require_login();
 
-$members = commar_team_members();
+$members = commar_team_members(true);
 $updated = ($_GET['updated'] ?? '') === '1';
 $error = trim((string) ($_GET['error'] ?? ''));
 ?>
@@ -44,7 +44,7 @@ $error = trim((string) ($_GET['error'] ?? ''));
                     <form action="save-team.php" method="post" enctype="multipart/form-data" class="admin-form admin-team-form" data-team-form>
                         <div class="admin-team-list" data-team-list>
                             <?php foreach ($members as $index => $member): ?>
-                                <article class="admin-team-card" data-team-card>
+                                <article class="admin-team-card <?php echo !empty($member['hidden']) ? 'is-hidden-member' : ''; ?>" data-team-card>
                                     <div class="admin-team-photo">
                                         <?php if (($member['image'] ?? '') !== ''): ?>
                                             <img src="../<?php echo commar_admin_h((string) $member['image']); ?>" alt="">
@@ -83,10 +83,16 @@ $error = trim((string) ($_GET['error'] ?? ''));
                                             </label>
                                         </div>
 
-                                        <label class="admin-checkbox-row admin-team-remove">
-                                            <input type="checkbox" name="members[<?php echo (int) $index; ?>][delete]" value="1">
-                                            Eliminar este miembro
-                                        </label>
+                                        <div class="admin-team-options">
+                                            <label class="admin-checkbox-row admin-team-hidden">
+                                                <input type="checkbox" name="members[<?php echo (int) $index; ?>][hidden]" value="1" <?php echo !empty($member['hidden']) ? 'checked' : ''; ?>>
+                                                Ocultar en El estudio
+                                            </label>
+                                            <label class="admin-checkbox-row admin-team-remove">
+                                                <input type="checkbox" name="members[<?php echo (int) $index; ?>][delete]" value="1">
+                                                Eliminar definitivamente
+                                            </label>
+                                        </div>
                                     </div>
                                 </article>
                             <?php endforeach; ?>
@@ -140,10 +146,16 @@ $error = trim((string) ($_GET['error'] ?? ''));
                     </label>
                 </div>
 
-                <label class="admin-checkbox-row admin-team-remove">
-                    <input type="checkbox" data-name-template="members[__INDEX__][delete]" value="1">
-                    Eliminar este miembro
-                </label>
+                <div class="admin-team-options">
+                    <label class="admin-checkbox-row admin-team-hidden">
+                        <input type="checkbox" data-name-template="members[__INDEX__][hidden]" value="1">
+                        Ocultar en El estudio
+                    </label>
+                    <label class="admin-checkbox-row admin-team-remove">
+                        <input type="checkbox" data-name-template="members[__INDEX__][delete]" value="1">
+                        Eliminar definitivamente
+                    </label>
+                </div>
             </div>
         </article>
     </template>
@@ -186,8 +198,23 @@ $error = trim((string) ($_GET['error'] ?? ''));
                 });
             };
 
+            var bindHiddenToggle = function (scope) {
+                scope.querySelectorAll('.admin-team-hidden input[type="checkbox"]').forEach(function (checkbox) {
+                    var updateCard = function () {
+                        var card = checkbox.closest('[data-team-card]');
+                        if (card) {
+                            card.classList.toggle('is-hidden-member', checkbox.checked);
+                        }
+                    };
+
+                    checkbox.addEventListener('change', updateCard);
+                    updateCard();
+                });
+            };
+
             bindFileInput(document);
             bindDeleteToggle(document);
+            bindHiddenToggle(document);
 
             if (addButton && list && template) {
                 addButton.addEventListener('click', function () {
@@ -202,6 +229,7 @@ $error = trim((string) ($_GET['error'] ?? ''));
                     list.appendChild(fragment);
                     bindFileInput(list.lastElementChild);
                     bindDeleteToggle(list.lastElementChild);
+                    bindHiddenToggle(list.lastElementChild);
                     list.lastElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
                     var firstInput = list.lastElementChild.querySelector('input[type="text"]');
                     if (firstInput) {

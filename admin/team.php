@@ -71,7 +71,8 @@ $error = trim((string) ($_GET['error'] ?? ''));
                                         <div class="admin-form-grid">
                                             <label>
                                                 LinkedIn
-                                                <input type="url" name="members[<?php echo (int) $index; ?>][linkedin]" value="<?php echo commar_admin_h((string) ($member['linkedin'] ?? '#')); ?>" placeholder="https://www.linkedin.com/in/...">
+                                                <?php $linkedinValue = (string) ($member['linkedin'] ?? ''); ?>
+                                                <input type="url" name="members[<?php echo (int) $index; ?>][linkedin]" value="<?php echo commar_admin_h($linkedinValue === '#' ? '' : $linkedinValue); ?>" placeholder="https://www.linkedin.com/in/...">
                                             </label>
                                             <label class="admin-file-control">
                                                 Foto
@@ -134,7 +135,7 @@ $error = trim((string) ($_GET['error'] ?? ''));
                 <div class="admin-form-grid">
                     <label>
                         LinkedIn
-                        <input type="url" data-name-template="members[__INDEX__][linkedin]" value="#" placeholder="https://www.linkedin.com/in/...">
+                        <input type="url" data-name-template="members[__INDEX__][linkedin]" value="" placeholder="https://www.linkedin.com/in/...">
                     </label>
                     <label class="admin-file-control">
                         Foto

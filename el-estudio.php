@@ -1,4 +1,7 @@
-<?php require_once __DIR__ . '/includes/site.php'; ?>
+<?php
+require_once __DIR__ . '/includes/site.php';
+require_once __DIR__ . '/includes/team.php';
+?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars(commar_lang_attr(), ENT_QUOTES, 'UTF-8'); ?>">
 <head>
@@ -109,34 +112,18 @@
                     <p class="about-section-intro">Espacio preparado para presentar a los profesionales del equipo, sus roles, áreas de especialidad y trayectoria dentro de Commar Group.</p>
                 </div>
 
-                <?php
-                $teamMembers = [
-                    ['image' => 'img/romina-loconte.jpg', 'width' => 800, 'height' => 800, 'name' => 'Romina', 'surname' => 'Lo Conte', 'position' => 'Presidente / CEO', 'linkedin' => '#'],
-                    ['image' => 'img/julian-parente.jpg', 'width' => 800, 'height' => 800, 'name' => 'Julian', 'surname' => 'Parente', 'position' => 'Vicepresidente / Representante técnico', 'linkedin' => '#'],
-                    ['image' => 'img/belen-gomez.jpg', 'width' => 800, 'height' => 765, 'name' => 'Belén', 'surname' => 'Gomez', 'position' => 'Gerente de Obras Nuevas y Habilitaciones', 'linkedin' => '#'],
-                    ['image' => 'img/geronimo-zoloaga.jpg', 'width' => 800, 'height' => 757, 'name' => 'Gerónimo', 'surname' => 'Zoloaga', 'position' => 'Gerente de Ajustes y Finales', 'linkedin' => '#'],
-                    ['image' => 'img/juan-pugliese.jpg', 'width' => 800, 'height' => 775, 'name' => 'Juan P', 'surname' => 'Pugliese', 'position' => 'Analista técnico', 'linkedin' => '#'],
-                    ['image' => 'img/agustina-freire.jpg', 'width' => 800, 'height' => 771, 'name' => 'Agustina', 'surname' => 'Freire', 'position' => 'Jefatura de obra', 'linkedin' => '#'],
-                    ['image' => 'img/valentin-lobaccaro.jpg', 'width' => 776, 'height' => 775, 'name' => 'Valentin', 'surname' => 'Lobaccaro', 'position' => 'Analista técnico', 'linkedin' => '#'],
-                    ['image' => 'img/agustina-futej.jpg', 'width' => 780, 'height' => 775, 'name' => 'Agustina', 'surname' => 'Futej', 'position' => 'Analista técnico', 'linkedin' => '#'],
-                    ['image' => 'img/claudia-gatica.jpg', 'width' => 800, 'height' => 780, 'name' => 'Claudia', 'surname' => 'Gatica', 'position' => 'Analista técnico', 'linkedin' => '#'],
-                    ['image' => 'img/kiara-battaglia.jpg', 'width' => 800, 'height' => 773, 'name' => 'Kiara', 'surname' => 'Bataglia', 'position' => 'Gerente administrativa', 'linkedin' => '#'],
-                    ['image' => 'img/carina-gatica.jpg', 'width' => 800, 'height' => 800, 'name' => 'Carina', 'surname' => 'Gatica', 'position' => 'Gerente RRHH', 'linkedin' => '#'],
-                    ['image' => 'img/nuria-zoloaga.jpg', 'width' => 727, 'height' => 777, 'name' => 'Nuria', 'surname' => 'Zoloaga', 'position' => 'Asistente administrativo', 'linkedin' => '#'],
-                    ['image' => 'img/camila-lamuta.jpg', 'width' => 800, 'height' => 779, 'name' => 'Camila', 'surname' => 'Lamuta', 'position' => 'Dra. Arquitectura legal', 'linkedin' => '#'],
-                ];
-                ?>
+                <?php $teamMembers = commar_team_members(); ?>
                 <div class="about-team-grid">
                     <?php foreach ($teamMembers as $member): ?>
                         <article class="about-team-card">
-                            <img src="<?php echo htmlspecialchars($member['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($member['name'] . ' ' . $member['surname'] . ' - ' . $member['position'], ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo (int) $member['width']; ?>" height="<?php echo (int) $member['height']; ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="about-team-image">
+                            <img src="<?php echo htmlspecialchars((string) $member['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($member['name'] . ' - ' . $member['role'], ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo (int) $member['width']; ?>" height="<?php echo (int) $member['height']; ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="about-team-image">
                             <div class="about-team-copy">
                                 <div>
-                                    <h3><?php echo htmlspecialchars($member['name'] . ' ' . $member['surname'], ENT_QUOTES, 'UTF-8'); ?></h3>
-                                    <p><?php echo htmlspecialchars($member['position'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                    <h3><?php echo htmlspecialchars($member['name'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                                    <p><?php echo htmlspecialchars($member['role'], ENT_QUOTES, 'UTF-8'); ?></p>
                                 </div>
                                 <?php if ($member['linkedin'] !== '#'): ?>
-                                    <a href="<?php echo htmlspecialchars($member['linkedin'], ENT_QUOTES, 'UTF-8'); ?>" class="about-team-linkedin" aria-label="<?php echo htmlspecialchars('LinkedIn de ' . $member['name'] . ' ' . $member['surname'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer">
+                                    <a href="<?php echo htmlspecialchars($member['linkedin'], ENT_QUOTES, 'UTF-8'); ?>" class="about-team-linkedin" aria-label="<?php echo htmlspecialchars('LinkedIn de ' . $member['name'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer">
                                         <span class="sr-only">LinkedIn</span>
                                         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                             <path d="M6.94 8.98H3.76V20h3.18V8.98ZM5.35 4a1.84 1.84 0 1 0 0 3.68A1.84 1.84 0 0 0 5.35 4Zm6.67 4.98H8.98V20h3.04v-5.78c0-1.52.29-2.99 2.17-2.99 1.86 0 1.88 1.74 1.88 3.09V20h3.05v-6.41c0-3.15-.68-5.57-4.36-5.57-1.77 0-2.96.97-3.45 1.89h-.04V8.98Z"></path>

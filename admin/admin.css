@@ -1338,12 +1338,15 @@ img {
 
 .admin-primary-link {
     display: inline-block;
+    border: 0;
     background-color: var(--admin-primary-color);
     color: #fff;
     padding: 0.65rem 1.25rem;
     border-radius: 0.3rem;
+    font-family: inherit;
     font-weight: 600;
     font-size: 0.9rem;
+    cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
@@ -2967,6 +2970,74 @@ img {
     font-weight: 800;
 }
 
+/* Team */
+.admin-team-form {
+    gap: 1.25rem;
+}
+
+.admin-team-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.admin-team-card {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.admin-team-card.is-marked-delete {
+    opacity: 0.62;
+}
+
+.admin-team-photo {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 8px;
+    background: #f8fafc;
+    color: var(--admin-text-secondary);
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.admin-team-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.admin-team-fields {
+    display: grid;
+    gap: 0.9rem;
+    min-width: 0;
+}
+
+.admin-team-remove {
+    align-self: end;
+}
+
+.admin-team-savebar .admin-settings-savebar-inner {
+    justify-content: flex-end;
+}
+
+.admin-team-savebar .admin-settings-savebar-inner span {
+    margin-right: auto;
+}
+
+.admin-team-savebar .admin-button-primary {
+    width: auto;
+    min-width: 0;
+    padding-inline: 1.1rem;
+    white-space: nowrap;
+}
+
 /* Footer */
 .admin-footer {
     padding: 1.5rem;
@@ -3270,5 +3341,13 @@ img {
 
     .admin-menu-new-item {
         grid-template-columns: 1fr;
+    }
+
+    .admin-team-card {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-team-photo {
+        width: min(180px, 100%);
     }
 }

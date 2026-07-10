@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/includes/site.php'; ?>
+<?php
+require_once __DIR__ . '/includes/site.php';
+require_once __DIR__ . '/includes/page-heroes.php';
+$obraVivaHero = commar_page_hero('obra_viva');
+?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars(commar_lang_attr(), ENT_QUOTES, 'UTF-8'); ?>">
 <head>
@@ -58,14 +62,14 @@
     <main>
         <section class="service-detail-hero obra-viva-hero" aria-labelledby="obra-viva-title">
             <div class="service-detail-hero-media" aria-hidden="true">
-                <img src="img/obras/eba-coarco.jpg" alt="" width="1920" height="976" fetchpriority="high" decoding="async" class="service-detail-hero-image">
+                <img src="<?php echo htmlspecialchars((string) $obraVivaHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $obraVivaHero['width']; ?>" height="<?php echo (int) $obraVivaHero['height']; ?>" fetchpriority="high" decoding="async" class="service-detail-hero-image">
                 <div class="service-detail-hero-overlay"></div>
             </div>
 
             <div class="site-shell-wide service-detail-hero-content">
-                <span class="service-detail-kicker">Solución 360° para obras</span>
-                <h1 id="obra-viva-title" class="service-detail-title">Obra Viva</h1>
-                <p class="service-detail-intro">Gestión técnico-administrativa de obras en CABA. Integramos trámites, documentación y cumplimiento normativo para que tu obra avance sin interrupciones.</p>
+                <span class="service-detail-kicker"><?php echo htmlspecialchars((string) $obraVivaHero['kicker'], ENT_QUOTES, 'UTF-8'); ?></span>
+                <h1 id="obra-viva-title" class="service-detail-title"><?php echo htmlspecialchars((string) $obraVivaHero['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+                <p class="service-detail-intro"><?php echo htmlspecialchars((string) $obraVivaHero['intro'], ENT_QUOTES, 'UTF-8'); ?></p>
             </div>
         </section>
 

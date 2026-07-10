@@ -2,7 +2,9 @@
 require_once __DIR__ . '/includes/site.php';
 require_once __DIR__ . '/includes/jobs.php';
 require_once __DIR__ . '/includes/integrations.php';
+require_once __DIR__ . '/includes/page-heroes.php';
 
+$jobsHero = commar_page_hero('trabaja');
 $jobs = commar_active_jobs();
 
 if (empty($jobs)) {
@@ -43,14 +45,20 @@ $seo = [
     ?>
 
     <main>
+        <section class="page-hero-section" aria-labelledby="jobs-title">
+            <div class="page-hero-media" aria-hidden="true">
+                <img src="<?php echo htmlspecialchars((string) $jobsHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $jobsHero['width']; ?>" height="<?php echo (int) $jobsHero['height']; ?>" fetchpriority="high" decoding="async" class="page-hero-image">
+                <div class="page-hero-overlay"></div>
+            </div>
+            <div class="site-shell-wide page-hero-content">
+                <span class="page-hero-kicker"><?php echo htmlspecialchars((string) $jobsHero['kicker'], ENT_QUOTES, 'UTF-8'); ?></span>
+                <h1 id="jobs-title" class="page-hero-title"><?php echo htmlspecialchars((string) $jobsHero['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+                <p class="page-hero-intro"><?php echo htmlspecialchars((string) $jobsHero['intro'], ENT_QUOTES, 'UTF-8'); ?></p>
+            </div>
+        </section>
+
         <section class="jobs-page" aria-labelledby="jobs-title">
             <div class="site-shell-wide jobs-shell">
-                <div class="jobs-intro">
-                    <span class="jobs-kicker">Trabajá con nosotros</span>
-                    <h1 id="jobs-title">Búsquedas laborales activas</h1>
-                    <p>Conocé las oportunidades abiertas y enviá tu CV para que el equipo de COMMAR GROUP pueda evaluarlo.</p>
-                </div>
-
                 <?php if ($status === 'ok'): ?>
                     <div class="jobs-status jobs-status-success" role="status">Recibimos tu postulación correctamente.</div>
                 <?php elseif ($status === 'error'): ?>

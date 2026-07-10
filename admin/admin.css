@@ -3029,6 +3029,32 @@ img {
     min-width: 0;
 }
 
+.admin-team-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.admin-team-card-head > span {
+    color: var(--admin-text-secondary);
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.admin-team-order-actions {
+    display: inline-flex;
+    gap: 0.35rem;
+}
+
+.admin-team-order-actions .admin-button-icon:disabled {
+    cursor: not-allowed;
+    opacity: 0.42;
+    transform: none;
+}
+
 .admin-team-options {
     display: flex;
     flex-wrap: wrap;
@@ -3054,6 +3080,79 @@ img {
 }
 
 .admin-team-savebar .admin-button-primary {
+    width: auto;
+    min-width: 0;
+    padding-inline: 1.1rem;
+    white-space: nowrap;
+}
+
+/* Page Heroes */
+.admin-page-heroes-form {
+    gap: 1.25rem;
+}
+
+.admin-page-heroes-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.admin-page-hero-card {
+    display: grid;
+    grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.admin-page-hero-preview {
+    display: grid;
+    place-items: center;
+    min-height: 180px;
+    overflow: hidden;
+    border: 1px solid var(--admin-border-color);
+    border-radius: 8px;
+    background: #f8fafc;
+    color: var(--admin-text-secondary);
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.admin-page-hero-preview img {
+    width: 100%;
+    height: 100%;
+    min-height: 180px;
+    object-fit: cover;
+}
+
+.admin-page-hero-fields {
+    display: grid;
+    gap: 0.9rem;
+    min-width: 0;
+}
+
+.admin-page-hero-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.admin-page-hero-head h3 {
+    margin: 0.15rem 0 0;
+    font-size: 1.2rem;
+}
+
+.admin-page-heroes-savebar .admin-settings-savebar-inner {
+    justify-content: flex-end;
+}
+
+.admin-page-heroes-savebar .admin-settings-savebar-inner span {
+    margin-right: auto;
+}
+
+.admin-page-heroes-savebar .admin-button-primary {
     width: auto;
     min-width: 0;
     padding-inline: 1.1rem;
@@ -3371,5 +3470,9 @@ img {
 
     .admin-team-photo {
         width: min(180px, 100%);
+    }
+
+    .admin-page-hero-card {
+        grid-template-columns: 1fr;
     }
 }

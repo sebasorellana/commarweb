@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/includes/site.php'; ?>
+<?php
+require_once __DIR__ . '/includes/site.php';
+require_once __DIR__ . '/includes/page-heroes.php';
+$projectHero = commar_page_hero('servicio_proyectos');
+?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars(commar_lang_attr(), ENT_QUOTES, 'UTF-8'); ?>">
 <head>
@@ -82,14 +86,14 @@
     <main>
         <section class="service-detail-hero" aria-labelledby="service-detail-title">
             <div class="service-detail-hero-media" aria-hidden="true">
-                <img src="img/proyecto-01.jpg" alt="" width="1400" height="933" fetchpriority="high" decoding="async" class="service-detail-hero-image">
+                <img src="<?php echo htmlspecialchars((string) $projectHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $projectHero['width']; ?>" height="<?php echo (int) $projectHero['height']; ?>" fetchpriority="high" decoding="async" class="service-detail-hero-image">
                 <div class="service-detail-hero-overlay"></div>
             </div>
 
             <div class="site-shell-wide service-detail-hero-content">
-                <span class="service-detail-kicker">Servicio // 01</span>
-                <h1 id="service-detail-title" class="service-detail-title">Proyecto</h1>
-                <p class="service-detail-intro">Convertimos una necesidad inicial en documentación clara, decisiones coordinadas y una base técnica sólida para avanzar hacia obra con menos incertidumbre.</p>
+                <span class="service-detail-kicker"><?php echo htmlspecialchars((string) $projectHero['kicker'], ENT_QUOTES, 'UTF-8'); ?></span>
+                <h1 id="service-detail-title" class="service-detail-title"><?php echo htmlspecialchars((string) $projectHero['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+                <p class="service-detail-intro"><?php echo htmlspecialchars((string) $projectHero['intro'], ENT_QUOTES, 'UTF-8'); ?></p>
             </div>
         </section>
 

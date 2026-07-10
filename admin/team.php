@@ -53,6 +53,17 @@ $error = trim((string) ($_GET['error'] ?? ''));
                                         <?php endif; ?>
                                     </div>
                                     <div class="admin-team-fields">
+                                        <div class="admin-team-card-head">
+                                            <span>Posición <?php echo (int) $index + 1; ?></span>
+                                            <div class="admin-team-order-actions">
+                                                <button type="button" class="admin-button-icon" title="Subir miembro" aria-label="Subir miembro" data-team-move="up">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+                                                </button>
+                                                <button type="button" class="admin-button-icon" title="Bajar miembro" aria-label="Bajar miembro" data-team-move="down">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                                                </button>
+                                            </div>
+                                        </div>
                                         <input type="hidden" name="members[<?php echo (int) $index; ?>][image]" value="<?php echo commar_admin_h((string) ($member['image'] ?? '')); ?>">
                                         <input type="hidden" name="members[<?php echo (int) $index; ?>][width]" value="<?php echo (int) ($member['width'] ?? 0); ?>">
                                         <input type="hidden" name="members[<?php echo (int) $index; ?>][height]" value="<?php echo (int) ($member['height'] ?? 0); ?>">
@@ -117,6 +128,17 @@ $error = trim((string) ($_GET['error'] ?? ''));
         <article class="admin-team-card" data-team-card>
             <div class="admin-team-photo"><span>Sin foto</span></div>
             <div class="admin-team-fields">
+                <div class="admin-team-card-head">
+                    <span>Nuevo miembro</span>
+                    <div class="admin-team-order-actions">
+                        <button type="button" class="admin-button-icon" title="Subir miembro" aria-label="Subir miembro" data-team-move="up">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+                        </button>
+                        <button type="button" class="admin-button-icon" title="Bajar miembro" aria-label="Bajar miembro" data-team-move="down">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                </div>
                 <input type="hidden" data-name-template="members[__INDEX__][image]" value="">
                 <input type="hidden" data-name-template="members[__INDEX__][width]" value="0">
                 <input type="hidden" data-name-template="members[__INDEX__][height]" value="0">
@@ -168,6 +190,49 @@ $error = trim((string) ($_GET['error'] ?? ''));
             var addButton = document.querySelector('[data-team-add]');
             var template = document.getElementById('team-card-template');
 
+            var updateTeamOrderControls = function () {
+                if (!list) {
+                    return;
+                }
+
+                var cards = Array.prototype.slice.call(list.querySelectorAll('[data-team-card]'));
+                cards.forEach(function (card, index) {
+                    var label = card.querySelector('.admin-team-card-head > span');
+                    var upButton = card.querySelector('[data-team-move="up"]');
+                    var downButton = card.querySelector('[data-team-move="down"]');
+
+                    if (label) {
+                        label.textContent = 'Posición ' + (index + 1);
+                    }
+                    if (upButton) {
+                        upButton.disabled = index === 0;
+                    }
+                    if (downButton) {
+                        downButton.disabled = index === cards.length - 1;
+                    }
+                });
+            };
+
+            var bindOrderControls = function (scope) {
+                scope.querySelectorAll('[data-team-move]').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        var card = button.closest('[data-team-card]');
+                        if (!card || !list) {
+                            return;
+                        }
+
+                        if (button.getAttribute('data-team-move') === 'up' && card.previousElementSibling) {
+                            list.insertBefore(card, card.previousElementSibling);
+                        } else if (button.getAttribute('data-team-move') === 'down' && card.nextElementSibling) {
+                            list.insertBefore(card.nextElementSibling, card);
+                        }
+
+                        updateTeamOrderControls();
+                        card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    });
+                });
+            };
+
             var bindFileInput = function (scope) {
                 scope.querySelectorAll('[data-file-input]').forEach(function (input) {
                     input.addEventListener('change', function () {
@@ -216,6 +281,8 @@ $error = trim((string) ($_GET['error'] ?? ''));
             bindFileInput(document);
             bindDeleteToggle(document);
             bindHiddenToggle(document);
+            bindOrderControls(document);
+            updateTeamOrderControls();
 
             if (addButton && list && template) {
                 addButton.addEventListener('click', function () {
@@ -231,6 +298,8 @@ $error = trim((string) ($_GET['error'] ?? ''));
                     bindFileInput(list.lastElementChild);
                     bindDeleteToggle(list.lastElementChild);
                     bindHiddenToggle(list.lastElementChild);
+                    bindOrderControls(list.lastElementChild);
+                    updateTeamOrderControls();
                     list.lastElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
                     var firstInput = list.lastElementChild.querySelector('input[type="text"]');
                     if (firstInput) {

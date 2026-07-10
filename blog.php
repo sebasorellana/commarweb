@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/includes/site.php'; ?>
+<?php
+require_once __DIR__ . '/includes/site.php';
+require_once __DIR__ . '/includes/page-heroes.php';
+$blogHero = commar_page_hero('blog');
+?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars(commar_lang_attr(), ENT_QUOTES, 'UTF-8'); ?>">
 <head>
@@ -11,7 +15,7 @@
         'title' => 'Blog',
         'description' => 'Artículos de COMMAR GROUP sobre arquitectura, construcción, documentación técnica, gestión de obra y estrategias ambientales.',
         'path' => 'blog.php',
-        'image' => 'img/logo-commar-500.png',
+        'image' => (string) $blogHero['image'],
         'image_alt' => 'COMMAR GROUP',
         'og_type' => 'website',
         'json_ld' => [
@@ -49,14 +53,20 @@
     ?>
 
     <main>
+        <section class="page-hero-section" aria-labelledby="blog-title">
+            <div class="page-hero-media" aria-hidden="true">
+                <img src="<?php echo htmlspecialchars((string) $blogHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $blogHero['width']; ?>" height="<?php echo (int) $blogHero['height']; ?>" fetchpriority="high" decoding="async" class="page-hero-image">
+                <div class="page-hero-overlay"></div>
+            </div>
+            <div class="site-shell-wide page-hero-content">
+                <span class="page-hero-kicker"><?php echo htmlspecialchars((string) $blogHero['kicker'], ENT_QUOTES, 'UTF-8'); ?></span>
+                <h1 id="blog-title" class="page-hero-title"><?php echo htmlspecialchars((string) $blogHero['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+                <p class="page-hero-intro"><?php echo htmlspecialchars((string) $blogHero['intro'], ENT_QUOTES, 'UTF-8'); ?></p>
+            </div>
+        </section>
+
         <section class="blog-page" aria-labelledby="blog-title">
             <div class="site-shell-wide">
-                <header class="blog-header">
-                    <span class="blog-kicker">Blog</span>
-                    <h1 id="blog-title" class="blog-title">Artículos de COMMAR GROUP</h1>
-                    <p class="blog-intro">Ideas y criterios prácticos sobre arquitectura, construcción, gestión de obra, documentación técnica y medio ambiente.</p>
-                </header>
-
                 <div class="blog-list">
                     <?php foreach ($articles as $article): ?>
                         <article class="blog-card">

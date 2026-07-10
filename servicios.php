@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/includes/site.php'; ?>
+<?php
+require_once __DIR__ . '/includes/site.php';
+require_once __DIR__ . '/includes/page-heroes.php';
+$servicesHero = commar_page_hero('servicios');
+?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars(commar_lang_attr(), ENT_QUOTES, 'UTF-8'); ?>">
 <head>
@@ -64,10 +68,10 @@
         'title' => 'Servicios',
         'description' => 'Servicios de COMMAR GROUP: Proyecto, Gerenciamiento, Demolición, Construcción, Habilitaciones y Medio ambiente / Seguridad e Higiene.',
         'path' => 'servicios.php',
-        'image' => 'img/proyecto-01.jpg',
+        'image' => (string) $servicesHero['image'],
         'image_alt' => 'Servicios de arquitectura, construcción y gestión técnica de COMMAR GROUP',
-        'image_width' => 1400,
-        'image_height' => 933,
+        'image_width' => (int) $servicesHero['width'],
+        'image_height' => (int) $servicesHero['height'],
         'og_type' => 'website',
         'json_ld' => [
             [
@@ -103,15 +107,18 @@
 
     <main>
         <section class="services-page-section" aria-labelledby="services-page-title">
+            <div class="services-page-hero-media" aria-hidden="true">
+                <img src="<?php echo htmlspecialchars((string) $servicesHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $servicesHero['width']; ?>" height="<?php echo (int) $servicesHero['height']; ?>" fetchpriority="high" decoding="async">
+            </div>
             <div class="site-shell-wide">
                 <div class="services-page-header">
-                    <span class="services-kicker">Servicios</span>
+                    <span class="services-kicker"><?php echo htmlspecialchars((string) $servicesHero['kicker'], ENT_QUOTES, 'UTF-8'); ?></span>
                     <h1 id="services-page-title" class="services-page-title">
-                        <span>Soluciones integrales</span>
-                        <span>para proyectos que</span>
-                        <span>exigen precisión.</span>
+                        <?php foreach (preg_split('/\R+/', (string) $servicesHero['title']) ?: [] as $line): ?>
+                            <span><?php echo htmlspecialchars($line, ENT_QUOTES, 'UTF-8'); ?></span>
+                        <?php endforeach; ?>
                     </h1>
-                    <p>Acompañamos cada etapa con dirección técnica, documentación clara y una gestión coordinada entre proyecto, obra, normativa, ambiente y seguridad.</p>
+                    <p><?php echo htmlspecialchars((string) $servicesHero['intro'], ENT_QUOTES, 'UTF-8'); ?></p>
                 </div>
 
                 <div class="services-page-grid">

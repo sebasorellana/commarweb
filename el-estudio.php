@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/includes/site.php';
 require_once __DIR__ . '/includes/team.php';
+require_once __DIR__ . '/includes/page-heroes.php';
+$aboutHero = commar_page_hero('el_estudio');
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars(commar_lang_attr(), ENT_QUOTES, 'UTF-8'); ?>">
@@ -56,7 +58,7 @@ require_once __DIR__ . '/includes/team.php';
     ];
     include __DIR__ . '/includes/seo.php';
     ?>
-    <link rel="preload" as="image" href="img/fullteam.jpg" fetchpriority="high">
+    <link rel="preload" as="image" href="<?php echo htmlspecialchars((string) $aboutHero['image'], ENT_QUOTES, 'UTF-8'); ?>" fetchpriority="high">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
@@ -81,13 +83,13 @@ require_once __DIR__ . '/includes/team.php';
     <main>
         <section class="about-hero" aria-labelledby="about-hero-title">
             <div class="about-hero-media" aria-hidden="true">
-                <img src="img/fullteam.jpg" alt="" width="3020" height="1480" fetchpriority="high" decoding="async" class="about-hero-image">
+                <img src="<?php echo htmlspecialchars((string) $aboutHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $aboutHero['width']; ?>" height="<?php echo (int) $aboutHero['height']; ?>" fetchpriority="high" decoding="async" class="about-hero-image">
                 <div class="about-hero-overlay"></div>
             </div>
             <div class="site-shell-wide about-hero-content">
-                <span class="about-kicker">El estudio</span>
-                <h1 id="about-hero-title" class="about-hero-title">Lo que somos</h1>
-                <p class="about-hero-intro">Somos una compañía formada por profesionales de distintas extracciones, que componen un grupo de trabajo multidisciplinario, enfocados en el compromiso, el profesionalismo y la pasión por los métodos y las formas.</p>
+                <span class="about-kicker"><?php echo htmlspecialchars((string) $aboutHero['kicker'], ENT_QUOTES, 'UTF-8'); ?></span>
+                <h1 id="about-hero-title" class="about-hero-title"><?php echo htmlspecialchars((string) $aboutHero['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+                <p class="about-hero-intro"><?php echo htmlspecialchars((string) $aboutHero['intro'], ENT_QUOTES, 'UTF-8'); ?></p>
             </div>
         </section>
 

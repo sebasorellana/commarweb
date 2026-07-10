@@ -1,7 +1,9 @@
 <?php
 require_once __DIR__ . '/includes/site.php';
 require_once __DIR__ . '/includes/integrations.php';
+require_once __DIR__ . '/includes/page-heroes.php';
 
+$contactHero = commar_page_hero('contacto');
 $contactEmail = commar_contact_email();
 $contactFormEmail = commar_contact_form_email();
 $contactAddressLines = commar_contact_address_lines();
@@ -79,7 +81,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         'title' => 'Contacto',
         'description' => 'Contactá a COMMAR GROUP para consultas sobre proyectos, construcción, demoliciones, habilitaciones, gerenciamiento municipal y medioambiente.',
         'path' => 'contacto.php',
-        'image' => 'img/logo-commar-500.png',
+        'image' => (string) $contactHero['image'],
         'image_alt' => 'COMMAR GROUP',
         'og_type' => 'website',
         'json_ld' => [
@@ -116,12 +118,21 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     ?>
 
     <main>
+        <section class="page-hero-section" aria-labelledby="contact-title">
+            <div class="page-hero-media" aria-hidden="true">
+                <img src="<?php echo htmlspecialchars((string) $contactHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $contactHero['width']; ?>" height="<?php echo (int) $contactHero['height']; ?>" fetchpriority="high" decoding="async" class="page-hero-image">
+                <div class="page-hero-overlay"></div>
+            </div>
+            <div class="site-shell-wide page-hero-content">
+                <span class="page-hero-kicker"><?php echo htmlspecialchars((string) $contactHero['kicker'], ENT_QUOTES, 'UTF-8'); ?></span>
+                <h1 id="contact-title" class="page-hero-title"><?php echo htmlspecialchars((string) $contactHero['title'], ENT_QUOTES, 'UTF-8'); ?></h1>
+                <p class="page-hero-intro"><?php echo htmlspecialchars((string) $contactHero['intro'], ENT_QUOTES, 'UTF-8'); ?></p>
+            </div>
+        </section>
+
         <section class="contact-page" aria-labelledby="contact-title">
             <div class="site-shell-wide contact-grid">
                 <div class="contact-copy">
-                    <span class="contact-kicker">Contacto</span>
-                    <h1 id="contact-title" class="contact-title">Hablemos de tu próximo proyecto.</h1>
-                    <p class="contact-intro">Completá el formulario y seleccioná el área de consulta para que podamos derivarla al equipo correspondiente.</p>
                     <div class="contact-details">
                         <a href="mailto:<?php echo htmlspecialchars($contactEmail, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($contactEmail, ENT_QUOTES, 'UTF-8'); ?></a>
                         <?php foreach ($contactAddressLines as $line): ?>

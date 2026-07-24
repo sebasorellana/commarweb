@@ -54,13 +54,74 @@ function commar_admin_sanitize_article_html(string $html): string
         return '';
     }
 
-    $html = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $html) ?? '';
-    $html = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $html) ?? '';
-    $html = preg_replace('/\s+on[a-z]+\s*=\s*(["\']).*?\1/is', '', $html) ?? '';
-    $html = preg_replace('/\s+(style|class|id|data-[a-z0-9_-]+)\s*=\s*(["\']).*?\2/is', '', $html) ?? '';
-    $html = preg_replace('/(href|src)\s*=\s*(["\'])\s*javascript:[^"\']*\2/is', '$1="#"', $html) ?? '';
+    $allowedTags = '<p><br><strong><b><em><i><u><s><ul><ol><li><h2><h3><blockquote><a><pre><code>';
+    $html = preg_replace('/<(script|style)\b[^>]*>.*?<\/\1>/is', '', $html) ?? '';
+    $html = strip_tags($html, $allowedTags);
 
-    return trim(strip_tags($html, '<p><br><strong><b><em><i><u><s><ul><ol><li><h2><h3><blockquote><a><pre><code>'));
+    if (!class_exists(DOMDocument::class)) {
+        return trim(preg_replace('/<([a-z0-9]+)\b[^>]*>/i', '<$1>', $html) ?? '');
+    }
+
+    $document = new DOMDocument('1.0', 'UTF-8');
+    $previousErrorMode = libxml_use_internal_errors(true);
+    $loaded = $document->loadHTML(
+        '<?xml encoding="utf-8" ?><div data-commar-root>' . $html . '</div>',
+        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+    );
+    libxml_clear_errors();
+    libxml_use_internal_errors($previousErrorMode);
+
+    if (!$loaded) {
+        return '';
+    }
+
+    foreach ($document->getElementsByTagName('*') as $element) {
+        if (!$element instanceof DOMElement || $element->tagName === 'div') {
+            continue;
+        }
+
+        for ($index = $element->attributes->length - 1; $index >= 0; $index--) {
+            $attribute = $element->attributes->item($index);
+            if ($attribute === null) {
+                continue;
+            }
+
+            $name = strtolower($attribute->name);
+            if ($element->tagName !== 'a' || !in_array($name, ['href', 'title', 'target', 'rel'], true)) {
+                $element->removeAttributeNode($attribute);
+            }
+        }
+
+        if ($element->tagName !== 'a') {
+            continue;
+        }
+
+        $href = trim(html_entity_decode($element->getAttribute('href'), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $safeHref = $href === ''
+            || preg_match('#^(?:https?://|mailto:|tel:|#|/(?!/)|[a-z0-9][a-z0-9._/-]*(?:[?#].*)?$)#i', $href) === 1;
+        if (!$safeHref) {
+            $element->removeAttribute('href');
+        }
+
+        if ($element->getAttribute('target') === '_blank') {
+            $element->setAttribute('rel', 'noopener noreferrer');
+        } else {
+            $element->removeAttribute('target');
+            $element->removeAttribute('rel');
+        }
+    }
+
+    $root = $document->getElementsByTagName('div')->item(0);
+    if (!$root instanceof DOMElement) {
+        return '';
+    }
+
+    $sanitized = '';
+    foreach ($root->childNodes as $child) {
+        $sanitized .= $document->saveHTML($child);
+    }
+
+    return trim($sanitized);
 }
 
 function commar_admin_unique_slug(string $slug, string $dataDir, ?string $currentSlug = null): string

@@ -41,7 +41,7 @@ $contactEmail = commar_contact_email();
     require_once __DIR__ . '/includes/articles.php';
 
     $projects = commar_projects();
-    $articles = commar_articles();
+    $articles = commar_articles(3);
     $focusedWorksCopy = [
         'es' => [
             'kicker' => 'Obras en foco',
@@ -140,15 +140,6 @@ $contactEmail = commar_contact_email();
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
     <?php
     $headerVariant = 'home';
-    $menuItems = [
-        ['label' => 'Inicio', 'href' => 'index.php'],
-        ['label' => 'El estudio', 'href' => 'el-estudio.php'],
-        ['label' => 'Servicios', 'href' => 'servicios.php'],
-        ['label' => 'Obra Viva', 'href' => 'obra-viva.php'],
-        ['label' => 'Obras', 'href' => 'obras.php'],
-        ['label' => 'Blog', 'href' => 'blog.php'],
-        ['label' => 'Contacto', 'href' => 'contacto.php'],
-    ];
     include __DIR__ . '/includes/header.php';
     ?>
 

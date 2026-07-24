@@ -38,14 +38,14 @@ if (!function_exists('commar_normalize_article_row')) {
 }
 
 if (!function_exists('commar_articles')) {
-    function commar_articles(): array
+    function commar_articles(?int $limit = null): array
     {
-        return commar_dynamic_articles(true);
+        return commar_dynamic_articles(true, $limit);
     }
 }
 
 if (!function_exists('commar_dynamic_articles')) {
-    function commar_dynamic_articles(bool $publishedOnly = true): array
+    function commar_dynamic_articles(bool $publishedOnly = true, ?int $limit = null): array
     {
         $sql = 'SELECT * FROM commar_articles WHERE status <> :deleted';
         $params = ['deleted' => 'deleted'];
@@ -56,6 +56,9 @@ if (!function_exists('commar_dynamic_articles')) {
         }
 
         $sql .= ' ORDER BY published_at DESC, updated_at DESC, id DESC';
+        if ($limit !== null) {
+            $sql .= ' LIMIT ' . max(1, min($limit, 100));
+        }
 
         $statement = commar_db()->prepare($sql);
         $statement->execute($params);

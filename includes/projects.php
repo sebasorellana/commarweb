@@ -189,6 +189,27 @@ if (!function_exists('commar_admin_delete_work_category')) {
     }
 }
 
+function commar_normalize_project_row(array $work): array
+{
+    return [
+        'id' => str_pad((string) $work['id'], 2, '0', STR_PAD_LEFT),
+        'slug' => (string) $work['slug'],
+        'title' => (string) $work['title'],
+        'category' => (string) $work['category'],
+        'location' => (string) $work['location'],
+        'year' => (string) $work['year'],
+        'summary' => (string) $work['summary'],
+        'img' => (string) $work['image'],
+        'img_width' => (int) $work['image_width'],
+        'img_height' => (int) $work['image_height'],
+        'hero_alt' => (string) $work['hero_alt'],
+        'intro' => (string) $work['intro'],
+        'description' => json_decode((string) ($work['description_json'] ?? '[]'), true) ?: [],
+        'metrics' => json_decode((string) ($work['metrics_json'] ?? '[]'), true) ?: [],
+        'gallery' => [],
+    ];
+}
+
 function commar_projects(): array
 {
     static $projects = null;
@@ -200,37 +221,24 @@ function commar_projects(): array
     $statement = $db->query("SELECT * FROM commar_works WHERE status = 'published' ORDER BY title ASC");
     $works = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-    $projects = array_map(static function (array $work): array {
-        return [
-            'id' => str_pad((string) $work['id'], 2, '0', STR_PAD_LEFT),
-            'slug' => (string) $work['slug'],
-            'title' => (string) $work['title'],
-            'category' => (string) $work['category'],
-            'location' => (string) $work['location'],
-            'year' => (string) $work['year'],
-            'summary' => (string) $work['summary'],
-            'img' => (string) $work['image'],
-            'img_width' => (int) $work['image_width'],
-            'img_height' => (int) $work['image_height'],
-            'hero_alt' => (string) $work['hero_alt'],
-            'intro' => (string) $work['intro'],
-            'description' => json_decode((string) ($work['description_json'] ?? '[]'), true) ?: [],
-            'metrics' => json_decode((string) ($work['metrics_json'] ?? '[]'), true) ?: [],
-            'gallery' => [], // La galería se puede implementar después si es necesario
-        ];
-    }, $works);
+    $projects = array_map('commar_normalize_project_row', $works);
 
     return $projects;
 }
 
 function commar_project_by_slug(string $slug): ?array
 {
-    foreach (commar_projects() as $project) {
-        if ($project['slug'] === $slug) {
-            return $project;
-        }
+    if (preg_match('/^[a-z0-9-]+$/', $slug) !== 1) {
+        return null;
     }
-    return null;
+
+    $statement = commar_db()->prepare(
+        "SELECT * FROM commar_works WHERE slug = :slug AND status = 'published' LIMIT 1"
+    );
+    $statement->execute(['slug' => $slug]);
+    $project = $statement->fetch(PDO::FETCH_ASSOC);
+
+    return is_array($project) ? commar_normalize_project_row($project) : null;
 }
 
 if (!function_exists('commar_static_projects')) {

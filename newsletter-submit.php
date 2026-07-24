@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
+
 define('COMMAR_SKIP_MAINTENANCE', true);
 require_once __DIR__ . '/includes/site.php';
 require_once __DIR__ . '/includes/integrations.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ' . commar_url('index.php'));
+    http_response_code(405);
+    header('Allow: POST');
     exit;
 }
 
@@ -14,6 +17,11 @@ $source = preg_replace('/[^a-zA-Z0-9_-]+/', '-', $source) ?? 'website';
 $source = trim(substr($source, 0, 80), '-') ?: 'website';
 $pageUrl = trim((string) ($_POST['page_url'] ?? ''));
 $honeypot = trim((string) ($_POST['company_name'] ?? ''));
+
+if (!commar_verify_csrf()) {
+    header('Location: ' . commar_url('newsletter-gracias.php?error=1'));
+    exit;
+}
 
 if ($honeypot !== '') {
     header('Location: ' . commar_url('newsletter-gracias.php'));
@@ -32,7 +40,7 @@ if (!commar_recaptcha_verify('newsletter')) {
 
 $ipAddress = substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 45);
 $userAgent = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
-$pageUrl = substr($pageUrl, 0, 500);
+$pageUrl = commar_request_path($pageUrl);
 $now = date('Y-m-d H:i:s');
 
 $statement = commar_db()->prepare(

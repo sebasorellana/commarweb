@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 $commarDbConfig = [];
 $commarDbConfigPath = __DIR__ . '/db-config.php';
 
@@ -15,6 +17,21 @@ defined('COMMAR_DB_NAME') || define('COMMAR_DB_NAME', (string) ($commarDbConfig[
 defined('COMMAR_DB_USER') || define('COMMAR_DB_USER', (string) ($commarDbConfig['user'] ?? 'root'));
 defined('COMMAR_DB_PASSWORD') || define('COMMAR_DB_PASSWORD', (string) ($commarDbConfig['password'] ?? ''));
 defined('COMMAR_DB_CHARSET') || define('COMMAR_DB_CHARSET', (string) ($commarDbConfig['charset'] ?? 'utf8mb4'));
+defined('COMMAR_DB_AUTO_MIGRATE') || define(
+    'COMMAR_DB_AUTO_MIGRATE',
+    filter_var(
+        $commarDbConfig['auto_migrate'] ?? getenv('COMMAR_DB_AUTO_MIGRATE') ?: false,
+        FILTER_VALIDATE_BOOL
+    )
+);
+
+if (preg_match('/^[a-zA-Z0-9_]+$/', COMMAR_DB_NAME) !== 1) {
+    throw new RuntimeException('El nombre configurado para la base de datos no es válido.');
+}
+
+if (preg_match('/^[a-zA-Z0-9_]+$/', COMMAR_DB_CHARSET) !== 1) {
+    throw new RuntimeException('El charset configurado para la base de datos no es válido.');
+}
 
 if (!function_exists('commar_text_lower')) {
     function commar_text_lower(string $value): string
@@ -84,7 +101,7 @@ if (!function_exists('commar_db')) {
             ]);
         }
 
-        if (!$schemaChecked) {
+        if (COMMAR_DB_AUTO_MIGRATE && !$schemaChecked) {
             commar_db_ensure_schema($pdo);
             $schemaChecked = true;
         }

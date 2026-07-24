@@ -310,8 +310,37 @@ const menuClose = document.querySelector('#menu-close');
 const menu = document.querySelector('#menu-content');
 
 if (menuBtn && menuClose && menu) {
-    menuBtn.onclick = () => menu.classList.add('active');
-    menuClose.onclick = () => menu.classList.remove('active');
+    menu.inert = true;
+
+    const openMenu = () => {
+        menu.classList.add('active');
+        menu.inert = false;
+        menu.setAttribute('aria-hidden', 'false');
+        menuBtn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+        menuClose.focus();
+    };
+    const closeMenu = () => {
+        menu.classList.remove('active');
+        menu.inert = true;
+        menu.setAttribute('aria-hidden', 'true');
+        menuBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+        menuBtn.focus();
+    };
+
+    menuBtn.addEventListener('click', openMenu);
+    menuClose.addEventListener('click', closeMenu);
+    menu.addEventListener('click', (event) => {
+        if (event.target.closest('a')) {
+            closeMenu();
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && menu.classList.contains('active')) {
+            closeMenu();
+        }
+    });
 }
 
 // Language switcher

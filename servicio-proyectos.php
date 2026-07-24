@@ -71,15 +71,6 @@ $projectHero = commar_page_hero('servicio_proyectos');
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
     <?php
     $headerVariant = 'home';
-    $menuItems = [
-        ['label' => 'Inicio', 'href' => 'index.php'],
-        ['label' => 'El estudio', 'href' => 'el-estudio.php'],
-        ['label' => 'Servicios', 'href' => 'servicios.php'],
-        ['label' => 'Obra Viva', 'href' => 'obra-viva.php'],
-        ['label' => 'Obras', 'href' => 'obras.php'],
-        ['label' => 'Blog', 'href' => 'blog.php'],
-        ['label' => 'Contacto', 'href' => 'contacto.php'],
-    ];
     include __DIR__ . '/includes/header.php';
     ?>
 

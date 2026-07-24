@@ -1,15 +1,50 @@
 <?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/security.php';
 require_once __DIR__ . '/i18n.php';
 require_once __DIR__ . '/settings.php';
 require_once __DIR__ . '/images.php';
 
+if (!function_exists('commar_request_host')) {
+    function commar_request_host(): string
+    {
+        $host = strtolower(trim((string) ($_SERVER['HTTP_HOST'] ?? '')));
+        $allowedHosts = [
+            'commar.group',
+            'www.commar.group',
+            'commargroup.com.ar',
+            'www.commargroup.com.ar',
+        ];
+
+        if (in_array($host, $allowedHosts, true)) {
+            return $host;
+        }
+
+        if (preg_match('/^(localhost|127\.0\.0\.1)(:\d{1,5})?$/', $host) === 1) {
+            return $host;
+        }
+
+        $serverName = strtolower(trim((string) ($_SERVER['SERVER_NAME'] ?? 'localhost')));
+
+        return preg_match('/^[a-z0-9.-]+$/', $serverName) === 1 ? $serverName : 'localhost';
+    }
+}
+
 if (!function_exists('commar_base_url')) {
     function commar_base_url(): string
     {
-        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
-        $scheme = $https ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $configuredBaseUrl = rtrim((string) getenv('COMMAR_BASE_URL'), '/');
+        if (
+            $configuredBaseUrl !== ''
+            && filter_var($configuredBaseUrl, FILTER_VALIDATE_URL)
+            && in_array(parse_url($configuredBaseUrl, PHP_URL_SCHEME), ['http', 'https'], true)
+        ) {
+            return $configuredBaseUrl;
+        }
+
+        $scheme = commar_is_https() ? 'https' : 'http';
+        $host = commar_request_host();
         $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
         $basePath = ($scriptDir === '/' || $scriptDir === '.') ? '' : $scriptDir;
 
@@ -41,17 +76,7 @@ if (!function_exists('commar_absolute_url')) {
 if (!function_exists('commar_current_absolute_url')) {
     function commar_current_absolute_url(): string
     {
-        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
-        $scheme = $https ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? parse_url(commar_base_url(), PHP_URL_HOST) ?: 'localhost';
-        $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
-
-        if ($requestUri === '') {
-            $requestUri = '/';
-        }
-
-        return $scheme . '://' . $host . $requestUri;
+        return rtrim(commar_base_url(), '/') . commar_request_path((string) ($_SERVER['REQUEST_URI'] ?? '/'));
     }
 }
 
@@ -86,14 +111,18 @@ if (!function_exists('commar_whatsapp_url')) {
 if (!function_exists('commar_contact_email')) {
     function commar_contact_email(): string
     {
-        return trim((string) commar_setting('contact_email')) ?: 'info@commargroup.com.ar';
+        $email = str_replace(["\r", "\n"], '', trim((string) commar_setting('contact_email')));
+
+        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : 'info@commargroup.com.ar';
     }
 }
 
 if (!function_exists('commar_contact_form_email')) {
     function commar_contact_form_email(): string
     {
-        return trim((string) commar_setting('contact_form_email')) ?: commar_contact_email();
+        $email = str_replace(["\r", "\n"], '', trim((string) commar_setting('contact_form_email')));
+
+        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : commar_contact_email();
     }
 }
 
@@ -362,5 +391,6 @@ if (PHP_SAPI !== 'cli' && !defined('COMMAR_SKIP_MAINTENANCE') && !commar_is_admi
 }
 
 if (PHP_SAPI !== 'cli' && !commar_is_admin_request()) {
+    commar_public_security_headers();
     commar_image_start_public_rewrite();
 }

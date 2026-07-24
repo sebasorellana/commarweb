@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/includes/site.php';
 require_once __DIR__ . '/includes/integrations.php';
 require_once __DIR__ . '/includes/page-heroes.php';
@@ -36,12 +38,34 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $formData = array_map(static fn ($value): string => trim((string) $value), $formData);
     $replyToName = str_replace(["\r", "\n"], ' ', $formData['full_name']);
 
+    if (!commar_verify_csrf()) {
+        $formErrors[] = 'La sesión del formulario expiró. Actualizá la página e intentá nuevamente.';
+    }
+
+    if (trim((string) ($_POST['website'] ?? '')) !== '') {
+        $formSent = true;
+    }
+
     if (!in_array($formData['subject'], $contactSubjects, true)) {
         $formErrors[] = 'Seleccioná un asunto válido.';
     }
 
     if (!filter_var($formData['email'], FILTER_VALIDATE_EMAIL)) {
         $formErrors[] = 'Ingresá un email válido.';
+    }
+
+    $fieldLimits = [
+        'full_name' => 160,
+        'email' => 255,
+        'phone' => 80,
+        'company' => 160,
+        'message' => 5000,
+    ];
+    foreach ($fieldLimits as $field => $limit) {
+        if (strlen($formData[$field]) > $limit) {
+            $formErrors[] = 'Uno de los campos supera la longitud permitida.';
+            break;
+        }
     }
 
     if (!commar_recaptcha_verify('contact')) {
@@ -60,7 +84,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     ]);
     $fallbackMailto = 'mailto:' . rawurlencode($contactFormEmail) . '?subject=' . rawurlencode($formData['subject']) . '&body=' . rawurlencode($emailBody);
 
-    if ($formErrors === []) {
+    if ($formErrors === [] && !$formSent) {
         $headers = [
             'From: COMMAR GROUP <' . $contactEmail . '>',
             'Reply-To: ' . ($replyToName !== '' ? $replyToName . ' ' : '') . '<' . $formData['email'] . '>',
@@ -105,15 +129,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
     <?php
     $headerVariant = 'default';
-    $menuItems = [
-        ['label' => 'Inicio', 'href' => 'index.php'],
-        ['label' => 'El estudio', 'href' => 'el-estudio.php'],
-        ['label' => 'Servicios', 'href' => 'servicios.php'],
-        ['label' => 'Obra Viva', 'href' => 'obra-viva.php'],
-        ['label' => 'Obras', 'href' => 'obras.php'],
-        ['label' => 'Blog', 'href' => 'blog.php'],
-        ['label' => 'Contacto', 'href' => 'contacto.php'],
-    ];
     include __DIR__ . '/includes/header.php';
     ?>
 
@@ -161,6 +176,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                     <?php endif; ?>
 
                     <form class="contact-form" action="<?php echo htmlspecialchars(commar_url('contacto.php'), ENT_QUOTES, 'UTF-8'); ?>" method="post"<?php echo commar_recaptcha_form_attributes('contact'); ?>>
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(commar_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
+                        <input type="text" name="website" value="" tabindex="-1" autocomplete="off" class="newsletter-honeypot" aria-hidden="true">
                         <div class="contact-field">
                             <label for="contact-subject">Asunto</label>
                             <select id="contact-subject" name="subject">

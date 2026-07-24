@@ -3,6 +3,7 @@ require_once __DIR__ . '/menu.php';
 
 $headerVariant = $headerVariant ?? 'home';
 $languageOptions = commar_supported_languages();
+$languageSwitcherEnabled = (string) commar_setting('language_switcher_enabled') === '1';
 $menuItems = $menuItems ?? commar_menu_items('header');
 ?>
 
@@ -18,6 +19,7 @@ $menuItems = $menuItems ?? commar_menu_items('header');
                     <a href="<?php echo htmlspecialchars(commar_url($item['href']), ENT_QUOTES, 'UTF-8'); ?>" class="desktop-nav-link"><?php echo htmlspecialchars(commar_nav_label($item['label']), ENT_QUOTES, 'UTF-8'); ?></a>
                 <?php endforeach; ?>
             </div>
+            <?php if ($languageSwitcherEnabled): ?>
             <details class="relative language-switcher">
                 <summary class="list-none flex items-center justify-center w-10 h-10 rounded-full border border-white/20 cursor-pointer hover:bg-white/10 transition-colors">
                     <span class="sr-only"><?php echo htmlspecialchars(commar_t('nav.language'), ENT_QUOTES, 'UTF-8'); ?></span>
@@ -32,8 +34,9 @@ $menuItems = $menuItems ?? commar_menu_items('header');
                     <?php endforeach; ?>
                 </div>
             </details>
+            <?php endif; ?>
 
-            <button id="menu-toggle" class="menu-toggle mobile-only flex items-center gap-4 text-[10px] tracking-[0.3em] uppercase font-bold" type="button">
+            <button id="menu-toggle" class="menu-toggle mobile-only flex items-center gap-4 text-[10px] tracking-[0.3em] uppercase font-bold" type="button" aria-controls="menu-content" aria-expanded="false">
                 <span><?php echo htmlspecialchars(commar_t('nav.menu'), ENT_QUOTES, 'UTF-8'); ?></span>
                 <div class="flex flex-col gap-1.5 w-6">
                     <span class="w-full h-[1px] bg-white"></span>
@@ -43,13 +46,13 @@ $menuItems = $menuItems ?? commar_menu_items('header');
         </div>
     </nav>
 
-    <div id="menu-content" class="menu-overlay fixed inset-0 bg-white text-black z-[200] flex flex-col p-6 md:p-10 justify-between">
+    <div id="menu-content" class="menu-overlay fixed inset-0 bg-white text-black z-[200] flex flex-col p-6 md:p-10 justify-between" aria-hidden="true">
         <div class="flex justify-between items-center text-black">
             <a href="<?php echo htmlspecialchars(commar_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="site-logo-link site-logo-link-overlay" aria-label="COMMAR GROUP, volver al inicio">
                 <img src="img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578" class="site-logo">
                 <span class="site-logo-text">Commar Group</span>
             </a>
-            <button id="menu-close" class="p-4 border border-black/10 rounded-full hover:bg-black hover:text-white transition-colors" type="button">
+            <button id="menu-close" class="p-4 border border-black/10 rounded-full hover:bg-black hover:text-white transition-colors" type="button" aria-label="Cerrar menú">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
@@ -83,6 +86,7 @@ $menuItems = $menuItems ?? commar_menu_items('header');
                     <a href="<?php echo htmlspecialchars(commar_url($item['href']), ENT_QUOTES, 'UTF-8'); ?>" class="desktop-nav-link"><?php echo htmlspecialchars(commar_nav_label($item['label']), ENT_QUOTES, 'UTF-8'); ?></a>
                 <?php endforeach; ?>
             </div>
+            <?php if ($languageSwitcherEnabled): ?>
             <details class="relative language-switcher">
                 <summary class="list-none flex items-center justify-center w-10 h-10 rounded-full border border-black/10 cursor-pointer hover:bg-black/5 transition-colors">
                     <span class="sr-only"><?php echo htmlspecialchars(commar_t('nav.language'), ENT_QUOTES, 'UTF-8'); ?></span>
@@ -97,8 +101,9 @@ $menuItems = $menuItems ?? commar_menu_items('header');
                     <?php endforeach; ?>
                 </div>
             </details>
+            <?php endif; ?>
 
-            <button id="menu-toggle" class="menu-toggle mobile-only flex items-center gap-4 text-[10px] tracking-[0.3em] uppercase font-bold" type="button">
+            <button id="menu-toggle" class="menu-toggle mobile-only flex items-center gap-4 text-[10px] tracking-[0.3em] uppercase font-bold" type="button" aria-controls="menu-content" aria-expanded="false">
                 <span><?php echo htmlspecialchars(commar_t('nav.menu'), ENT_QUOTES, 'UTF-8'); ?></span>
                 <div class="flex flex-col gap-1.5 w-6">
                     <span class="w-full h-[1px] bg-black"></span>
@@ -108,13 +113,13 @@ $menuItems = $menuItems ?? commar_menu_items('header');
         </div>
     </nav>
 
-    <div id="menu-content" class="menu-overlay fixed inset-0 bg-white text-black z-[200] flex flex-col p-6 md:p-10 justify-between">
+    <div id="menu-content" class="menu-overlay fixed inset-0 bg-white text-black z-[200] flex flex-col p-6 md:p-10 justify-between" aria-hidden="true">
         <div class="flex justify-between items-center text-black">
             <a href="<?php echo htmlspecialchars(commar_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="site-logo-link site-logo-link-overlay" aria-label="COMMAR GROUP, volver al inicio">
                 <img src="img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578" class="site-logo">
                 <span class="site-logo-text">Commar Group</span>
             </a>
-            <button id="menu-close" class="p-4 border border-black/10 rounded-full hover:bg-black hover:text-white transition-colors" type="button">
+            <button id="menu-close" class="p-4 border border-black/10 rounded-full hover:bg-black hover:text-white transition-colors" type="button" aria-label="Cerrar menú">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>

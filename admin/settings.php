@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $settings['instagram_url'] = trim((string) ($_POST['instagram_url'] ?? ''));
     $settings['linkedin_url'] = trim((string) ($_POST['linkedin_url'] ?? ''));
     $settings['whatsapp_number'] = preg_replace('/\D+/', '', (string) ($_POST['whatsapp_number'] ?? '')) ?? '';
+    $settings['language_switcher_enabled'] = isset($_POST['language_switcher_enabled']) ? '1' : '0';
     $settings['maintenance_enabled'] = isset($_POST['maintenance_enabled']) ? '1' : '0';
     $settings['maintenance_title'] = trim((string) ($_POST['maintenance_title'] ?? ''));
     $settings['maintenance_message'] = trim((string) ($_POST['maintenance_message'] ?? ''));
@@ -51,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'instagram_url' => $settings['instagram_url'],
             'linkedin_url' => $settings['linkedin_url'],
             'whatsapp_number' => $settings['whatsapp_number'],
+            'language_switcher_enabled' => $settings['language_switcher_enabled'],
             'maintenance_enabled' => $settings['maintenance_enabled'],
             'maintenance_title' => $settings['maintenance_title'],
             'maintenance_message' => $settings['maintenance_message'],
@@ -112,6 +114,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label>
                                 Dirección
                                 <textarea name="contact_address" rows="4"><?php echo commar_admin_h((string) $settings['contact_address']); ?></textarea>
+                            </label>
+                        </section>
+
+                        <section class="admin-settings-section">
+                            <div class="admin-section-head">
+                                <span class="admin-kicker">Navegación</span>
+                                <h3>Selector de idiomas</h3>
+                            </div>
+                            <label class="admin-toggle-row">
+                                <input type="checkbox" name="language_switcher_enabled" value="1" <?php echo ((string) ($settings['language_switcher_enabled'] ?? '1')) === '1' ? 'checked' : ''; ?>>
+                                <span>
+                                    Mostrar el ícono de idiomas en el header
+                                    <small>Permite acceder a las versiones en español, inglés y portugués desde la navegación principal.</small>
+                                </span>
                             </label>
                         </section>
 

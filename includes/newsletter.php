@@ -11,6 +11,7 @@ $newsletterTitleId = $newsletterTitleId ?? 'newsletter-title';
                 <h2 id="<?php echo htmlspecialchars($newsletterTitleId, ENT_QUOTES, 'UTF-8'); ?>" class="home-newsletter-title">Recibí nuevas obras, ideas y próximos movimientos de COMMAR GROUP.</h2>
             </div>
             <form class="home-newsletter-form" action="<?php echo htmlspecialchars(commar_url('newsletter-submit.php'), ENT_QUOTES, 'UTF-8'); ?>" method="post"<?php echo commar_recaptcha_form_attributes('newsletter'); ?>>
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(commar_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
                 <label class="sr-only" for="<?php echo htmlspecialchars($newsletterTitleId, ENT_QUOTES, 'UTF-8'); ?>-email">Email</label>
                 <input id="<?php echo htmlspecialchars($newsletterTitleId, ENT_QUOTES, 'UTF-8'); ?>-email" class="home-newsletter-input" type="email" name="email" placeholder="tu@email.com" autocomplete="email" required>
                 <input type="hidden" name="source" value="newsletter">

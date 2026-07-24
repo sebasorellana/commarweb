@@ -32,15 +32,6 @@ $seo = [
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
     <?php
     $headerVariant = 'default';
-    $menuItems = [
-        ['label' => 'Inicio', 'href' => 'index.php'],
-        ['label' => 'El estudio', 'href' => 'el-estudio.php'],
-        ['label' => 'Servicios', 'href' => 'servicios.php'],
-        ['label' => 'Obra Viva', 'href' => 'obra-viva.php'],
-        ['label' => 'Obras', 'href' => 'obras.php'],
-        ['label' => 'Blog', 'href' => 'blog.php'],
-        ['label' => 'Contacto', 'href' => 'contacto.php'],
-    ];
     include __DIR__ . '/includes/header.php';
     ?>
 
@@ -88,6 +79,7 @@ $seo = [
                                 </div>
 
                                 <form class="job-apply-form" action="<?php echo htmlspecialchars(commar_url('job-apply.php'), ENT_QUOTES, 'UTF-8'); ?>" method="post" enctype="multipart/form-data"<?php echo commar_recaptcha_form_attributes('job_apply'); ?>>
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(commar_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
                                     <input type="hidden" name="job_id" value="<?php echo (int) $job['id']; ?>">
                                     <label>
                                         Nombre y apellido

@@ -8,7 +8,7 @@ $menuItems = $menuItems ?? commar_menu_items('header');
 ?>
 
 <?php if ($headerVariant === 'home'): ?>
-    <nav id="home-nav" class="fixed top-0 left-0 w-full z-[100] px-6 md:px-10 py-8 flex justify-between items-center text-white">
+    <nav id="site-header-nav" class="site-header-nav fixed top-0 left-0 w-full z-[100] px-6 md:px-10 py-8 flex justify-between items-center text-white" data-site-header>
         <a href="<?php echo htmlspecialchars(commar_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="site-logo-link" aria-label="COMMAR GROUP, volver al inicio">
             <img src="img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578" class="site-logo">
             <span class="site-logo-text">Commar Group</span>
@@ -25,7 +25,7 @@ $menuItems = $menuItems ?? commar_menu_items('header');
                     <span class="sr-only"><?php echo htmlspecialchars(commar_t('nav.language'), ENT_QUOTES, 'UTF-8'); ?></span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                 </summary>
-                <div class="absolute right-0 mt-3 min-w-[160px] bg-black/90 border border-white/10 rounded-2xl p-2 backdrop-blur-sm">
+                <div class="site-language-menu absolute right-0 mt-3 min-w-[160px] bg-black/90 border border-white/10 rounded-2xl p-2 backdrop-blur-sm">
                     <?php foreach ($languageOptions as $languageKey => $language): ?>
                         <a href="<?php echo htmlspecialchars(commar_language_url($languageKey), ENT_QUOTES, 'UTF-8'); ?>" class="flex items-center justify-between gap-4 px-3 py-2 text-[11px] uppercase tracking-[0.24em] font-bold hover:bg-white/10 rounded-xl transition-colors">
                             <span><?php echo htmlspecialchars($language['label'], ENT_QUOTES, 'UTF-8'); ?></span>
@@ -38,9 +38,9 @@ $menuItems = $menuItems ?? commar_menu_items('header');
 
             <button id="menu-toggle" class="menu-toggle mobile-only flex items-center gap-4 text-[10px] tracking-[0.3em] uppercase font-bold" type="button" aria-controls="menu-content" aria-expanded="false">
                 <span><?php echo htmlspecialchars(commar_t('nav.menu'), ENT_QUOTES, 'UTF-8'); ?></span>
-                <div class="flex flex-col gap-1.5 w-6">
-                    <span class="w-full h-[1px] bg-white"></span>
-                    <span class="w-full h-[1px] bg-white"></span>
+                <div class="menu-toggle-lines">
+                    <span class="menu-toggle-line"></span>
+                    <span class="menu-toggle-line"></span>
                 </div>
             </button>
         </div>
@@ -75,7 +75,7 @@ $menuItems = $menuItems ?? commar_menu_items('header');
         </div>
     </div>
 <?php else: ?>
-    <nav class="fixed top-0 left-0 w-full z-[100] px-6 md:px-10 py-8 flex justify-between items-center text-black">
+    <nav id="site-header-nav" class="site-header-nav fixed top-0 left-0 w-full z-[100] px-6 md:px-10 py-8 flex justify-between items-center text-white" data-site-header>
         <a href="<?php echo htmlspecialchars(commar_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="site-logo-link" aria-label="COMMAR GROUP, volver al inicio">
             <img src="img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578" class="site-logo">
             <span class="site-logo-text">Commar Group</span>
@@ -88,15 +88,15 @@ $menuItems = $menuItems ?? commar_menu_items('header');
             </div>
             <?php if ($languageSwitcherEnabled): ?>
             <details class="relative language-switcher">
-                <summary class="list-none flex items-center justify-center w-10 h-10 rounded-full border border-black/10 cursor-pointer hover:bg-black/5 transition-colors">
+                <summary class="list-none flex items-center justify-center w-10 h-10 rounded-full border border-white/20 cursor-pointer hover:bg-white/10 transition-colors">
                     <span class="sr-only"><?php echo htmlspecialchars(commar_t('nav.language'), ENT_QUOTES, 'UTF-8'); ?></span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                 </summary>
-                <div class="absolute right-0 mt-3 min-w-[160px] bg-white/95 border border-black/10 rounded-2xl p-2 backdrop-blur-sm shadow-xl">
+                <div class="site-language-menu absolute right-0 mt-3 min-w-[160px] bg-black/90 border border-white/10 rounded-2xl p-2 backdrop-blur-sm shadow-xl">
                     <?php foreach ($languageOptions as $languageKey => $language): ?>
-                        <a href="<?php echo htmlspecialchars(commar_language_url($languageKey), ENT_QUOTES, 'UTF-8'); ?>" class="flex items-center justify-between gap-4 px-3 py-2 text-[11px] uppercase tracking-[0.24em] font-bold hover:bg-black/5 rounded-xl transition-colors">
+                        <a href="<?php echo htmlspecialchars(commar_language_url($languageKey), ENT_QUOTES, 'UTF-8'); ?>" class="flex items-center justify-between gap-4 px-3 py-2 text-[11px] uppercase tracking-[0.24em] font-bold hover:bg-white/10 rounded-xl transition-colors">
                             <span><?php echo htmlspecialchars($language['label'], ENT_QUOTES, 'UTF-8'); ?></span>
-                            <span class="text-black/40"><?php echo htmlspecialchars($language['code'], ENT_QUOTES, 'UTF-8'); ?></span>
+                            <span class="text-white/50"><?php echo htmlspecialchars($language['code'], ENT_QUOTES, 'UTF-8'); ?></span>
                         </a>
                     <?php endforeach; ?>
                 </div>
@@ -105,9 +105,9 @@ $menuItems = $menuItems ?? commar_menu_items('header');
 
             <button id="menu-toggle" class="menu-toggle mobile-only flex items-center gap-4 text-[10px] tracking-[0.3em] uppercase font-bold" type="button" aria-controls="menu-content" aria-expanded="false">
                 <span><?php echo htmlspecialchars(commar_t('nav.menu'), ENT_QUOTES, 'UTF-8'); ?></span>
-                <div class="flex flex-col gap-1.5 w-6">
-                    <span class="w-full h-[1px] bg-black"></span>
-                    <span class="w-full h-[1px] bg-black"></span>
+                <div class="menu-toggle-lines">
+                    <span class="menu-toggle-line"></span>
+                    <span class="menu-toggle-line"></span>
                 </div>
             </button>
         </div>

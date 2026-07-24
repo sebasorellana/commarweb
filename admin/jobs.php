@@ -72,6 +72,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $message = 'No se pudo eliminar la búsqueda.';
         $messageType = 'error';
+    } elseif (in_array($action, ['pause', 'resume'], true)) {
+        $nextStatus = $action === 'pause' ? 'inactive' : 'active';
+        if (commar_set_job_status($id, $nextStatus)) {
+            header('Location: jobs.php?' . ($action === 'pause' ? 'paused=1' : 'resumed=1'));
+            exit;
+        }
+        $message = $action === 'pause'
+            ? 'No se pudo pausar la búsqueda.'
+            : 'No se pudo reactivar la búsqueda.';
+        $messageType = 'error';
     } else {
         $title = trim((string) ($_POST['title'] ?? ''));
         $description = trim((string) ($_POST['description'] ?? ''));
@@ -110,6 +120,8 @@ $jobs = commar_admin_jobs();
 $created = ($_GET['created'] ?? '') === '1';
 $updated = ($_GET['updated'] ?? '') === '1';
 $deleted = ($_GET['deleted'] ?? '') === '1';
+$paused = ($_GET['paused'] ?? '') === '1';
+$resumed = ($_GET['resumed'] ?? '') === '1';
 $formTitle = $editingJob ? 'Editar búsqueda' : 'Nueva búsqueda';
 $descriptionHtml = commar_job_description_html((string) ($editingJob['description'] ?? ''));
 ?>
@@ -139,6 +151,8 @@ $descriptionHtml = commar_job_description_html((string) ($editingJob['descriptio
                     <?php if ($created): ?><p class="admin-alert admin-alert-success">Búsqueda creada.</p><?php endif; ?>
                     <?php if ($updated): ?><p class="admin-alert admin-alert-success">Búsqueda actualizada.</p><?php endif; ?>
                     <?php if ($deleted): ?><p class="admin-alert admin-alert-success">Búsqueda eliminada.</p><?php endif; ?>
+                    <?php if ($paused): ?><p class="admin-alert admin-alert-success">Búsqueda pausada y oculta del frontend.</p><?php endif; ?>
+                    <?php if ($resumed): ?><p class="admin-alert admin-alert-success">Búsqueda reactivada y visible en el frontend.</p><?php endif; ?>
                     <?php if ($message !== ''): ?><p class="admin-alert admin-alert-<?php echo $messageType === 'error' ? 'error' : 'success'; ?>"><?php echo commar_admin_h($message); ?></p><?php endif; ?>
 
                     <div class="admin-categories-grid">
@@ -192,7 +206,7 @@ $descriptionHtml = commar_job_description_html((string) ($editingJob['descriptio
                                     <select name="status">
                                         <?php $selectedStatus = (string) ($editingJob['status'] ?? 'active'); ?>
                                         <option value="active" <?php echo $selectedStatus === 'active' ? 'selected' : ''; ?>>Activa</option>
-                                        <option value="inactive" <?php echo $selectedStatus !== 'active' ? 'selected' : ''; ?>>Inactiva</option>
+                                        <option value="inactive" <?php echo $selectedStatus !== 'active' ? 'selected' : ''; ?>>Pausada</option>
                                     </select>
                                 </label>
                                 <div class="admin-work-savebar">
@@ -240,10 +254,23 @@ $descriptionHtml = commar_job_description_html((string) ($editingJob['descriptio
                                                             <span class="admin-empty-inline">Sin imagen</span>
                                                         <?php endif; ?>
                                                     </td>
-                                                    <td><span class="admin-status-pill <?php echo $job['status'] === 'active' ? 'is-published' : 'is-draft'; ?>"><?php echo $job['status'] === 'active' ? 'Activa' : 'Inactiva'; ?></span></td>
+                                                    <td><span class="admin-status-pill <?php echo $job['status'] === 'active' ? 'is-published' : 'is-draft'; ?>"><?php echo $job['status'] === 'active' ? 'Activa' : 'Pausada'; ?></span></td>
                                                     <td>
                                                         <div class="admin-table-actions">
                                                             <a href="jobs.php?edit=<?php echo (int) $job['id']; ?>" class="admin-button-icon" title="Editar búsqueda"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></a>
+                                                            <?php if ($job['status'] === 'active'): ?>
+                                                                <form action="jobs.php" method="post" onsubmit="return confirm('¿Pausar esta búsqueda? Dejará de mostrarse en el frontend.');" style="display: inline;">
+                                                                    <input type="hidden" name="action" value="pause">
+                                                                    <input type="hidden" name="id" value="<?php echo (int) $job['id']; ?>">
+                                                                    <button type="submit" class="admin-button-icon" title="Pausar búsqueda" aria-label="Pausar búsqueda"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M10 9v6"/><path d="M14 9v6"/></svg></button>
+                                                                </form>
+                                                            <?php else: ?>
+                                                                <form action="jobs.php" method="post" style="display: inline;">
+                                                                    <input type="hidden" name="action" value="resume">
+                                                                    <input type="hidden" name="id" value="<?php echo (int) $job['id']; ?>">
+                                                                    <button type="submit" class="admin-button-icon" title="Reactivar búsqueda" aria-label="Reactivar búsqueda"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m10 8 6 4-6 4Z"/></svg></button>
+                                                                </form>
+                                                            <?php endif; ?>
                                                             <form action="jobs.php" method="post" onsubmit="return confirm('¿Eliminar esta búsqueda?');" style="display: inline;">
                                                                 <input type="hidden" name="action" value="delete">
                                                                 <input type="hidden" name="id" value="<?php echo (int) $job['id']; ?>">

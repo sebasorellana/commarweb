@@ -202,7 +202,7 @@ button {
 }
 
 .language-switcher[open] summary {
-    background: rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.14);
 }
 
 .text-outline {
@@ -224,10 +224,6 @@ button {
     color: #fff;
 }
 
-.home-nav-scrolled {
-    mix-blend-mode: difference;
-}
-
 .brand-mark {
     font-size: 1.25rem;
     font-weight: 900;
@@ -238,8 +234,27 @@ button {
     color: #000;
 }
 
-#home-nav {
+.site-header-nav {
     color: #ffffff;
+    background: linear-gradient(180deg, rgba(7, 7, 7, 0.68) 0%, rgba(7, 7, 7, 0.34) 68%, rgba(7, 7, 7, 0) 100%);
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.65);
+    transition: background-color 220ms ease, box-shadow 220ms ease;
+}
+
+.site-header-nav.is-scrolled {
+    background: rgba(7, 7, 7, 0.88);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+    -webkit-backdrop-filter: saturate(130%) blur(12px);
+    backdrop-filter: saturate(130%) blur(12px);
+}
+
+.site-header-nav .site-logo {
+    filter: brightness(0) invert(1) drop-shadow(0 1px 8px rgba(0, 0, 0, 0.45));
+}
+
+.site-header-nav .site-language-menu {
+    color: #ffffff;
+    text-shadow: none;
 }
 
 .menu-toggle {

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/cache.php';
 
 if (!function_exists('commar_default_settings')) {
     function commar_default_settings(): array
@@ -22,6 +23,8 @@ if (!function_exists('commar_default_settings')) {
             'linkedin_url' => '',
             'whatsapp_number' => '5491100000000',
             'language_switcher_enabled' => '1',
+            'cache_enabled' => '1',
+            'cache_ttl' => '300',
             'maintenance_enabled' => '0',
             'maintenance_title' => 'Sitio en mantenimiento',
             'maintenance_message' => 'Estamos realizando tareas de actualización. Volveremos a estar disponibles en breve.',
@@ -43,14 +46,29 @@ if (!function_exists('commar_default_settings')) {
 if (!function_exists('commar_settings')) {
     function commar_settings(): array
     {
+        if (isset($GLOBALS['commar_settings_runtime']) && is_array($GLOBALS['commar_settings_runtime'])) {
+            return $GLOBALS['commar_settings_runtime'];
+        }
+
         $settings = commar_default_settings();
+        $cachedSettings = commar_cache_get('settings');
+        if (is_array($cachedSettings) && (string) ($cachedSettings['cache_enabled'] ?? '0') === '1') {
+            $GLOBALS['commar_settings_runtime'] = array_replace($settings, $cachedSettings);
+            return $GLOBALS['commar_settings_runtime'];
+        }
+
         $statement = commar_db()->query('SELECT setting_key, setting_value FROM commar_settings');
 
         foreach ($statement->fetchAll() as $row) {
             $settings[(string) $row['setting_key']] = (string) $row['setting_value'];
         }
 
-        return $settings;
+        $GLOBALS['commar_settings_runtime'] = $settings;
+        if ((string) ($settings['cache_enabled'] ?? '0') === '1') {
+            commar_cache_set('settings', $settings, max(60, min(86400, (int) ($settings['cache_ttl'] ?? 300))));
+        }
+
+        return $GLOBALS['commar_settings_runtime'];
     }
 }
 
@@ -79,5 +97,22 @@ if (!function_exists('commar_save_settings')) {
                 'updated_at' => date('Y-m-d H:i:s'),
             ]);
         }
+
+        unset($GLOBALS['commar_settings_runtime']);
+        commar_cache_clear();
+    }
+}
+
+if (!function_exists('commar_cache_enabled')) {
+    function commar_cache_enabled(): bool
+    {
+        return (string) commar_setting('cache_enabled') === '1';
+    }
+}
+
+if (!function_exists('commar_cache_ttl')) {
+    function commar_cache_ttl(): int
+    {
+        return max(60, min(86400, (int) commar_setting('cache_ttl')));
     }
 }

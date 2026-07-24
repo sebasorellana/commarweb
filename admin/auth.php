@@ -4,6 +4,7 @@ if (is_file($commarAdminConfigPath)) {
     require_once $commarAdminConfigPath;
 }
 require_once dirname(__DIR__) . '/includes/db.php';
+require_once dirname(__DIR__) . '/includes/cache.php';
 
 if (!headers_sent()) {
     header('X-Robots-Tag: noindex, nofollow, noarchive', true);
@@ -507,6 +508,14 @@ function commar_admin_require_valid_csrf(): void
     if (!commar_admin_verify_csrf_token()) {
         http_response_code(403);
         exit('Token de seguridad inválido.');
+    }
+
+    static $cacheInvalidationRegistered = false;
+    if (!$cacheInvalidationRegistered) {
+        register_shutdown_function(static function (): void {
+            commar_cache_clear();
+        });
+        $cacheInvalidationRegistered = true;
     }
 }
 

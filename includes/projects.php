@@ -217,11 +217,12 @@ function commar_projects(): array
         return $projects;
     }
 
-    $db = commar_db();
-    $statement = $db->query("SELECT * FROM commar_works WHERE status = 'published' ORDER BY title ASC");
-    $works = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $projects = commar_cache_remember('projects:published:all', static function (): array {
+        $statement = commar_db()->query("SELECT * FROM commar_works WHERE status = 'published' ORDER BY title ASC");
+        $works = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-    $projects = array_map('commar_normalize_project_row', $works);
+        return array_map('commar_normalize_project_row', $works);
+    });
 
     return $projects;
 }
@@ -232,13 +233,15 @@ function commar_project_by_slug(string $slug): ?array
         return null;
     }
 
-    $statement = commar_db()->prepare(
-        "SELECT * FROM commar_works WHERE slug = :slug AND status = 'published' LIMIT 1"
-    );
-    $statement->execute(['slug' => $slug]);
-    $project = $statement->fetch(PDO::FETCH_ASSOC);
+    return commar_cache_remember('project:published:' . $slug, static function () use ($slug): ?array {
+        $statement = commar_db()->prepare(
+            "SELECT * FROM commar_works WHERE slug = :slug AND status = 'published' LIMIT 1"
+        );
+        $statement->execute(['slug' => $slug]);
+        $project = $statement->fetch(PDO::FETCH_ASSOC);
 
-    return is_array($project) ? commar_normalize_project_row($project) : null;
+        return is_array($project) ? commar_normalize_project_row($project) : null;
+    });
 }
 
 if (!function_exists('commar_static_projects')) {

@@ -157,3 +157,24 @@ if (!function_exists('commar_delete_job')) {
         ]);
     }
 }
+
+if (!function_exists('commar_set_job_status')) {
+    function commar_set_job_status(int $id, string $status): bool
+    {
+        if ($id <= 0 || !in_array($status, ['active', 'inactive'], true)) {
+            return false;
+        }
+
+        $statement = commar_db()->prepare(
+            "UPDATE commar_jobs
+             SET status = :status, updated_at = :updated_at
+             WHERE id = :id AND status <> 'deleted'"
+        );
+
+        return $statement->execute([
+            'id' => $id,
+            'status' => $status,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+}

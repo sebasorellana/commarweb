@@ -1,6 +1,5 @@
-// Home nav contrast mode
-const homeNav = document.querySelector('#home-nav');
-const navContrastHero = document.querySelector('#hero-home, .about-hero, .service-detail-hero, .project-detail-hero, .article-hero');
+// Global header contrast mode
+const siteHeader = document.querySelector('[data-site-header]');
 const heroTypewriter = document.querySelector('[data-hero-typewriter]');
 const heroCarousel = document.querySelector('[data-hero-carousel]');
 
@@ -73,17 +72,13 @@ if (heroCarousel) {
     }
 }
 
-if (homeNav && navContrastHero) {
-    const syncHomeNavState = () => {
-        const heroBottom = navContrastHero.getBoundingClientRect().bottom;
-        homeNav.classList.toggle('home-nav-scrolled', heroBottom <= 120);
+if (siteHeader) {
+    const syncSiteHeaderState = () => {
+        siteHeader.classList.toggle('is-scrolled', window.scrollY > 24);
     };
 
-    syncHomeNavState();
-    window.addEventListener('scroll', syncHomeNavState, { passive: true });
-    window.addEventListener('resize', syncHomeNavState);
-} else if (homeNav) {
-    homeNav.classList.add('home-nav-scrolled');
+    syncSiteHeaderState();
+    window.addEventListener('scroll', syncSiteHeaderState, { passive: true });
 }
 
 document.querySelectorAll('[data-work-gallery]').forEach((gallery) => {

@@ -83,7 +83,7 @@ $servicesHero = commar_page_hero('servicios');
                         '@type' => 'ListItem',
                         'position' => $index + 1,
                         'name' => $service['title'],
-                        'url' => commar_absolute_url($service['href']),
+                        'url' => commar_absolute_url(commar_url($service['href'])),
                     ],
                     $services,
                     array_keys($services)

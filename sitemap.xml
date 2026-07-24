@@ -6,52 +6,47 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://commargroup.com.ar/el-estudio.php</loc>
+    <loc>https://commargroup.com.ar/el-estudio</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://commargroup.com.ar/servicio-proyectos.php</loc>
+    <loc>https://commargroup.com.ar/servicio-proyectos</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://commargroup.com.ar/servicios.php</loc>
+    <loc>https://commargroup.com.ar/servicios</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://commargroup.com.ar/obra-viva.php</loc>
+    <loc>https://commargroup.com.ar/obra-viva</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://commargroup.com.ar/obras.php</loc>
+    <loc>https://commargroup.com.ar/obras</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://commargroup.com.ar/blog.php</loc>
+    <loc>https://commargroup.com.ar/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://commargroup.com.ar/contacto.php</loc>
+    <loc>https://commargroup.com.ar/contacto</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://commargroup.com.ar/como-anticipar-decisiones-criticas-antes-de-iniciar-una-obra.php</loc>
+    <loc>https://commargroup.com.ar/articulos/micro-obras-en-caba-declaraci-on-obligatoria-en-el-portal-del-director-de-obra</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://commargroup.com.ar/documentacion-ejecutiva-el-mapa-que-evita-errores-en-obra.php</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://commargroup.com.ar/estrategias-ambientales-que-elevan-el-valor-del-proyecto.php</loc>
+    <loc>https://commargroup.com.ar/articulos/informes-t-ecnicos-de-obra-nuevas-exigencias-para-empresas-constructoras-en-caba</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

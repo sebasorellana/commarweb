@@ -168,6 +168,50 @@ if (!function_exists('commar_url')) {
     }
 }
 
+if (!function_exists('commar_friendly_path')) {
+    function commar_friendly_path(string $href): string
+    {
+        if ($href === '' || $href === '#' || preg_match('#^(https?:|mailto:|tel:|//)#i', $href)) {
+            return $href;
+        }
+
+        $fragmentParts = explode('#', $href, 2);
+        $pathAndQuery = $fragmentParts[0];
+        $fragment = isset($fragmentParts[1]) ? '#' . $fragmentParts[1] : '';
+        $queryParts = explode('?', $pathAndQuery, 2);
+        $path = $queryParts[0];
+        $query = isset($queryParts[1]) ? '?' . $queryParts[1] : '';
+        $hasLeadingSlash = str_starts_with($path, '/');
+        $normalizedPath = ltrim($path, '/');
+
+        $routes = [
+            'index.php' => '',
+            'el-estudio.php' => 'el-estudio',
+            'servicios.php' => 'servicios',
+            'servicio-proyectos.php' => 'servicio-proyectos',
+            'obra-viva.php' => 'obra-viva',
+            'obras.php' => 'obras',
+            'blog.php' => 'blog',
+            'contacto.php' => 'contacto',
+            'trabaja-con-nosotros.php' => 'trabaja-con-nosotros',
+            'newsletter-gracias.php' => 'newsletter-gracias',
+        ];
+
+        if (!array_key_exists($normalizedPath, $routes)) {
+            return $href;
+        }
+
+        $route = $routes[$normalizedPath];
+        if ($route === '') {
+            $route = $hasLeadingSlash ? '/' : './';
+        } elseif ($hasLeadingSlash) {
+            $route = '/' . $route;
+        }
+
+        return $route . $query . $fragment;
+    }
+}
+
 if (!function_exists('commar_localized_path')) {
     function commar_localized_path(string $href, string $lang): string
     {
@@ -178,6 +222,8 @@ if (!function_exists('commar_localized_path')) {
         if (preg_match('#^(https?:|mailto:|tel:|//)#i', $href)) {
             return $href;
         }
+
+        $href = commar_friendly_path($href);
 
         if ($lang === 'es') {
             return $href;
@@ -195,8 +241,21 @@ if (!function_exists('commar_localized_path')) {
 if (!function_exists('commar_language_url')) {
     function commar_language_url(string $lang): string
     {
-        $currentPage = basename($_SERVER['PHP_SELF'] ?? 'index.php');
-        $query = $_GET;
+        if (!array_key_exists($lang, commar_supported_languages())) {
+            $lang = 'es';
+        }
+
+        $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '');
+        $currentPage = (string) parse_url($requestUri, PHP_URL_PATH);
+        if ($currentPage === '') {
+            $currentPage = commar_friendly_path(basename($_SERVER['PHP_SELF'] ?? 'index.php'));
+        }
+
+        $query = [];
+        $requestQuery = parse_url($requestUri, PHP_URL_QUERY);
+        if (is_string($requestQuery) && $requestQuery !== '') {
+            parse_str($requestQuery, $query);
+        }
         $query['lang'] = $lang;
 
         return $currentPage . '?' . http_build_query($query);

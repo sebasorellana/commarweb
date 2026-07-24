@@ -43,11 +43,37 @@ AddType image/webp .webp
 
     RewriteRule ^data(?:/|$) - [F,L,NC]
 
+    # Canonical public URLs: redirect browser requests for legacy PHP pages.
+    RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$ [NC]
+    RewriteCond %{THE_REQUEST} \s/+[^\s?]*index\.php(?:[?\s]) [NC]
+    RewriteRule ^index\.php$ ./ [R=301,L,NE]
+
+    RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$ [NC]
+    RewriteCond %{THE_REQUEST} \s/+[^\s?]*(?:el-estudio|servicios|servicio-proyectos|obra-viva|obras|blog|contacto|trabaja-con-nosotros|newsletter-gracias)\.php(?:[?\s]) [NC]
+    RewriteRule ^(el-estudio|servicios|servicio-proyectos|obra-viva|obras|blog|contacto|trabaja-con-nosotros|newsletter-gracias)\.php$ $1 [R=301,L,NE]
+
+    RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$ [NC]
+    RewriteCond %{THE_REQUEST} \s/+[^\s?]*(?:como-anticipar-decisiones-criticas-antes-de-iniciar-una-obra|documentacion-ejecutiva-el-mapa-que-evita-errores-en-obra|estrategias-ambientales-que-elevan-el-valor-del-proyecto)\.php(?:[?\s]) [NC]
+    RewriteRule ^(?:como-anticipar-decisiones-criticas-antes-de-iniciar-una-obra|documentacion-ejecutiva-el-mapa-que-evita-errores-en-obra|estrategias-ambientales-que-elevan-el-valor-del-proyecto)\.php$ blog [R=301,L,NE]
+
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)/$ $1 [R=301,L]
+
     RewriteCond %{HTTP_ACCEPT} image/webp
     RewriteCond %{REQUEST_FILENAME} ^(.+)\.(jpe?g|png)$ [NC]
     RewriteCond %1.webp -f
     RewriteRule ^(.+)\.(jpe?g|png)$ $1.webp [T=image/webp,E=accept:1,L]
 
-    RewriteRule ^articulos/([a-z0-9-]+)/?$ articulo.php?slug=$1 [L,QSA]
-    RewriteRule ^obras/([a-z0-9-]+)/?$ obra.php?slug=$1 [L,QSA]
+    # Friendly public pages.
+    RewriteRule ^el-estudio$ el-estudio.php [L,QSA]
+    RewriteRule ^servicios$ servicios.php [L,QSA]
+    RewriteRule ^servicio-proyectos$ servicio-proyectos.php [L,QSA]
+    RewriteRule ^obra-viva$ obra-viva.php [L,QSA]
+    RewriteRule ^obras$ obras.php [L,QSA]
+    RewriteRule ^blog$ blog.php [L,QSA]
+    RewriteRule ^contacto$ contacto.php [L,QSA]
+    RewriteRule ^trabaja-con-nosotros$ trabaja-con-nosotros.php [L,QSA]
+    RewriteRule ^newsletter-gracias$ newsletter-gracias.php [L,QSA]
+    RewriteRule ^articulos/([a-z0-9-]+)$ articulo.php?slug=$1 [L,QSA]
+    RewriteRule ^obras/([a-z0-9-]+)$ obra.php?slug=$1 [L,QSA]
 </IfModule>

@@ -69,6 +69,11 @@ if (!function_exists('commar_absolute_url')) {
             return $path;
         }
 
+        if (function_exists('commar_friendly_path')) {
+            $path = commar_friendly_path($path);
+        }
+        $path = preg_replace('#^\./#', '', $path) ?? $path;
+
         return rtrim(commar_base_url(), '/') . '/' . ltrim($path, '/');
     }
 }
@@ -76,7 +81,22 @@ if (!function_exists('commar_absolute_url')) {
 if (!function_exists('commar_current_absolute_url')) {
     function commar_current_absolute_url(): string
     {
-        return rtrim(commar_base_url(), '/') . commar_request_path((string) ($_SERVER['REQUEST_URI'] ?? '/'));
+        $baseUrl = rtrim(commar_base_url(), '/');
+        $basePath = rtrim((string) parse_url($baseUrl, PHP_URL_PATH), '/');
+        $requestPath = commar_request_path((string) ($_SERVER['REQUEST_URI'] ?? '/'));
+
+        if (
+            $basePath !== ''
+            && (
+                $requestPath === $basePath
+                || str_starts_with($requestPath, $basePath . '/')
+                || str_starts_with($requestPath, $basePath . '?')
+            )
+        ) {
+            $requestPath = substr($requestPath, strlen($basePath)) ?: '/';
+        }
+
+        return $baseUrl . '/' . ltrim($requestPath, '/');
     }
 }
 

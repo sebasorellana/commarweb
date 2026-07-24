@@ -86,9 +86,9 @@
                     <div class="works-directory-layout">
                         <aside class="works-directory-nav" aria-label="Directorio de obras">
                             <div class="works-directory-filter" aria-label="Filtro de categorías">
-                                <a href="obras.php" class="works-directory-filter-link<?php echo $selectedCategory === '' ? ' is-active' : ''; ?>">Todas</a>
+                                <a href="<?php echo htmlspecialchars(commar_url('obras.php'), ENT_QUOTES, 'UTF-8'); ?>" class="works-directory-filter-link<?php echo $selectedCategory === '' ? ' is-active' : ''; ?>">Todas</a>
                                 <?php foreach ($categories as $category): ?>
-                                    <a href="obras.php?categoria=<?php echo urlencode($category); ?>" class="works-directory-filter-link<?php echo $selectedCategory === $category ? ' is-active' : ''; ?>">
+                                    <a href="<?php echo htmlspecialchars(commar_url('obras.php?categoria=' . rawurlencode($category)), ENT_QUOTES, 'UTF-8'); ?>" class="works-directory-filter-link<?php echo $selectedCategory === $category ? ' is-active' : ''; ?>">
                                         <?php echo htmlspecialchars($category, ENT_QUOTES, 'UTF-8'); ?>
                                     </a>
                                 <?php endforeach; ?>
@@ -105,10 +105,11 @@
                                                 <?php foreach ($letterProjects as $project): ?>
                                                     <?php
                                                     $isActive = $selectedProject && $project['slug'] === $selectedProject['slug'];
-                                                    $projectUrl = 'obras.php?slug=' . urlencode($project['slug']);
+                                                    $projectUrl = 'obras.php?slug=' . rawurlencode($project['slug']);
                                                     if ($selectedCategory !== '') {
-                                                        $projectUrl .= '&categoria=' . urlencode($selectedCategory);
+                                                        $projectUrl .= '&categoria=' . rawurlencode($selectedCategory);
                                                     }
+                                                    $projectUrl = commar_url($projectUrl);
                                                     ?>
                                                     <a href="<?php echo htmlspecialchars($projectUrl, ENT_QUOTES, 'UTF-8'); ?>" class="works-directory-link<?php echo $isActive ? ' is-active' : ''; ?>">
                                                         <strong><?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?></strong>

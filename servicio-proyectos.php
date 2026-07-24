@@ -166,7 +166,7 @@ $projectHero = commar_page_hero('servicio_proyectos');
                     <span class="service-detail-kicker">Consulta</span>
                     <h2 id="service-cta-title" class="service-detail-cta-title">Hablemos de tu proyecto.</h2>
                 </div>
-                <a href="contacto.php?asunto=Proyecto" class="service-detail-cta-link">Escribir al estudio</a>
+                <a href="<?php echo htmlspecialchars(commar_url('contacto.php?asunto=Proyecto'), ENT_QUOTES, 'UTF-8'); ?>" class="service-detail-cta-link">Escribir al estudio</a>
             </div>
         </section>
         <?php include __DIR__ . '/includes/footer.php'; ?>

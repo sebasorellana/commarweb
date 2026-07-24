@@ -208,7 +208,7 @@ $obraVivaHero = commar_page_hero('obra_viva');
                         <h2 id="obra-viva-cta-title" class="service-detail-cta-title">Delegá la gestión administrativa de tu obra.</h2>
                     </div>
                 </div>
-                <a href="contacto.php?asunto=Obra%20Viva" class="service-detail-cta-link">Consultar por Obra Viva</a>
+                <a href="<?php echo htmlspecialchars(commar_url('contacto.php?asunto=Obra%20Viva'), ENT_QUOTES, 'UTF-8'); ?>" class="service-detail-cta-link">Consultar por Obra Viva</a>
             </div>
         </section>
     </main>

@@ -196,7 +196,7 @@ $contactEmail = commar_contact_email();
                         <p>"Nuestro valor no está solo en lo que construimos, sino en todo lo que evitamos que falle."</p>
                         <footer>Romina Lo Conte</footer>
                     </blockquote>
-                    <a href="el-estudio.php" class="studio-overview-link">Conocer el estudio</a>
+                    <a href="<?php echo htmlspecialchars(commar_url('el-estudio.php'), ENT_QUOTES, 'UTF-8'); ?>" class="studio-overview-link">Conocer el estudio</a>
                 </div>
             </div>
         </div>
@@ -217,7 +217,7 @@ $contactEmail = commar_contact_email();
             <div class="services-grid">
                 <article class="service-card" data-scroll-reveal="up" style="--reveal-delay: 0.04s;">
                     <span class="service-card-index">01</span>
-                    <h3 class="service-card-title"><a href="servicio-proyectos.php" class="service-card-title-link">Proyecto</a></h3>
+                    <h3 class="service-card-title"><a href="<?php echo htmlspecialchars(commar_url('servicio-proyectos.php'), ENT_QUOTES, 'UTF-8'); ?>" class="service-card-title-link">Proyecto</a></h3>
                     <p class="service-card-text">Anteproyecto, proyecto ejecutivo, documentación técnica y coordinación de decisiones para obras claras desde el inicio.</p>
                 </article>
                 <article class="service-card" data-scroll-reveal="up" style="--reveal-delay: 0.1s;">

@@ -73,7 +73,7 @@
                 <div class="site-shell">
                     <span class="project-detail-kicker">Error 404</span>
                     <h1 class="project-detail-empty-title">La obra solicitada no está disponible.</h1>
-                    <a href="obras.php" class="studio-overview-link">Volver a obras</a>
+                    <a href="<?php echo htmlspecialchars(commar_url('obras.php'), ENT_QUOTES, 'UTF-8'); ?>" class="studio-overview-link">Volver a obras</a>
                 </div>
             </section>
         <?php else: ?>
@@ -119,8 +119,8 @@
 
             <section class="project-detail-cta-section">
                 <div class="site-shell-wide project-detail-cta">
-                    <a href="obras.php" class="studio-overview-link">Volver a obras</a>
-                    <a href="contacto.php?asunto=Consulta" class="projects-showcase-link">Consultar por este proyecto</a>
+                    <a href="<?php echo htmlspecialchars(commar_url('obras.php'), ENT_QUOTES, 'UTF-8'); ?>" class="studio-overview-link">Volver a obras</a>
+                    <a href="<?php echo htmlspecialchars(commar_url('contacto.php?asunto=Consulta'), ENT_QUOTES, 'UTF-8'); ?>" class="projects-showcase-link">Consultar por este proyecto</a>
                 </div>
             </section>
 

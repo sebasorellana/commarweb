@@ -129,6 +129,7 @@ function commar_admin_settings_nav(string $active): void
         ['id' => 'menu', 'label' => 'Menú', 'href' => 'settings-menu.php'],
         ['id' => 'integrations', 'label' => 'Integraciones', 'href' => 'settings-integrations.php'],
         ['id' => 'images', 'label' => 'Imágenes', 'href' => 'settings-images.php'],
+        ['id' => 'social-home', 'label' => 'Compartir Home', 'href' => 'settings-social-home.php'],
         ['id' => 'cache', 'label' => 'Caché', 'href' => 'settings-cache.php'],
     ];
     ?>

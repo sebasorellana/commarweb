@@ -15,11 +15,15 @@ $alternateUrls = [
     'pt-BR' => commar_absolute_url(commar_localized_path($pagePath, 'pt')),
 ];
 $ogType = $seo['og_type'] ?? 'website';
+$ogTitle = $seo['og_title'] ?? $metaTitle;
+$ogDescription = $seo['og_description'] ?? $description;
 $ogImage = commar_absolute_url($seo['image'] ?? 'img/logo-commar-500.png');
 $ogImageAlt = $seo['image_alt'] ?? $pageTitle;
 $ogImageWidth = $seo['image_width'] ?? null;
 $ogImageHeight = $seo['image_height'] ?? null;
 $twitterCard = $seo['twitter_card'] ?? 'summary_large_image';
+$twitterTitle = $seo['twitter_title'] ?? $ogTitle;
+$twitterDescription = $seo['twitter_description'] ?? $ogDescription;
 $robots = $seo['robots'] ?? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 $jsonLd = $seo['json_ld'] ?? [];
 $ogLocale = $seo['locale'] ?? commar_locale();
@@ -48,8 +52,8 @@ $recaptchaVersion = commar_recaptcha_version();
     <meta property="og:locale" content="<?php echo htmlspecialchars($ogLocale, ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="og:type" content="<?php echo htmlspecialchars($ogType, ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="og:site_name" content="<?php echo htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8'); ?>">
-    <meta property="og:title" content="<?php echo htmlspecialchars($metaTitle, ENT_QUOTES, 'UTF-8'); ?>">
-    <meta property="og:description" content="<?php echo htmlspecialchars($description, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:title" content="<?php echo htmlspecialchars($ogTitle, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:description" content="<?php echo htmlspecialchars($ogDescription, ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="og:url" content="<?php echo htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="og:image" content="<?php echo htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="og:image:alt" content="<?php echo htmlspecialchars($ogImageAlt, ENT_QUOTES, 'UTF-8'); ?>">
@@ -61,8 +65,8 @@ $recaptchaVersion = commar_recaptcha_version();
 <?php endif; ?>
 
     <meta name="twitter:card" content="<?php echo htmlspecialchars($twitterCard, ENT_QUOTES, 'UTF-8'); ?>">
-    <meta name="twitter:title" content="<?php echo htmlspecialchars($metaTitle, ENT_QUOTES, 'UTF-8'); ?>">
-    <meta name="twitter:description" content="<?php echo htmlspecialchars($description, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta name="twitter:title" content="<?php echo htmlspecialchars($twitterTitle, ENT_QUOTES, 'UTF-8'); ?>">
+    <meta name="twitter:description" content="<?php echo htmlspecialchars($twitterDescription, ENT_QUOTES, 'UTF-8'); ?>">
     <meta name="twitter:image" content="<?php echo htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8'); ?>">
     <meta name="twitter:image:alt" content="<?php echo htmlspecialchars($ogImageAlt, ENT_QUOTES, 'UTF-8'); ?>">
 

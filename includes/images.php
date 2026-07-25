@@ -86,7 +86,12 @@ if (!function_exists('commar_image_normalize_canvas')) {
 }
 
 if (!function_exists('commar_admin_store_uploaded_image')) {
-    function commar_admin_store_uploaded_image(string $tmpName, string $relativePathWithoutExtension, string $errorContext = 'imagen'): array
+    function commar_admin_store_uploaded_image(
+        string $tmpName,
+        string $relativePathWithoutExtension,
+        string $errorContext = 'imagen',
+        bool $allowWebpConversion = true
+    ): array
     {
         $imageInfo = getimagesize($tmpName);
         if ($imageInfo === false) {
@@ -115,7 +120,7 @@ if (!function_exists('commar_admin_store_uploaded_image')) {
             $targetHeight = max(1, (int) round($sourceHeight * ($targetWidth / $sourceWidth)));
         }
 
-        if (commar_image_webp_enabled() && function_exists('imagewebp')) {
+        if ($allowWebpConversion && commar_image_webp_enabled() && function_exists('imagewebp')) {
             $source = commar_image_create_from_file($tmpName, (int) $imageInfo[2]);
             if ($source) {
                 if (!imageistruecolor($source) && function_exists('imagepalettetotruecolor')) {

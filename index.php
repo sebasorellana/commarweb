@@ -30,6 +30,11 @@ $homeHeroStaticText = trim((string) commar_setting('home_hero_static_text'));
 $homeHeroLinkText = trim((string) commar_setting('home_hero_link_text'));
 $homeHeroLinkUrl = trim((string) commar_setting('home_hero_link_url'));
 $homeHeroCarouselSpeed = max(1500, min(20000, (int) commar_setting('home_hero_carousel_speed')));
+$homeSocialTitle = trim((string) commar_setting('home_social_title'));
+$homeSocialDescription = trim((string) commar_setting('home_social_description'));
+$homeSocialImage = trim((string) commar_setting('home_social_image'));
+$homeSocialImageWidth = (int) commar_setting('home_social_image_width');
+$homeSocialImageHeight = (int) commar_setting('home_social_image_height');
 $contactEmail = commar_contact_email();
 ?>
 <!DOCTYPE html>
@@ -67,14 +72,19 @@ $contactEmail = commar_contact_email();
     ];
     $focusedWorks = $focusedWorksCopy[$currentLang];
     $featuredProjects = commar_get_focused_works($currentLang);
+    $socialImage = $homeSocialImage !== '' ? $homeSocialImage : (string) ($homeHeroFirstImage['path'] ?? $homeHeroImage);
+    $socialImageWidth = $homeSocialImage !== '' ? $homeSocialImageWidth : (int) ($homeHeroFirstImage['width'] ?? $homeHeroWidth);
+    $socialImageHeight = $homeSocialImage !== '' ? $homeSocialImageHeight : (int) ($homeHeroFirstImage['height'] ?? $homeHeroHeight);
     $seo = [
         'title' => 'Estudio de arquitectura contemporánea',
         'description' => 'COMMAR GROUP es un estudio de arquitectura contemporánea que diseña espacios de alto impacto, obras radicales y manifiestos espaciales para clientes globales.',
+        'og_title' => $homeSocialTitle !== '' ? $homeSocialTitle : 'COMMAR GROUP | Estudio de arquitectura contemporánea',
+        'og_description' => $homeSocialDescription !== '' ? $homeSocialDescription : 'COMMAR GROUP es un estudio de arquitectura contemporánea que diseña espacios de alto impacto, obras radicales y manifiestos espaciales para clientes globales.',
         'path' => '',
-        'image' => (string) ($homeHeroFirstImage['path'] ?? $homeHeroImage),
-        'image_alt' => 'Visual arquitectónico de COMMAR GROUP',
-        'image_width' => (int) ($homeHeroFirstImage['width'] ?? $homeHeroWidth),
-        'image_height' => (int) ($homeHeroFirstImage['height'] ?? $homeHeroHeight),
+        'image' => $socialImage,
+        'image_alt' => $homeSocialTitle !== '' ? $homeSocialTitle : 'Visual arquitectónico de COMMAR GROUP',
+        'image_width' => $socialImageWidth,
+        'image_height' => $socialImageHeight,
         'og_type' => 'website',
         'json_ld' => [
             [

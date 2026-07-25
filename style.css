@@ -248,10 +248,6 @@ button {
     backdrop-filter: saturate(130%) blur(12px);
 }
 
-.site-header-nav .site-logo {
-    filter: brightness(0) invert(1) drop-shadow(0 1px 8px rgba(0, 0, 0, 0.45));
-}
-
 .site-header-nav .site-language-menu {
     color: #ffffff;
     text-shadow: none;

@@ -75,7 +75,7 @@ function commar_render_article_shortcodes(string $html): string
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
-    <link rel="stylesheet" href="style.css?v=20260724-header-contrast">
+    <link rel="stylesheet" href="style.css?v=20260724-logo-colors">
 </head>
 <body>
     <?php

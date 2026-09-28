@@ -379,7 +379,7 @@ if (!function_exists('commar_media_save_upload')) {
 
         $kind = commar_media_kind($originalName);
         $baseName = pathinfo($originalName, PATHINFO_FILENAME);
-        $baseName = preg_replace('/[^a-z0-9]+/', '-', strtolower(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $baseName) ?: $baseName)) ?: 'archivo';
+        $baseName = preg_replace('/[^a-z0-9]+/', '-', strtolower(commar_text_ascii($baseName) ?: $baseName)) ?: 'archivo';
         $relativeDir = $kind === 'image' ? 'img/media' : 'uploads/media';
         $targetDir = dirname(__DIR__) . '/' . $relativeDir;
         if (!is_dir($targetDir) && !mkdir($targetDir, 0775, true)) {

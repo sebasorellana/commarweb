@@ -5,8 +5,17 @@ require_once __DIR__ . '/includes/articles.php';
 $slug = (string) ($_GET['slug'] ?? '');
 $article = commar_find_article_by_slug($slug);
 
+if (!$article) {
+    $legacyArticle = commar_find_article_by_legacy_slug($slug);
+    if ($legacyArticle) {
+        header('Location: ' . commar_absolute_url(commar_article_url($legacyArticle['slug'])), true, 301);
+        exit;
+    }
+}
+
 if (!$article || ($article['status'] ?? 'published') !== 'published') {
     http_response_code(404);
+    $article = null;
     $articleTitle = 'Artículo no encontrado';
     $articleDescription = 'El artículo solicitado no está disponible.';
 } else {
@@ -45,14 +54,16 @@ function commar_render_article_shortcodes(string $html): string
         'image_width' => $article['image_width'] ?? null,
         'image_height' => $article['image_height'] ?? null,
         'og_type' => 'article',
+        'robots' => $article ? null : 'noindex, follow',
         'json_ld' => $article ? [
             [
                 '@context' => 'https://schema.org',
                 '@type' => 'Article',
                 'headline' => $articleTitle,
                 'description' => $articleDescription,
-                'image' => commar_absolute_url($article['image']),
+                'image' => commar_absolute_url($article['image'] !== '' ? $article['image'] : 'img/og-default.jpg'),
                 'datePublished' => $article['published_at'] ?? null,
+                'dateModified' => ($article['updated_at'] ?? '') !== '' ? $article['updated_at'] : ($article['published_at'] ?? null),
                 'author' => [
                     '@type' => 'Organization',
                     'name' => 'COMMAR GROUP',
@@ -68,14 +79,21 @@ function commar_render_article_shortcodes(string $html): string
                 'mainEntityOfPage' => commar_absolute_url(commar_article_url($article['slug'])),
                 'inLanguage' => commar_lang_attr(),
             ],
+            [
+                '@context' => 'https://schema.org',
+                '@type' => 'BreadcrumbList',
+                'itemListElement' => [
+                    ['@type' => 'ListItem', 'position' => 1, 'name' => 'Inicio', 'item' => commar_absolute_url('')],
+                    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => commar_absolute_url('blog.php')],
+                    ['@type' => 'ListItem', 'position' => 3, 'name' => $articleTitle, 'item' => commar_absolute_url(commar_article_url($article['slug']))],
+                ],
+            ],
         ] : [],
     ];
     include __DIR__ . '/includes/seo.php';
     ?>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
-    <link rel="stylesheet" href="style.css?v=20260724-logo-colors">
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20260928-perf">
 </head>
 <body>
     <?php

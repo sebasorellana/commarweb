@@ -46,8 +46,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Imágenes | MOnkey CMS</title>
-    <link rel="icon" type="image/png" href="../img/logo-commar-500.png">
-    <link rel="apple-touch-icon" href="../img/logo-commar-500.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../img/apple-touch-icon.png">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body class="admin-page">

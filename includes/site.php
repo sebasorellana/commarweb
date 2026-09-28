@@ -56,6 +56,7 @@ if (!function_exists('commar_base_url')) {
         ) {
             $basePath = '';
             $scheme = 'https';
+            $host = preg_replace('/^www\./', '', $host) ?? $host;
         }
 
         return rtrim($scheme . '://' . $host . $basePath, '/');
@@ -255,8 +256,8 @@ if (!function_exists('commar_render_maintenance_page')) {
     <title><?php echo htmlspecialchars($metaTitle, ENT_QUOTES, 'UTF-8'); ?></title>
     <meta name="description" content="<?php echo htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8'); ?>">
     <link rel="canonical" href="<?php echo htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8'); ?>">
-    <link rel="icon" type="image/png" href="img/logo-commar-500.png">
-    <link rel="apple-touch-icon" href="img/logo-commar-500.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
     <meta property="og:locale" content="es_AR">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="COMMAR GROUP">

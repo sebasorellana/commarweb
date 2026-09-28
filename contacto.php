@@ -120,10 +120,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     ];
     include __DIR__ . '/includes/seo.php';
     ?>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
-    <link rel="stylesheet" href="style.css?v=20260724-logo-colors">
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20260928-perf">
 </head>
 <body>
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
@@ -135,7 +133,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     <main>
         <section class="page-hero-section" aria-labelledby="contact-title">
             <div class="page-hero-media" aria-hidden="true">
-                <img src="<?php echo htmlspecialchars((string) $contactHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $contactHero['width']; ?>" height="<?php echo (int) $contactHero['height']; ?>" fetchpriority="high" decoding="async" class="page-hero-image">
+                <img src="<?php echo htmlspecialchars((string) $contactHero['image'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo commar_image_srcset_attrs((string) $contactHero['image'], (int) $contactHero['width']); ?> alt="" width="<?php echo (int) $contactHero['width']; ?>" height="<?php echo (int) $contactHero['height']; ?>" fetchpriority="high" decoding="async" class="page-hero-image">
                 <div class="page-hero-overlay"></div>
             </div>
             <div class="site-shell-wide page-hero-content">

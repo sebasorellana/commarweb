@@ -1,14 +1,18 @@
 <?php
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/settings.php';
 
 if (!function_exists('commar_get_focused_works')) {
     function commar_get_focused_works(string $lang = 'es'): array
     {
-        $statement = commar_db()->prepare(
-            'SELECT * FROM commar_focused_works WHERE lang = :lang ORDER BY display_order ASC'
-        );
-        $statement->execute(['lang' => $lang]);
-        $results = $statement->fetchAll();
+        $results = commar_cache_remember('focused-works:' . $lang, static function () use ($lang): array {
+            $statement = commar_db()->prepare(
+                'SELECT * FROM commar_focused_works WHERE lang = :lang ORDER BY display_order ASC'
+            );
+            $statement->execute(['lang' => $lang]);
+
+            return $statement->fetchAll();
+        });
 
         return array_map(static function (array $work, int $index): array {
             return [

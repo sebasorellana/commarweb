@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/settings.php';
 
 if (!function_exists('commar_job_description_html')) {
     function commar_job_description_html(string $description): string
@@ -41,11 +42,20 @@ if (!function_exists('commar_sanitize_job_description_html')) {
 if (!function_exists('commar_active_jobs')) {
     function commar_active_jobs(): array
     {
-        $statement = commar_db()->query(
-            "SELECT * FROM commar_jobs WHERE status = 'active' ORDER BY updated_at DESC, id DESC"
-        );
+        static $jobs = null;
+        if ($jobs !== null) {
+            return $jobs;
+        }
 
-        return $statement->fetchAll();
+        $jobs = commar_cache_remember('jobs:active', static function (): array {
+            $statement = commar_db()->query(
+                "SELECT * FROM commar_jobs WHERE status = 'active' ORDER BY updated_at DESC, id DESC"
+            );
+
+            return $statement->fetchAll();
+        });
+
+        return $jobs;
     }
 }
 

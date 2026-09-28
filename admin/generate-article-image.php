@@ -28,7 +28,7 @@ function commar_admin_ai_image_response(int $status, string $error): void
 function commar_admin_ai_slug(string $value): string
 {
     $value = trim(commar_text_lower($value));
-    $converted = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+    $converted = commar_text_ascii($value);
     $value = $converted !== false ? $converted : $value;
     $value = preg_replace('/[^a-z0-9]+/', '-', strtolower($value)) ?? '';
     $value = trim($value, '-');

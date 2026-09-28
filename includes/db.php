@@ -47,6 +47,22 @@ if (!function_exists('commar_text_upper')) {
     }
 }
 
+if (!function_exists('commar_text_ascii')) {
+    // Strips accents before iconv: libiconv transliterates "ó" as "'o", which produced slugs like "declaraci-on".
+    function commar_text_ascii(string $value): string
+    {
+        $value = strtr($value, [
+            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ñ' => 'n',
+            'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U', 'Ü' => 'U', 'Ñ' => 'N',
+            'à' => 'a', 'è' => 'e', 'ì' => 'i', 'ò' => 'o', 'ù' => 'u', 'â' => 'a', 'ê' => 'e', 'ô' => 'o',
+            'ã' => 'a', 'õ' => 'o', 'ç' => 'c', 'À' => 'A', 'Â' => 'A', 'Ê' => 'E', 'Ô' => 'O', 'Ã' => 'A', 'Õ' => 'O', 'Ç' => 'C',
+        ]);
+        $converted = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+
+        return $converted !== false ? str_replace(["'", '`', '"', '^', '~'], '', $converted) : $value;
+    }
+}
+
 if (!function_exists('commar_text_substr')) {
     function commar_text_substr(string $value, int $start, ?int $length = null): string
     {

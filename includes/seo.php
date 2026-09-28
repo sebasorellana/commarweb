@@ -6,21 +6,18 @@ $seo = $seo ?? [];
 $siteName = 'COMMAR GROUP';
 $pageTitle = $seo['title'] ?? $siteName;
 $metaTitle = $pageTitle . ' | ' . $siteName;
-$description = $seo['description'] ?? 'Estudio de arquitectura contemporánea enfocado en diseño radical, manifiestos espaciales y obras de alto impacto.';
+$description = $seo['description'] ?? 'Estudio de arquitectura, construcción y medio ambiente en Buenos Aires. Proyecto, gerenciamiento de obra, demoliciones, habilitaciones y seguridad e higiene.';
 $pagePath = $seo['path'] ?? '';
-$canonicalUrl = commar_absolute_url(commar_localized_path($pagePath, commar_current_lang()));
-$alternateUrls = [
-    'es-AR' => commar_absolute_url(commar_localized_path($pagePath, 'es')),
-    'en-US' => commar_absolute_url(commar_localized_path($pagePath, 'en')),
-    'pt-BR' => commar_absolute_url(commar_localized_path($pagePath, 'pt')),
-];
+// Content is only published in Spanish, so the canonical never carries ?lang= and no hreflang alternates are emitted.
+$canonicalUrl = commar_absolute_url(commar_localized_path($pagePath, 'es'));
 $ogType = $seo['og_type'] ?? 'website';
 $ogTitle = $seo['og_title'] ?? $metaTitle;
 $ogDescription = $seo['og_description'] ?? $description;
-$ogImage = commar_absolute_url($seo['image'] ?? 'img/logo-commar-500.png');
+$hasCustomOgImage = !empty($seo['image']) && $seo['image'] !== 'img/logo-commar-500.png';
+$ogImage = commar_absolute_url($hasCustomOgImage ? $seo['image'] : 'img/og-default.jpg');
 $ogImageAlt = $seo['image_alt'] ?? $pageTitle;
-$ogImageWidth = $seo['image_width'] ?? null;
-$ogImageHeight = $seo['image_height'] ?? null;
+$ogImageWidth = $hasCustomOgImage ? ($seo['image_width'] ?? null) : 1200;
+$ogImageHeight = $hasCustomOgImage ? ($seo['image_height'] ?? null) : 630;
 $twitterCard = $seo['twitter_card'] ?? 'summary_large_image';
 $twitterTitle = $seo['twitter_title'] ?? $ogTitle;
 $twitterDescription = $seo['twitter_description'] ?? $ogDescription;
@@ -42,12 +39,8 @@ $recaptchaVersion = commar_recaptcha_version();
     <meta name="author" content="COMMAR GROUP">
     <meta name="theme-color" content="#0a0a0a">
     <link rel="canonical" href="<?php echo htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8'); ?>">
-<?php foreach ($alternateUrls as $hreflang => $alternateUrl): ?>
-    <link rel="alternate" hreflang="<?php echo htmlspecialchars($hreflang, ENT_QUOTES, 'UTF-8'); ?>" href="<?php echo htmlspecialchars($alternateUrl, ENT_QUOTES, 'UTF-8'); ?>">
-<?php endforeach; ?>
-    <link rel="alternate" hreflang="x-default" href="<?php echo htmlspecialchars($alternateUrls['es-AR'], ENT_QUOTES, 'UTF-8'); ?>">
-    <link rel="icon" type="image/png" href="img/logo-commar-500.png">
-    <link rel="apple-touch-icon" href="img/logo-commar-500.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
 
     <meta property="og:locale" content="<?php echo htmlspecialchars($ogLocale, ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="og:type" content="<?php echo htmlspecialchars($ogType, ENT_QUOTES, 'UTF-8'); ?>">

@@ -17,7 +17,7 @@ commar_admin_require_valid_csrf();
 function commar_admin_work_slug(string $value): string
 {
     $value = trim($value);
-    $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+    $ascii = commar_text_ascii($value);
     $value = $ascii !== false ? $ascii : $value;
     $value = strtolower($value);
     $value = preg_replace('/[^a-z0-9]+/', '-', $value) ?? '';

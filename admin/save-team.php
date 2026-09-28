@@ -41,7 +41,7 @@ foreach ($postedMembers as $key => $member) {
             exit;
         }
 
-        $baseName = preg_replace('/[^a-z0-9]+/', '-', strtolower(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $name) ?: $name)) ?: 'miembro';
+        $baseName = preg_replace('/[^a-z0-9]+/', '-', strtolower(commar_text_ascii($name) ?: $name)) ?: 'miembro';
 
         try {
             $image = commar_admin_store_uploaded_image(

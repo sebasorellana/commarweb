@@ -10,7 +10,7 @@ $menuItems = $menuItems ?? commar_menu_items('header');
 <?php if ($headerVariant === 'home'): ?>
     <nav id="site-header-nav" class="site-header-nav fixed top-0 left-0 w-full z-[100] px-6 md:px-10 py-8 flex justify-between items-center text-white" data-site-header>
         <a href="<?php echo htmlspecialchars(commar_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="site-logo-link" aria-label="COMMAR GROUP, volver al inicio">
-            <img src="img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578" class="site-logo">
+            <img src="img/logo-commar-120.png" alt="COMMAR GROUP" width="120" height="139" decoding="async" class="site-logo">
             <span class="site-logo-text">Commar Group</span>
         </a>
         <div class="flex items-center gap-4">
@@ -49,7 +49,7 @@ $menuItems = $menuItems ?? commar_menu_items('header');
     <div id="menu-content" class="menu-overlay fixed inset-0 bg-white text-black z-[200] flex flex-col p-6 md:p-10 justify-between" aria-hidden="true">
         <div class="flex justify-between items-center text-black">
             <a href="<?php echo htmlspecialchars(commar_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="site-logo-link site-logo-link-overlay" aria-label="COMMAR GROUP, volver al inicio">
-                <img src="img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578" class="site-logo">
+                <img src="img/logo-commar-120.png" alt="COMMAR GROUP" width="120" height="139" decoding="async" class="site-logo">
                 <span class="site-logo-text">Commar Group</span>
             </a>
             <button id="menu-close" class="p-4 border border-black/10 rounded-full hover:bg-black hover:text-white transition-colors" type="button" aria-label="Cerrar menú">
@@ -77,7 +77,7 @@ $menuItems = $menuItems ?? commar_menu_items('header');
 <?php else: ?>
     <nav id="site-header-nav" class="site-header-nav fixed top-0 left-0 w-full z-[100] px-6 md:px-10 py-8 flex justify-between items-center text-white" data-site-header>
         <a href="<?php echo htmlspecialchars(commar_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="site-logo-link" aria-label="COMMAR GROUP, volver al inicio">
-            <img src="img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578" class="site-logo">
+            <img src="img/logo-commar-120.png" alt="COMMAR GROUP" width="120" height="139" decoding="async" class="site-logo">
             <span class="site-logo-text">Commar Group</span>
         </a>
         <div class="flex items-center gap-4">
@@ -116,7 +116,7 @@ $menuItems = $menuItems ?? commar_menu_items('header');
     <div id="menu-content" class="menu-overlay fixed inset-0 bg-white text-black z-[200] flex flex-col p-6 md:p-10 justify-between" aria-hidden="true">
         <div class="flex justify-between items-center text-black">
             <a href="<?php echo htmlspecialchars(commar_url('index.php'), ENT_QUOTES, 'UTF-8'); ?>" class="site-logo-link site-logo-link-overlay" aria-label="COMMAR GROUP, volver al inicio">
-                <img src="img/logo-commar-500.png" alt="COMMAR GROUP" width="500" height="578" class="site-logo">
+                <img src="img/logo-commar-120.png" alt="COMMAR GROUP" width="120" height="139" decoding="async" class="site-logo">
                 <span class="site-logo-text">Commar Group</span>
             </a>
             <button id="menu-close" class="p-4 border border-black/10 rounded-full hover:bg-black hover:text-white transition-colors" type="button" aria-label="Cerrar menú">

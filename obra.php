@@ -10,6 +10,14 @@
     $project = $slug !== '' ? commar_project_by_slug($slug) : null;
     $otherProjects = [];
 
+    if (!$project && $slug !== '') {
+        $legacyProject = commar_project_by_legacy_slug($slug);
+        if ($legacyProject) {
+            header('Location: ' . commar_absolute_url(commar_work_url($legacyProject['slug'])), true, 301);
+            exit;
+        }
+    }
+
     if (!$project) {
         http_response_code(404);
         $seo = [
@@ -49,16 +57,23 @@
                         'name' => 'COMMAR GROUP',
                     ],
                 ],
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'BreadcrumbList',
+                    'itemListElement' => [
+                        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Inicio', 'item' => commar_absolute_url('')],
+                        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Obras', 'item' => commar_absolute_url('obras.php')],
+                        ['@type' => 'ListItem', 'position' => 3, 'name' => $project['title'], 'item' => commar_absolute_url(commar_work_url($project['slug']))],
+                    ],
+                ],
             ],
         ];
     }
 
     include __DIR__ . '/includes/seo.php';
     ?>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
-    <link rel="stylesheet" href="style.css?v=20260724-logo-colors">
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20260928-perf">
 </head>
 <body>
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
@@ -79,7 +94,7 @@
         <?php else: ?>
             <section class="project-detail-hero" aria-labelledby="project-detail-title">
                 <div class="project-detail-hero-media">
-                    <img src="<?php echo htmlspecialchars($project['img'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($project['hero_alt'], ENT_QUOTES, 'UTF-8'); ?>" width="2000" height="1333" fetchpriority="high" decoding="async" class="project-detail-hero-image">
+                    <img src="<?php echo htmlspecialchars($project['img'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo commar_image_srcset_attrs((string) $project['img'], (int) ($project['img_width'] ?: 2000)); ?> alt="<?php echo htmlspecialchars($project['hero_alt'], ENT_QUOTES, 'UTF-8'); ?>" width="2000" height="1333" fetchpriority="high" decoding="async" class="project-detail-hero-image">
                     <div class="project-detail-hero-overlay"></div>
                 </div>
 

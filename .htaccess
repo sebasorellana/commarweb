@@ -3,6 +3,7 @@
 </IfModule>
 
 AddType image/webp .webp
+AddType font/woff2 .woff2
 
 <IfModule mod_expires.c>
     ExpiresActive On
@@ -23,14 +24,16 @@ AddType image/webp .webp
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always unset X-Powered-By
 
-    Header append Vary Accept env=accept
     <FilesMatch "\.(css|js|jpg|jpeg|png|svg|webp|woff2)$">
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
+    # JPG/PNG requests may be answered with the WebP sibling depending on Accept.
+    <FilesMatch "\.(jpe?g|png|webp)$">
+        Header append Vary Accept
+    </FilesMatch>
+    # Revalidate public HTML on every visit without disabling the back/forward cache (admin/ keeps no-store).
     <FilesMatch "\.(html|php)$">
-        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
-        Header set Pragma "no-cache"
-        Header set Expires "0"
+        Header set Cache-Control "no-cache, must-revalidate"
     </FilesMatch>
 </IfModule>
 
@@ -40,6 +43,10 @@ AddType image/webp .webp
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Single canonical host: www.commargroup.com.ar -> commargroup.com.ar
+    RewriteCond %{HTTP_HOST} ^www\.commargroup\.com\.ar$ [NC]
+    RewriteRule ^ https://commargroup.com.ar%{REQUEST_URI} [R=301,L,NE]
 
     RewriteRule ^data(?:/|$) - [F,L,NC]
 
@@ -76,4 +83,11 @@ AddType image/webp .webp
     RewriteRule ^newsletter-gracias$ newsletter-gracias.php [L,QSA]
     RewriteRule ^articulos/([a-z0-9-]+)$ articulo.php?slug=$1 [L,QSA]
     RewriteRule ^obras/([a-z0-9-]+)$ obra.php?slug=$1 [L,QSA]
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+    # Branded 404 for missing pages (static assets keep Apache's lightweight 404).
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !\.(?:jpe?g|png|webp|gif|svg|ico|css|js|map|woff2?|pdf|txt|xml)$ [NC]
+    RewriteRule ^ 404.php [L]
 </IfModule>

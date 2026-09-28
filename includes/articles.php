@@ -82,10 +82,31 @@ if (!function_exists('commar_find_article_by_slug')) {
             return null;
         }
 
-        $statement = commar_db()->prepare('SELECT * FROM commar_articles WHERE slug = :slug LIMIT 1');
-        $statement->execute(['slug' => $slug]);
-        $article = $statement->fetch();
+        return commar_cache_remember('article:' . $slug, static function () use ($slug): ?array {
+            $statement = commar_db()->prepare('SELECT * FROM commar_articles WHERE slug = :slug LIMIT 1');
+            $statement->execute(['slug' => $slug]);
+            $article = $statement->fetch();
 
-        return is_array($article) ? commar_normalize_article_row($article) : null;
+            return is_array($article) ? commar_normalize_article_row($article) : null;
+        });
+    }
+}
+
+if (!function_exists('commar_find_article_by_legacy_slug')) {
+    // Old slugs split accented words ("declaraci-on"); match them ignoring hyphens so they can 301 to the current slug.
+    function commar_find_article_by_legacy_slug(string $slug): ?array
+    {
+        $needle = str_replace('-', '', $slug);
+        if ($needle === '' || !preg_match('/^[a-z0-9-]+$/', $slug)) {
+            return null;
+        }
+
+        foreach (commar_articles() as $article) {
+            if (str_replace('-', '', $article['slug']) === $needle) {
+                return $article;
+            }
+        }
+
+        return null;
     }
 }

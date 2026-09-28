@@ -58,11 +58,9 @@ $aboutHero = commar_page_hero('el_estudio');
     ];
     include __DIR__ . '/includes/seo.php';
     ?>
-    <link rel="preload" as="image" href="<?php echo htmlspecialchars((string) $aboutHero['image'], ENT_QUOTES, 'UTF-8'); ?>" fetchpriority="high">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
-    <link rel="stylesheet" href="style.css?v=20260724-logo-colors">
+    <?php echo commar_image_preload_tag((string) $aboutHero['image'], (int) $aboutHero['width']); ?>
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20260928-perf">
 </head>
 <body>
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
@@ -74,7 +72,7 @@ $aboutHero = commar_page_hero('el_estudio');
     <main>
         <section class="about-hero" aria-labelledby="about-hero-title">
             <div class="about-hero-media" aria-hidden="true">
-                <img src="<?php echo htmlspecialchars((string) $aboutHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $aboutHero['width']; ?>" height="<?php echo (int) $aboutHero['height']; ?>" fetchpriority="high" decoding="async" class="about-hero-image">
+                <img src="<?php echo htmlspecialchars((string) $aboutHero['image'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo commar_image_srcset_attrs((string) $aboutHero['image'], (int) $aboutHero['width']); ?> alt="" width="<?php echo (int) $aboutHero['width']; ?>" height="<?php echo (int) $aboutHero['height']; ?>" fetchpriority="high" decoding="async" class="about-hero-image">
                 <div class="about-hero-overlay"></div>
             </div>
             <div class="site-shell-wide about-hero-content">
@@ -133,8 +131,8 @@ $aboutHero = commar_page_hero('el_estudio');
         <section class="about-section about-history" aria-labelledby="about-history-title">
             <div class="site-shell-wide about-history-grid">
                 <div class="about-founder-card" data-history-images-reveal>
-                    <img src="img/reunion.jpg" alt="Reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="about-founder-image">
-                    <img src="img/reunion2.jpg" alt="Segunda reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="about-founder-image">
+                    <img src="img/reunion.jpg"<?php echo commar_image_srcset_attrs('img/reunion.jpg', 2000, '(max-width: 900px) 100vw, 50vw'); ?> alt="Reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="about-founder-image">
+                    <img src="img/reunion2.jpg"<?php echo commar_image_srcset_attrs('img/reunion2.jpg', 2000, '(max-width: 900px) 100vw, 50vw'); ?> alt="Segunda reunión de trabajo del equipo de COMMAR GROUP" width="2000" height="1333" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="about-founder-image">
                 </div>
 
                 <div class="about-history-content">

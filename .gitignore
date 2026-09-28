@@ -2,3 +2,4 @@
 Archive.zip
 admin/config.php
 includes/db-config.php
+data/cache/

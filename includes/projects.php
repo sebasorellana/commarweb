@@ -6,7 +6,7 @@ if (!function_exists('commar_slugify')) {
     function commar_slugify(string $value): string
     {
         $value = trim($value);
-        $normalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+        $normalized = commar_text_ascii($value);
         $value = $normalized !== false ? $normalized : $value;
         $value = strtolower($value);
         $value = preg_replace('/[^a-z0-9]+/', '-', $value) ?? '';
@@ -242,6 +242,25 @@ function commar_project_by_slug(string $slug): ?array
 
         return is_array($project) ? commar_normalize_project_row($project) : null;
     });
+}
+
+if (!function_exists('commar_project_by_legacy_slug')) {
+    // Old slugs split accented words ("declaraci-on"); match them ignoring hyphens so they can 301 to the current slug.
+    function commar_project_by_legacy_slug(string $slug): ?array
+    {
+        $needle = str_replace('-', '', $slug);
+        if ($needle === '' || preg_match('/^[a-z0-9-]+$/', $slug) !== 1) {
+            return null;
+        }
+
+        foreach (commar_projects() as $project) {
+            if (str_replace('-', '', $project['slug']) === $needle) {
+                return $project;
+            }
+        }
+
+        return null;
+    }
 }
 
 if (!function_exists('commar_static_projects')) {

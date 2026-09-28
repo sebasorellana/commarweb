@@ -72,14 +72,21 @@ $contactEmail = commar_contact_email();
     ];
     $focusedWorks = $focusedWorksCopy[$currentLang];
     $featuredProjects = commar_get_focused_works($currentLang);
-    $socialImage = $homeSocialImage !== '' ? $homeSocialImage : (string) ($homeHeroFirstImage['path'] ?? $homeHeroImage);
-    $socialImageWidth = $homeSocialImage !== '' ? $homeSocialImageWidth : (int) ($homeHeroFirstImage['width'] ?? $homeHeroWidth);
-    $socialImageHeight = $homeSocialImage !== '' ? $homeSocialImageHeight : (int) ($homeHeroFirstImage['height'] ?? $homeHeroHeight);
+    // The portrait hero crops badly in link previews, so fall back to the 1200x630 share image.
+    $socialImage = $homeSocialImage !== '' ? $homeSocialImage : 'img/og-default.jpg';
+    $socialImageWidth = $homeSocialImage !== '' ? $homeSocialImageWidth : 1200;
+    $socialImageHeight = $homeSocialImage !== '' ? $homeSocialImageHeight : 630;
+    $homeMetaDescription = 'Estudio de arquitectura, construcción y medio ambiente en Buenos Aires. Proyecto, gerenciamiento de obra, demoliciones, habilitaciones y seguridad e higiene.';
+    $contactAddressLines = commar_contact_address_lines();
+    $sameAs = array_values(array_filter([
+        trim((string) commar_setting('instagram_url')),
+        trim((string) commar_setting('linkedin_url')),
+    ]));
     $seo = [
-        'title' => 'Estudio de arquitectura contemporánea',
-        'description' => 'COMMAR GROUP es un estudio de arquitectura contemporánea que diseña espacios de alto impacto, obras radicales y manifiestos espaciales para clientes globales.',
+        'title' => 'Estudio de arquitectura y construcción en Buenos Aires',
+        'description' => $homeMetaDescription,
         'og_title' => $homeSocialTitle !== '' ? $homeSocialTitle : 'COMMAR GROUP | Estudio de arquitectura contemporánea',
-        'og_description' => $homeSocialDescription !== '' ? $homeSocialDescription : 'COMMAR GROUP es un estudio de arquitectura contemporánea que diseña espacios de alto impacto, obras radicales y manifiestos espaciales para clientes globales.',
+        'og_description' => $homeSocialDescription !== '' ? $homeSocialDescription : $homeMetaDescription,
         'path' => '',
         'image' => $socialImage,
         'image_alt' => $homeSocialTitle !== '' ? $homeSocialTitle : 'Visual arquitectónico de COMMAR GROUP',
@@ -89,12 +96,22 @@ $contactEmail = commar_contact_email();
         'json_ld' => [
             [
                 '@context' => 'https://schema.org',
-                '@type' => 'Organization',
+                '@type' => 'GeneralContractor',
                 'name' => 'COMMAR GROUP',
                 'url' => commar_absolute_url(''),
                 'logo' => commar_absolute_url('img/logo-commar-500.png'),
+                'image' => commar_absolute_url('img/og-default.jpg'),
                 'email' => $contactEmail,
-                'description' => 'Estudio de arquitectura contemporánea con base creativa en Buenos Aires y presencia internacional.',
+                'description' => $homeMetaDescription,
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'streetAddress' => $contactAddressLines[0] ?? '',
+                    'addressLocality' => $contactAddressLines[1] ?? 'Buenos Aires',
+                    'addressRegion' => 'CABA',
+                    'addressCountry' => 'AR',
+                ],
+                'areaServed' => 'Buenos Aires',
+                'sameAs' => $sameAs,
                 'contactPoint' => [
                     '@type' => 'ContactPoint',
                     'contactType' => 'customer support',
@@ -112,9 +129,9 @@ $contactEmail = commar_contact_email();
             [
                 '@context' => 'https://schema.org',
                 '@type' => 'WebPage',
-                'name' => 'COMMAR GROUP | Estudio de arquitectura contemporánea',
+                'name' => 'COMMAR GROUP | Estudio de arquitectura y construcción en Buenos Aires',
                 'url' => commar_absolute_url(''),
-                'description' => 'COMMAR GROUP es un estudio de arquitectura contemporánea que diseña espacios de alto impacto, obras radicales y manifiestos espaciales para clientes globales.',
+                'description' => $homeMetaDescription,
                 'isPartOf' => [
                     '@type' => 'WebSite',
                     'name' => 'COMMAR GROUP',
@@ -140,11 +157,9 @@ $contactEmail = commar_contact_email();
     ];
     include __DIR__ . '/includes/seo.php';
     ?>
-    <link rel="preload" as="image" href="<?php echo htmlspecialchars($homeHeroImage, ENT_QUOTES, 'UTF-8'); ?>" fetchpriority="high">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
-    <link rel="stylesheet" href="style.css?v=20260724-logo-colors">
+    <?php echo commar_image_preload_tag((string) ($homeHeroFirstImage['path'] ?? $homeHeroImage), (int) ($homeHeroFirstImage['width'] ?? $homeHeroWidth)); ?>
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20260928-perf">
 </head>
 <body>
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
@@ -155,12 +170,12 @@ $contactEmail = commar_contact_email();
 
     <main>
     <section id="hero-home" class="hero-reveal-section" aria-labelledby="hero-home-title">
-        <h1 id="hero-home-title" class="sr-only">COMMAR GROUP, estudio de arquitectura contemporánea y diseño espacial</h1>
+        <h1 id="hero-home-title" class="sr-only">COMMAR GROUP, estudio de arquitectura, construcción y medio ambiente en Buenos Aires</h1>
 
         <div class="hero-reveal-container">
             <div class="hero-reveal-media" aria-hidden="true" data-hero-carousel data-hero-carousel-speed="<?php echo $homeHeroCarouselSpeed; ?>">
                 <?php foreach ($homeHeroImages as $index => $image): ?>
-                    <img src="<?php echo htmlspecialchars((string) $image['path'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) ($image['width'] ?? $homeHeroWidth); ?>" height="<?php echo (int) ($image['height'] ?? $homeHeroHeight); ?>" fetchpriority="<?php echo $index === 0 ? 'high' : 'auto'; ?>" loading="<?php echo commar_image_loading_attr($index === 0 ? 'eager' : 'lazy'); ?>" decoding="async" class="hero-reveal-image<?php echo $index === 0 ? ' is-active' : ''; ?>">
+                    <img src="<?php echo htmlspecialchars((string) $image['path'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo commar_image_srcset_attrs((string) $image['path'], (int) ($image['width'] ?? $homeHeroWidth)); ?> alt="" width="<?php echo (int) ($image['width'] ?? $homeHeroWidth); ?>" height="<?php echo (int) ($image['height'] ?? $homeHeroHeight); ?>" fetchpriority="<?php echo $index === 0 ? 'high' : 'auto'; ?>" loading="<?php echo commar_image_loading_attr($index === 0 ? 'eager' : 'lazy'); ?>" decoding="async" class="hero-reveal-image<?php echo $index === 0 ? ' is-active' : ''; ?>">
                 <?php endforeach; ?>
                 <div class="hero-reveal-overlay" aria-hidden="true"></div>
             </div>
@@ -191,7 +206,7 @@ $contactEmail = commar_contact_email();
             <div class="studio-overview-grid">
                 <div class="studio-overview-media" data-scroll-reveal="left">
                     <picture>
-                        <source srcset="img/romina-lo-conte-mobile.jpg" media="(max-width: 767px)">
+                        <source srcset="<?php echo htmlspecialchars(commar_image_src('img/romina-lo-conte-mobile.jpg'), ENT_QUOTES, 'UTF-8'); ?>" media="(max-width: 767px)">
                         <img src="img/romina-lo-conte.jpg" alt="Retrato de la arquitecta Romina Lo Conte, fundadora y directora creativa de COMMAR GROUP" width="852" height="1280" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="studio-overview-image">
                     </picture>
                 </div>
@@ -267,7 +282,7 @@ $contactEmail = commar_contact_email();
         <div class="shader-carousel" data-project-carousel>
             <div class="shader-carousel-media" aria-hidden="true">
                 <?php foreach ($featuredProjects as $projectIndex => $project): ?>
-                    <img src="<?php echo htmlspecialchars($project['img'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $project['img_width']; ?>" height="<?php echo (int) $project['img_height']; ?>" loading="<?php echo commar_image_loading_attr($projectIndex === 0 ? 'eager' : 'lazy'); ?>" decoding="async" class="shader-carousel-image<?php echo $projectIndex === 0 ? ' is-active' : ''; ?>">
+                    <img src="<?php echo htmlspecialchars($project['img'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo commar_image_srcset_attrs((string) $project['img'], (int) $project['img_width']); ?> alt="" width="<?php echo (int) $project['img_width']; ?>" height="<?php echo (int) $project['img_height']; ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="shader-carousel-image<?php echo $projectIndex === 0 ? ' is-active' : ''; ?>">
                 <?php endforeach; ?>
             </div>
             <div class="shader-carousel-scrim" aria-hidden="true"></div>

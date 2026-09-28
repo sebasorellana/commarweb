@@ -23,10 +23,8 @@ $seo = [
 <html lang="<?php echo htmlspecialchars(commar_lang_attr(), ENT_QUOTES, 'UTF-8'); ?>">
 <head>
     <?php include __DIR__ . '/includes/seo.php'; ?>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
-    <link rel="stylesheet" href="style.css?v=20260724-logo-colors">
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20260928-perf">
 </head>
 <body>
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
@@ -38,7 +36,7 @@ $seo = [
     <main>
         <section class="page-hero-section" aria-labelledby="jobs-title">
             <div class="page-hero-media" aria-hidden="true">
-                <img src="<?php echo htmlspecialchars((string) $jobsHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $jobsHero['width']; ?>" height="<?php echo (int) $jobsHero['height']; ?>" fetchpriority="high" decoding="async" class="page-hero-image">
+                <img src="<?php echo htmlspecialchars((string) $jobsHero['image'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo commar_image_srcset_attrs((string) $jobsHero['image'], (int) $jobsHero['width']); ?> alt="" width="<?php echo (int) $jobsHero['width']; ?>" height="<?php echo (int) $jobsHero['height']; ?>" fetchpriority="high" decoding="async" class="page-hero-image">
                 <div class="page-hero-overlay"></div>
             </div>
             <div class="site-shell-wide page-hero-content">

@@ -61,11 +61,9 @@ $projectHero = commar_page_hero('servicio_proyectos');
     ];
     include __DIR__ . '/includes/seo.php';
     ?>
-    <link rel="preload" as="image" href="img/proyecto-01.jpg" fetchpriority="high">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;900&display=swap">
-    <link rel="stylesheet" href="style.css?v=20260724-logo-colors">
+    <?php echo commar_image_preload_tag((string) $projectHero['image'], (int) $projectHero['width']); ?>
+    <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20260928-perf">
 </head>
 <body>
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
@@ -77,7 +75,7 @@ $projectHero = commar_page_hero('servicio_proyectos');
     <main>
         <section class="service-detail-hero" aria-labelledby="service-detail-title">
             <div class="service-detail-hero-media" aria-hidden="true">
-                <img src="<?php echo htmlspecialchars((string) $projectHero['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="" width="<?php echo (int) $projectHero['width']; ?>" height="<?php echo (int) $projectHero['height']; ?>" fetchpriority="high" decoding="async" class="service-detail-hero-image">
+                <img src="<?php echo htmlspecialchars((string) $projectHero['image'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo commar_image_srcset_attrs((string) $projectHero['image'], (int) $projectHero['width']); ?> alt="" width="<?php echo (int) $projectHero['width']; ?>" height="<?php echo (int) $projectHero['height']; ?>" fetchpriority="high" decoding="async" class="service-detail-hero-image">
                 <div class="service-detail-hero-overlay"></div>
             </div>
 

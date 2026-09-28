@@ -193,6 +193,54 @@ if (!function_exists('commar_image_src')) {
     }
 }
 
+if (!function_exists('commar_image_srcset')) {
+    // Uses the "-960" variant generated next to wide images; srcset is not covered by commar_image_rewrite_html.
+    function commar_image_srcset(string $path, int $width): string
+    {
+        $path = trim($path);
+        if ($width <= 960 || !preg_match('#^img/[^"\'\s]+\.(?:jpe?g|png)$#i', $path)) {
+            return '';
+        }
+
+        $variant = preg_replace('/(\.(?:jpe?g|png))$/i', '-960$1', $path) ?? $path;
+        if (!is_file(dirname(__DIR__) . '/' . $variant)) {
+            return '';
+        }
+
+        return commar_image_src($variant) . ' 960w, ' . commar_image_src($path) . ' ' . $width . 'w';
+    }
+}
+
+if (!function_exists('commar_image_srcset_attrs')) {
+    function commar_image_srcset_attrs(string $path, int $width, string $sizes = '100vw'): string
+    {
+        $srcset = commar_image_srcset($path, $width);
+        if ($srcset === '') {
+            return '';
+        }
+
+        return ' srcset="' . htmlspecialchars($srcset, ENT_QUOTES, 'UTF-8') . '" sizes="' . htmlspecialchars($sizes, ENT_QUOTES, 'UTF-8') . '"';
+    }
+}
+
+if (!function_exists('commar_image_preload_tag')) {
+    function commar_image_preload_tag(string $path, int $width, string $sizes = '100vw'): string
+    {
+        $path = trim($path);
+        if ($path === '') {
+            return '';
+        }
+
+        $tag = '<link rel="preload" as="image" href="' . htmlspecialchars(commar_image_src($path), ENT_QUOTES, 'UTF-8') . '"';
+        $srcset = commar_image_srcset($path, $width);
+        if ($srcset !== '') {
+            $tag .= ' imagesrcset="' . htmlspecialchars($srcset, ENT_QUOTES, 'UTF-8') . '" imagesizes="' . htmlspecialchars($sizes, ENT_QUOTES, 'UTF-8') . '"';
+        }
+
+        return $tag . ' fetchpriority="high">';
+    }
+}
+
 if (!function_exists('commar_image_rewrite_html')) {
     function commar_image_rewrite_html(string $html): string
     {

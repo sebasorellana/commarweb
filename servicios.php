@@ -49,7 +49,7 @@ $servicesHero = commar_page_hero('servicios');
             'title' => 'Habilitaciones',
             'description' => 'Gestión normativa, documentación y acompañamiento técnico para habilitar locales, actividades y espacios comerciales.',
             'href' => 'contacto.php?asunto=Habilitaciones',
-            'image' => 'img/obras/alto-palermo',
+            'image' => 'img/obras/alto-palermo.jpg',
             'image_width' => 1200,
             'image_height' => 900,
         ],

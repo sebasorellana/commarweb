@@ -427,12 +427,19 @@ function commar_admin_send_password_reset(string $identifier): bool
         'El enlace vence en 1 hora. Si no solicitaste este cambio, podés ignorar este email.',
     ]);
 
+    // Must be a domain covered by the server's SPF record; commar.group has no DNS, so mail from it was silently dropped.
+    $sender = 'no-reply@commargroup.com.ar';
     $headers = [
-        'From: COMMAR GROUP <no-reply@commar.group>',
+        'From: COMMAR GROUP <' . $sender . '>',
         'Content-Type: text/plain; charset=UTF-8',
     ];
 
-    return @mail((string) $user['email'], 'Restablecer clave | COMMAR GROUP', $body, implode("\r\n", $headers));
+    $sent = @mail((string) $user['email'], 'Restablecer clave | COMMAR GROUP', $body, implode("\r\n", $headers), '-f' . $sender);
+    if (!$sent) {
+        error_log('COMMAR: no se pudo enviar el email de recuperación de clave al usuario #' . (int) $user['id']);
+    }
+
+    return $sent;
 }
 
 function commar_admin_get_password_reset(string $token): ?array

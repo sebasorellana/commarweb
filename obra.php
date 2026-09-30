@@ -73,7 +73,7 @@
     include __DIR__ . '/includes/seo.php';
     ?>
     <link rel="preload" href="fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="style.css?v=20260928-perf">
+    <link rel="stylesheet" href="style.css?v=20260930-works-grid2">
 </head>
 <body>
     <?php include __DIR__ . '/includes/google-tag-manager-body.php'; ?>
@@ -132,6 +132,51 @@
                 </div>
             </section>
 
+            <?php
+            $projectGallery = array_values(array_filter(
+                $project['gallery'] ?? [],
+                static fn ($item): bool => is_array($item) && trim((string) ($item['path'] ?? '')) !== ''
+            ));
+            ?>
+            <?php if (count($projectGallery) > 1): ?>
+                <section class="project-gallery-section" aria-labelledby="project-gallery-title">
+                    <div class="site-shell-wide">
+                        <div class="project-gallery-header">
+                            <span class="project-detail-kicker">Galería</span>
+                            <h2 id="project-gallery-title" class="project-gallery-title"><?php echo count($projectGallery); ?> <?php echo count($projectGallery) === 1 ? 'imagen' : 'imágenes'; ?></h2>
+                        </div>
+
+                        <ul class="project-gallery-grid" data-project-gallery>
+                            <?php foreach ($projectGallery as $galleryIndex => $galleryItem): ?>
+                                <?php
+                                $galleryPath = (string) $galleryItem['path'];
+                                $galleryAlt = trim((string) ($galleryItem['alt'] ?? '')) ?: $project['title'];
+                                $galleryWidth = (int) ($galleryItem['width'] ?? 0) ?: 1400;
+                                $galleryHeight = (int) ($galleryItem['height'] ?? 0) ?: 933;
+                                ?>
+                                <li class="project-gallery-item<?php echo $galleryWidth < $galleryHeight ? ' is-portrait' : ''; ?>">
+                                    <button type="button" class="project-gallery-button" data-project-gallery-item data-src="<?php echo htmlspecialchars($galleryPath, ENT_QUOTES, 'UTF-8'); ?>" data-alt="<?php echo htmlspecialchars($galleryAlt, ENT_QUOTES, 'UTF-8'); ?>" aria-label="Ampliar imagen <?php echo $galleryIndex + 1; ?> de <?php echo count($projectGallery); ?>">
+                                        <img src="<?php echo htmlspecialchars($galleryPath, ENT_QUOTES, 'UTF-8'); ?>"<?php echo commar_image_srcset_attrs($galleryPath, $galleryWidth, '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'); ?> alt="<?php echo htmlspecialchars($galleryAlt, ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo $galleryWidth; ?>" height="<?php echo $galleryHeight; ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async">
+                                    </button>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+
+                    <div class="project-lightbox" data-project-lightbox hidden role="dialog" aria-modal="true" aria-label="Galería de <?php echo htmlspecialchars($project['title'], ENT_QUOTES, 'UTF-8'); ?>">
+                        <button type="button" class="project-lightbox-close" data-project-lightbox-close aria-label="Cerrar galería">&times;</button>
+                        <?php if (count($projectGallery) > 1): ?>
+                            <button type="button" class="project-lightbox-nav is-prev" data-project-lightbox-prev aria-label="Imagen anterior">&lsaquo;</button>
+                            <button type="button" class="project-lightbox-nav is-next" data-project-lightbox-next aria-label="Imagen siguiente">&rsaquo;</button>
+                        <?php endif; ?>
+                        <figure class="project-lightbox-figure">
+                            <img src="" alt="" class="project-lightbox-image" data-project-lightbox-image>
+                            <figcaption class="project-lightbox-caption" data-project-lightbox-caption></figcaption>
+                        </figure>
+                    </div>
+                </section>
+            <?php endif; ?>
+
             <section class="project-detail-cta-section">
                 <div class="site-shell-wide project-detail-cta">
                     <a href="<?php echo htmlspecialchars(commar_url('obras.php'), ENT_QUOTES, 'UTF-8'); ?>" class="studio-overview-link">Volver a obras</a>
@@ -147,31 +192,33 @@
                             <h2 id="project-detail-related-title" class="project-detail-related-title">Seguí explorando otros proyectos del estudio.</h2>
                         </div>
 
-                        <div class="project-detail-related-grid">
+                        <ul class="works-grid works-grid-related">
                             <?php foreach (array_slice($otherProjects, 0, 3) as $relatedProject): ?>
-                                <article class="project-item project-card">
-                                    <div class="project-card-media img-reveal-container">
-                                        <img src="<?php echo htmlspecialchars($relatedProject['img'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($relatedProject['title'] . ' - ' . $relatedProject['category'], ENT_QUOTES, 'UTF-8'); ?>" width="2000" height="1333" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="project-card-image">
-                                        <div class="project-card-badge">
-                                            <?php echo htmlspecialchars($relatedProject['id'], ENT_QUOTES, 'UTF-8'); ?> // <?php echo htmlspecialchars($relatedProject['category'], ENT_QUOTES, 'UTF-8'); ?>
+                                <?php
+                                $relatedMeta = array_values(array_filter([
+                                    trim((string) ($relatedProject['location'] ?? '')),
+                                    trim((string) ($relatedProject['year'] ?? '')),
+                                ]));
+                                ?>
+                                <li>
+                                    <a href="<?php echo htmlspecialchars(commar_url(commar_work_url($relatedProject['slug'])), ENT_QUOTES, 'UTF-8'); ?>" class="works-card">
+                                        <div class="works-card-media">
+                                            <img src="<?php echo htmlspecialchars($relatedProject['img'], ENT_QUOTES, 'UTF-8'); ?>"<?php echo commar_image_srcset_attrs((string) $relatedProject['img'], (int) ($relatedProject['img_width'] ?: 1400), '(min-width: 1024px) 30vw, (min-width: 640px) 48vw, 100vw'); ?> alt="<?php echo htmlspecialchars($relatedProject['hero_alt'] ?: $relatedProject['title'], ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo (int) ($relatedProject['img_width'] ?: 1400); ?>" height="<?php echo (int) ($relatedProject['img_height'] ?: 933); ?>" loading="<?php echo commar_image_loading_attr('lazy'); ?>" decoding="async" class="works-card-image">
+                                            <?php if (trim((string) $relatedProject['category']) !== ''): ?>
+                                                <span class="works-card-badge"><?php echo htmlspecialchars($relatedProject['category'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                            <?php endif; ?>
                                         </div>
-                                    </div>
-
-                                    <div class="project-card-copy">
-                                        <div class="project-card-meta">
-                                            <span><?php echo htmlspecialchars($relatedProject['location'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                            <span><?php echo htmlspecialchars($relatedProject['year'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <div class="works-card-copy">
+                                            <h3 class="works-card-title"><?php echo htmlspecialchars($relatedProject['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                                            <?php if (!empty($relatedMeta)): ?>
+                                                <p class="works-card-meta"><?php echo htmlspecialchars(implode(' · ', $relatedMeta), ENT_QUOTES, 'UTF-8'); ?></p>
+                                            <?php endif; ?>
+                                            <span class="works-card-cta" aria-hidden="true">Ver obra</span>
                                         </div>
-                                        <h3 class="project-card-title"><?php echo htmlspecialchars($relatedProject['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
-                                        <p class="project-card-summary"><?php echo htmlspecialchars($relatedProject['summary'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                        <a href="<?php echo htmlspecialchars(commar_url(commar_work_url($relatedProject['slug'])), ENT_QUOTES, 'UTF-8'); ?>" class="project-card-cta">
-                                            <div class="project-card-cta-line"></div>
-                                            <span class="project-card-cta-text">Explorar proyecto</span>
-                                        </a>
-                                    </div>
-                                </article>
+                                    </a>
+                                </li>
                             <?php endforeach; ?>
-                        </div>
+                        </ul>
                     </div>
                 </section>
             <?php endif; ?>
@@ -179,6 +226,6 @@
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </main>
 
-    <script src="script.js?v=20260724-header-contrast" defer></script>
+    <script src="script.js?v=20260930-works-grid2" defer></script>
 </body>
 </html>

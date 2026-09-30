@@ -206,7 +206,7 @@ function commar_normalize_project_row(array $work): array
         'intro' => (string) $work['intro'],
         'description' => json_decode((string) ($work['description_json'] ?? '[]'), true) ?: [],
         'metrics' => json_decode((string) ($work['metrics_json'] ?? '[]'), true) ?: [],
-        'gallery' => [],
+        'gallery' => commar_normalize_work_row($work)['gallery'],
     ];
 }
 
